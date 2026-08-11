@@ -1,7 +1,7 @@
 import { jsPDF } from 'jspdf'
 import { OPS, type PDFDocumentProxy } from 'pdfjs-dist'
 import { loadPdfDocument } from './pdfjs'
-import { paintBoxes, type RedactionMap } from './redactions'
+import { asArray, paintBoxes, type RedactionMap } from './redactions'
 
 /**
  * Raster density for the export, as a multiple of the PDF's own 72 dpi user
@@ -9,6 +9,38 @@ import { paintBoxes, type RedactionMap } from './redactions'
  * 20-page document unmanageably large.
  */
 export const EXPORT_SCALE = 2
+
+/**
+ * WebKit refuses to back a canvas larger than roughly 16.7 million pixels, and
+ * caps each axis well below what other engines allow. Over the limit it does
+ * not throw — it hands back a blank bitmap, and `toDataURL` returns the empty
+ * `"data:,"`. That would produce a silently blank "redacted" page, which for
+ * this tool is the worst possible failure, so oversized pages are rasterised at
+ * a reduced density instead. A2 and smaller are unaffected at EXPORT_SCALE.
+ */
+const MAX_CANVAS_AREA = 16_777_216
+const MAX_CANVAS_SIDE = 8_192
+
+/** Largest scale at which this page still fits inside the canvas limits. */
+function fitExportScale(baseWidth: number, baseHeight: number): number {
+  if (!(baseWidth > 0) || !(baseHeight > 0)) return EXPORT_SCALE
+  return Math.min(
+    EXPORT_SCALE,
+    MAX_CANVAS_SIDE / baseWidth,
+    MAX_CANVAS_SIDE / baseHeight,
+    Math.sqrt(MAX_CANVAS_AREA / (baseWidth * baseHeight)),
+  )
+}
+
+/** WebKit signals a canvas it could not back by returning `"data:,"`. */
+function assertRasterised(dataUrl: string, pageNumber: number): string {
+  if (!dataUrl.startsWith('data:image/png') || dataUrl.length < 128) {
+    throw new Error(
+      `Page ${pageNumber} could not be converted to an image — this browser refused a canvas that large. Try a smaller page size.`,
+    )
+  }
+  return dataUrl
+}
 
 export interface ExportProgress {
   phase: 'render' | 'assemble' | 'verify'
@@ -59,7 +91,10 @@ export async function exportRedactedPdf(
     const page = await pdf.getPage(pageNumber)
     // Unscaled viewport = the page's true size in PDF points, rotation applied.
     const base = page.getViewport({ scale: 1 })
-    const viewport = page.getViewport({ scale: EXPORT_SCALE })
+    // Density is decided per page: a page too large for this engine's canvas
+    // gets less of it rather than a blank sheet.
+    const pageScale = fitExportScale(base.width, base.height)
+    const viewport = page.getViewport({ scale: pageScale })
 
     const canvas = document.createElement('canvas')
     canvas.width = Math.floor(viewport.width)
@@ -74,18 +109,19 @@ export async function exportRedactedPdf(
     await page.render({ canvas, viewport }).promise
 
     // Burn the boxes in. The context is scaled into unscaled PDF units so the
-    // stored coordinates apply unchanged at any export density.
-    const boxes = redactions[pageNumber]
-    if (boxes?.length) {
+    // stored coordinates apply unchanged at any export density — which is why
+    // this must use the same scale the page was just rendered at.
+    const boxes = asArray(redactions?.[pageNumber])
+    if (boxes.length) {
       ctx.save()
-      ctx.setTransform(EXPORT_SCALE, 0, 0, EXPORT_SCALE, 0, 0)
+      ctx.setTransform(pageScale, 0, 0, pageScale, 0, 0)
       paintBoxes(ctx, boxes)
       ctx.restore()
     }
 
     onProgress?.({ phase: 'assemble', page: pageNumber, total })
 
-    const png = canvas.toDataURL('image/png', 1.0)
+    const png = assertRasterised(canvas.toDataURL('image/png', 1.0), pageNumber)
     const orientation = base.width > base.height ? 'landscape' : 'portrait'
     const format: [number, number] = [base.width, base.height]
 
@@ -119,7 +155,15 @@ export async function exportRedactedPdf(
   // user's timezone offset onto every file they redact.
   doc.setCreationDate("D:20000101000000+00'00'")
 
-  const blob = doc.output('blob') as Blob
+  // jsPDF builds the Blob itself. If a engine ever hands back something else,
+  // rebuild it from the raw bytes rather than passing a non-Blob down the chain
+  // to `arrayBuffer()` and failing with an unrelated-looking error.
+  const output: unknown = doc.output('blob')
+  const blob =
+    output instanceof Blob
+      ? output
+      : new Blob([doc.output('arraybuffer') as ArrayBuffer], { type: 'application/pdf' })
+
   onProgress?.({ phase: 'verify', page: total, total })
   const verification = await verifyExport(blob)
 
@@ -136,8 +180,8 @@ export async function verifyExport(blob: Blob): Promise<VerificationReport> {
 
   // Object dictionaries are written uncompressed, so font objects can be counted
   // straight off the bytes — a check that does not depend on pdf.js at all.
-  const fontObjects = (
-    new TextDecoder('latin1').decode(bytes).match(/\/Type\s*\/Font/g) ?? []
+  const fontObjects = asArray(
+    new TextDecoder('latin1').decode(bytes).match(/\/Type\s*\/Font/g),
   ).length
 
   const check = await loadPdfDocument(bytes)
@@ -150,17 +194,27 @@ export async function verifyExport(blob: Blob): Promise<VerificationReport> {
     for (let pageNumber = 1; pageNumber <= check.numPages; pageNumber++) {
       const page = await check.getPage(pageNumber)
 
+      // Everything below comes out of pdf.js rather than out of our own code,
+      // and a page with no text at all — which is exactly what we just built —
+      // is the case most likely to hand back a missing collection instead of an
+      // empty one. Iterating that directly is what throws in WebKit.
       const content = await page.getTextContent()
-      for (const item of content.items) {
-        if ('str' in item) textCharacters += item.str.trim().length
+      for (const item of asArray(content?.items)) {
+        if (item && 'str' in item && typeof item.str === 'string') {
+          textCharacters += item.str.trim().length
+        }
       }
 
-      const { fnArray } = await page.getOperatorList()
-      textOperators += fnArray.filter(
-        (fn) => fn === OPS.showText || fn === OPS.showSpacedText || fn === OPS.setFont,
-      ).length
+      const operatorList = await page.getOperatorList()
+      // `fnArray` is array-like but not always a real Array, so it is copied
+      // rather than assumed to carry Array.prototype.filter.
+      for (const fn of Array.from(operatorList?.fnArray ?? [])) {
+        if (fn === OPS.showText || fn === OPS.showSpacedText || fn === OPS.setFont) {
+          textOperators += 1
+        }
+      }
 
-      annotations += (await page.getAnnotations()).length
+      annotations += asArray(await page.getAnnotations()).length
       page.cleanup()
     }
 

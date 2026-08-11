@@ -37,14 +37,28 @@ export function countBoxes(map: RedactionMap): number {
   return Object.values(map).reduce((total, boxes) => total + boxes.length, 0)
 }
 
+/**
+ * Coerce anything to a safely iterable array.
+ *
+ * `for (const x of undefined)` fails by looking up `Symbol.iterator` on
+ * undefined, which WebKit reports as "undefined is not a function" rather than
+ * as a null dereference — an error that reads like a missing method and sends
+ * you hunting in the wrong place. Every loop over data we did not construct
+ * ourselves goes through here.
+ */
+export function asArray<T>(value: readonly T[] | null | undefined): T[] {
+  return Array.isArray(value) ? (value as T[]) : []
+}
+
 /** Paint boxes onto a context already transformed into unscaled PDF units. */
 export function paintBoxes(
   ctx: CanvasRenderingContext2D,
-  boxes: RedactionBox[],
+  boxes: readonly RedactionBox[] | null | undefined,
   color = '#000000',
 ) {
   ctx.fillStyle = color
-  for (const box of boxes) {
+  for (const box of asArray(boxes)) {
+    if (!box) continue
     ctx.fillRect(box.x, box.y, box.width, box.height)
   }
 }

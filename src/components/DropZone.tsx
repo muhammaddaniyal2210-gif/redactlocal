@@ -54,7 +54,7 @@ export function DropZone({ onFile, loading, error }: DropZoneProps) {
           e.preventDefault()
           dragDepth.current = 0
           setDragging(false)
-          accept(e.dataTransfer.files[0])
+          accept(e.dataTransfer?.files?.[0])
         }}
         onClick={() => !loading && inputRef.current?.click()}
         onKeyDown={(e) => {
