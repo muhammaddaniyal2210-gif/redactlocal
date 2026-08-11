@@ -1,0 +1,33 @@
+{
+  "name": "redactlocal",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build && npm run prerender",
+    "lint": "oxlint",
+    "preview": "vite preview",
+    "sync:pdfjs": "rm -rf public/pdfjs && mkdir -p public/pdfjs && for d in standard_fonts cmaps wasm iccs; do cp -R node_modules/pdfjs-dist/$d public/pdfjs/$d; done",
+    "prerender": "node scripts/prerender.mjs"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "jspdf": "^4.2.1",
+    "lucide-react": "^1.31.0",
+    "pdfjs-dist": "^6.2.108",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-router-dom": "^7.18.2",
+    "tailwindcss": "^4.3.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.4",
+    "oxlint": "^1.75.0",
+    "typescript": "~6.0.2",
+    "vite": "^8.2.0"
+  }
+}
