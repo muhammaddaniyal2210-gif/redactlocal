@@ -82,10 +82,54 @@ export async function exportRedactedPdf(
   redactions: RedactionMap,
   onProgress?: (progress: ExportProgress) => void,
 ): Promise<ExportResult> {
+  // Tracks where we were when something threw, so a failure can name the page
+  // and phase even when the stack is minified beyond recognition.
+  const context = { phase: 'render' as ExportProgress['phase'], page: 0, total: pdf.numPages }
+  try {
+    return await runExport(pdf, redactions, context, onProgress)
+  } catch (err) {
+    console.error('Export Stack:', err)
+    throw new ExportFailure(err, context)
+  }
+}
+
+/** Carries the original error's stack plus where in the export it happened. */
+export class ExportFailure extends Error {
+  readonly originalStack: string
+  readonly context: { phase: string; page: number; total: number }
+
+  constructor(cause: unknown, context: { phase: string; page: number; total: number }) {
+    const message = cause instanceof Error ? cause.message : String(cause)
+    super(message, { cause })
+    this.name = 'ExportFailure'
+    this.context = { ...context }
+    this.originalStack =
+      (cause instanceof Error && cause.stack) || this.stack || '(no stack available)'
+  }
+
+  /** Everything worth pasting into a bug report, as one block of text. */
+  get details(): string {
+    return [
+      `${this.name}: ${this.message}`,
+      `at phase "${this.context.phase}", page ${this.context.page} of ${this.context.total}`,
+      '',
+      this.originalStack,
+    ].join('\n')
+  }
+}
+
+async function runExport(
+  pdf: PDFDocumentProxy,
+  redactions: RedactionMap,
+  context: { phase: ExportProgress['phase']; page: number; total: number },
+  onProgress?: (progress: ExportProgress) => void,
+): Promise<ExportResult> {
   const total = pdf.numPages
   let doc: jsPDF | null = null
 
   for (let pageNumber = 1; pageNumber <= total; pageNumber++) {
+    context.phase = 'render'
+    context.page = pageNumber
     onProgress?.({ phase: 'render', page: pageNumber, total })
 
     const page = await pdf.getPage(pageNumber)
@@ -119,6 +163,7 @@ export async function exportRedactedPdf(
       ctx.restore()
     }
 
+    context.phase = 'assemble'
     onProgress?.({ phase: 'assemble', page: pageNumber, total })
 
     const png = assertRasterised(canvas.toDataURL('image/png', 1.0), pageNumber)
@@ -164,6 +209,8 @@ export async function exportRedactedPdf(
       ? output
       : new Blob([doc.output('arraybuffer') as ArrayBuffer], { type: 'application/pdf' })
 
+  context.phase = 'verify'
+  context.page = total
   onProgress?.({ phase: 'verify', page: total, total })
   const verification = await verifyExport(blob)
 

@@ -9,7 +9,8 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "sync:pdfjs": "rm -rf public/pdfjs && mkdir -p public/pdfjs && for d in standard_fonts cmaps wasm iccs; do cp -R node_modules/pdfjs-dist/$d public/pdfjs/$d; done",
-    "prerender": "node scripts/prerender.mjs"
+    "prerender": "node scripts/prerender.mjs",
+    "build:debug": "tsc -b && vite build --mode debug && npm run prerender"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",

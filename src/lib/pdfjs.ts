@@ -4,8 +4,11 @@ import type { PDFDocumentProxy } from 'pdfjs-dist'
 // The worker, the font data and the CMaps are all served from our own origin.
 // A CDN would work in development but would break the core promise of this app:
 // with Wi-Fi off, a CDN-hosted worker never loads and nothing renders at all.
-// `?url` makes Vite emit the worker as a hashed asset next to the bundle.
-import workerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
+//
+// This points at our wrapper rather than at pdf.js's worker directly, so the
+// worker thread gets the polyfills too. `?worker&url` makes Vite bundle the
+// wrapper as a worker entry and hand back its URL.
+import workerUrl from './pdfWorker?worker&url'
 
 pdfjs.GlobalWorkerOptions.workerSrc = workerUrl
 

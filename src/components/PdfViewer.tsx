@@ -22,9 +22,11 @@ import { formatBytes, isRenderCancelled } from '../lib/pdfjs'
 import {
   downloadBlob,
   exportRedactedPdf,
+  ExportFailure,
   type ExportProgress,
   type VerificationReport,
 } from '../lib/export'
+import { collectEnvironmentReport, summariseEnvironment } from '../lib/environment'
 import { AdSlot } from './AdSlot'
 import { RedactionLayer } from './RedactionLayer'
 import { useRedactions } from '../hooks/useRedactions'
@@ -41,6 +43,12 @@ const ZOOM_STEP = 0.25
 const STAGE_PADDING = 48
 
 const clampScale = (value: number) => Math.min(MAX_SCALE, Math.max(MIN_SCALE, value))
+
+interface ExportErrorState {
+  message: string
+  /** Stack, failure phase and engine capabilities, ready to paste into a report. */
+  details: string
+}
 
 export function PdfViewer({ doc, onClose }: PdfViewerProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -59,7 +67,7 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
   const pageBoxes = boxes[pageNumber] ?? []
 
   const [exporting, setExporting] = useState<ExportProgress | null>(null)
-  const [exportError, setExportError] = useState<string | null>(null)
+  const [exportError, setExportError] = useState<ExportErrorState | null>(null)
   const [report, setReport] = useState<VerificationReport | null>(null)
 
   // A new document starts clean: page 1, 100 %, no redactions carried over.
@@ -169,7 +177,25 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
       downloadBlob(result.blob, result.fileName)
       setReport(result.verification)
     } catch (err) {
-      setExportError(err instanceof Error ? err.message : 'The export failed.')
+      // The whole diagnostic goes on screen: message, stack, and what this
+      // engine can do. On a phone there is no console to read.
+      const environment = collectEnvironmentReport()
+      const details =
+        err instanceof ExportFailure
+          ? err.details
+          : `${err instanceof Error ? `${err.name}: ${err.message}` : String(err)}\n\n${
+              (err instanceof Error && err.stack) || '(no stack available)'
+            }`
+
+      setExportError({
+        message: err instanceof Error ? err.message : String(err),
+        details: [
+          details,
+          '',
+          `userAgent: ${environment.userAgent}`,
+          summariseEnvironment(environment),
+        ].join('\n'),
+      })
     } finally {
       setExporting(null)
     }
@@ -354,10 +380,7 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
       {(report || exportError) && !busy && (
         <div className="border-t border-slate-800 px-3 py-2.5">
           {exportError ? (
-            <p className="flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300">
-              <ShieldAlert className="size-4 shrink-0" />
-              {exportError}
-            </p>
+            <ExportErrorPanel error={exportError} />
           ) : report?.clean ? (
             <>
               <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2.5">
@@ -389,6 +412,55 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
           )}
         </div>
       )}
+    </div>
+  )
+}
+
+/**
+ * Everything known about a failed export, on screen.
+ *
+ * A minified stack is close to unreadable, so the capability summary underneath
+ * it usually carries more signal — "missing: Promise.withResolvers" names the
+ * problem outright on a device you cannot attach a debugger to.
+ */
+function ExportErrorPanel({ error }: { error: ExportErrorState }) {
+  const [copied, setCopied] = useState(false)
+  const panelRef = useRef<HTMLDivElement>(null)
+
+  // The panel sits below the page stage, which can put it off-screen on a
+  // phone — a diagnostic nobody sees is not a diagnostic.
+  useEffect(() => {
+    panelRef.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+  }, [error])
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(error.details)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      // Clipboard access can be refused; the text is selectable either way.
+    }
+  }
+
+  return (
+    <div ref={panelRef} className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2.5">
+      <div className="flex items-start gap-2">
+        <ShieldAlert className="mt-0.5 size-4 shrink-0 text-red-300" />
+        <p className="min-w-0 flex-1 text-sm font-medium text-red-300">
+          The export failed — {error.message}
+        </p>
+        <button
+          type="button"
+          onClick={copy}
+          className="shrink-0 rounded border border-red-500/40 px-2 py-1 text-xs text-red-200 transition hover:bg-red-500/20"
+        >
+          {copied ? 'Copied' : 'Copy details'}
+        </button>
+      </div>
+      <pre className="mt-2 max-h-56 overflow-auto rounded bg-slate-950/70 p-3 text-[11px] leading-relaxed whitespace-pre-wrap break-words text-red-200/90 select-text">
+        {error.details}
+      </pre>
     </div>
   )
 }
