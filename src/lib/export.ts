@@ -57,8 +57,19 @@ export interface VerificationReport {
   /** Font objects in the file. A raster-only PDF needs none. */
   fontObjects: number
   annotations: number
-  /** True only when nothing above is recoverable. */
+  /**
+   * Probes that could not run on this browser.
+   *
+   * A check that throws is *not* a check that passed. Counting a failed probe
+   * as zero would let the app report "0 selectable characters" about a file it
+   * never managed to read — a false all-clear on the one claim this tool
+   * exists to make.
+   */
+  skippedChecks: string[]
+  /** Every probe ran and every probe came back zero. */
   clean: boolean
+  /** Everything that did run came back zero, but some probes were skipped. */
+  cleanAsFarAsChecked: boolean
 }
 
 export interface ExportResult {
@@ -223,15 +234,48 @@ async function runExport(
  * annotations carrying leftovers.
  */
 export async function verifyExport(blob: Blob): Promise<VerificationReport> {
+  const skipped = new Set<string>()
+
+  /**
+   * Run one probe in isolation. A probe that throws is recorded by name and
+   * contributes nothing — never a zero, which would read as "checked and
+   * clean". WebKit throws here on exactly the pages we produce: flattened,
+   * image-only, with no text streams to walk.
+   */
+  const probe = async <T>(label: string, run: () => Promise<T> | T): Promise<T | null> => {
+    try {
+      return await run()
+    } catch (err) {
+      console.error(`Verification probe "${label}" failed:`, err)
+      skipped.add(label)
+      return null
+    }
+  }
+
   const bytes = new Uint8Array(await blob.arrayBuffer())
 
   // Object dictionaries are written uncompressed, so font objects can be counted
-  // straight off the bytes — a check that does not depend on pdf.js at all.
-  const fontObjects = asArray(
-    new TextDecoder('latin1').decode(bytes).match(/\/Type\s*\/Font/g),
-  ).length
+  // straight off the bytes — a check that does not depend on pdf.js at all, and
+  // therefore survives whatever pdf.js does on this engine.
+  const fontObjects =
+    (await probe(
+      'font objects',
+      () => asArray(new TextDecoder('latin1').decode(bytes).match(/\/Type\s*\/Font/g)).length,
+    )) ?? 0
 
-  const check = await loadPdfDocument(bytes)
+  const check = await probe('reopen document', () => loadPdfDocument(bytes))
+  if (!check) {
+    return {
+      pages: 0,
+      textCharacters: 0,
+      textOperators: 0,
+      fontObjects,
+      annotations: 0,
+      skippedChecks: [...skipped],
+      clean: false,
+      cleanAsFarAsChecked: fontObjects === 0,
+    }
+  }
 
   let textCharacters = 0
   let textOperators = 0
@@ -239,31 +283,41 @@ export async function verifyExport(blob: Blob): Promise<VerificationReport> {
 
   try {
     for (let pageNumber = 1; pageNumber <= check.numPages; pageNumber++) {
-      const page = await check.getPage(pageNumber)
+      const page = await probe(`page ${pageNumber}`, () => check.getPage(pageNumber))
+      if (!page) continue
 
-      // Everything below comes out of pdf.js rather than out of our own code,
-      // and a page with no text at all — which is exactly what we just built —
-      // is the case most likely to hand back a missing collection instead of an
-      // empty one. Iterating that directly is what throws in WebKit.
-      const content = await page.getTextContent()
+      // Text extraction. This is the call that throws in Safari on image-only
+      // pages; the fallback is an empty item list, and the miss is recorded.
+      const content = await probe('text extraction', () => page.getTextContent())
       for (const item of asArray(content?.items)) {
         if (item && 'str' in item && typeof item.str === 'string') {
           textCharacters += item.str.trim().length
         }
       }
 
-      const operatorList = await page.getOperatorList()
-      // `fnArray` is array-like but not always a real Array, so it is copied
-      // rather than assumed to carry Array.prototype.filter.
+      // Content stream operators. `fnArray` is array-like but not always a real
+      // Array, so it is copied rather than assumed to carry Array.prototype.
+      const operatorList = await probe('content stream operators', () => page.getOperatorList())
       for (const fn of Array.from(operatorList?.fnArray ?? [])) {
         if (fn === OPS.showText || fn === OPS.showSpacedText || fn === OPS.setFont) {
           textOperators += 1
         }
       }
 
-      annotations += asArray(await page.getAnnotations()).length
-      page.cleanup()
+      const pageAnnotations = await probe('annotations', () => page.getAnnotations())
+      annotations += asArray(pageAnnotations).length
+
+      // Not a probe: releasing page memory is housekeeping, and failing at it
+      // says nothing about whether the file is clean.
+      try {
+        page.cleanup()
+      } catch {
+        // Ignored deliberately.
+      }
     }
+
+    const measuredAreClean =
+      textCharacters === 0 && textOperators === 0 && fontObjects === 0 && annotations === 0
 
     return {
       pages: check.numPages,
@@ -271,8 +325,9 @@ export async function verifyExport(blob: Blob): Promise<VerificationReport> {
       textOperators,
       fontObjects,
       annotations,
-      clean:
-        textCharacters === 0 && textOperators === 0 && fontObjects === 0 && annotations === 0,
+      skippedChecks: [...skipped],
+      clean: measuredAreClean && skipped.size === 0,
+      cleanAsFarAsChecked: measuredAreClean,
     }
   } finally {
     void check.loadingTask.destroy().catch(() => {})

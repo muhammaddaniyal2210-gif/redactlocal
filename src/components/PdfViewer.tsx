@@ -381,38 +381,71 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
         <div className="border-t border-slate-800 px-3 py-2.5">
           {exportError ? (
             <ExportErrorPanel error={exportError} />
-          ) : report?.clean ? (
+          ) : report ? (
             <>
-              <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2.5">
-                <p className="flex items-center gap-2 text-sm font-medium text-emerald-300">
-                  <CheckCircle2 className="size-4 shrink-0" />
-                  Download complete — redacted_document.pdf
-                </p>
-                <p className="mt-1 pl-6 text-sm text-emerald-300/80">
-                  Re-opened and checked: {report.pages} flattened{' '}
-                  {report.pages === 1 ? 'page' : 'pages'}, 0 selectable characters, 0 text
-                  operators, 0 font objects, 0 annotations.
-                </p>
-              </div>
+              <VerificationPanel report={report} />
               {/* Reserved below the success state, where it interrupts nothing. */}
-              <AdSlot variant="post-download" className="mx-auto mt-3" />
+              {report.cleanAsFarAsChecked && <AdSlot variant="post-download" className="mx-auto mt-3" />}
             </>
-          ) : (
-            report && (
-              <p className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-300">
-                <ShieldAlert className="size-4 shrink-0" />
-                <span className="font-medium">Downloaded, but the check found recoverable content:</span>
-                <span>
-                  {report.textCharacters} characters, {report.textOperators} text operators,{' '}
-                  {report.fontObjects} font objects, {report.annotations} annotations. Do not share
-                  this file.
-                </span>
-              </p>
-            )
-          )}
+          ) : null}
         </div>
       )}
     </div>
+  )
+}
+
+/**
+ * What the post-export check found.
+ *
+ * Three outcomes, not two. "Every probe ran and found nothing" and "some probes
+ * could not run on this browser" are different claims, and collapsing them into
+ * one green banner would tell the user a file was verified when it was not.
+ */
+function VerificationPanel({ report }: { report: VerificationReport }) {
+  const pageWord = report.pages === 1 ? 'page' : 'pages'
+
+  if (report.clean) {
+    return (
+      <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2.5">
+        <p className="flex items-center gap-2 text-sm font-medium text-emerald-300">
+          <CheckCircle2 className="size-4 shrink-0" />
+          Download complete — redacted_document.pdf
+        </p>
+        <p className="mt-1 pl-6 text-sm text-emerald-300/80">
+          Re-opened and checked: {report.pages} flattened {pageWord}, 0 selectable characters, 0
+          text operators, 0 font objects, 0 annotations.
+        </p>
+      </div>
+    )
+  }
+
+  if (report.cleanAsFarAsChecked) {
+    return (
+      <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2.5">
+        <p className="flex items-center gap-2 text-sm font-medium text-amber-300">
+          <ShieldAlert className="size-4 shrink-0" />
+          Download complete — redacted_document.pdf, partly verified
+        </p>
+        <p className="mt-1 pl-6 text-sm text-amber-300/90">
+          The redaction itself is done: every page was flattened to an image before the file was
+          written, so there is no text layer to recover. What could not run on this browser is part
+          of the double-check — {report.skippedChecks.join(', ')}. Everything that did run came
+          back at zero.
+        </p>
+      </div>
+    )
+  }
+
+  return (
+    <p className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300">
+      <ShieldAlert className="size-4 shrink-0" />
+      <span className="font-medium">Downloaded, but the check found recoverable content:</span>
+      <span>
+        {report.textCharacters} characters, {report.textOperators} text operators,{' '}
+        {report.fontObjects} font objects, {report.annotations} annotations. Do not share this file.
+      </span>
+      {report.skippedChecks.length > 0 && <span>Skipped: {report.skippedChecks.join(', ')}.</span>}
+    </p>
   )
 }
 
