@@ -322,15 +322,23 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
           {pageBoxes.length} on this page · {total} in document
         </span>
 
-        <button
-          type="button"
-          onClick={runExport}
-          disabled={busy}
-          className="ml-auto inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-3.5 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {busy ? <Loader2 className="size-4 animate-spin" /> : <ShieldCheck className="size-4" />}
-          {busy ? 'Exporting…' : 'Export Redacted PDF'}
-        </button>
+        {/* The badge sits with the button as one unit, so the claim and the
+            action it describes can never drift apart when the toolbar wraps. */}
+        <div className="ml-auto flex flex-col items-stretch gap-1.5 sm:items-end">
+          <span className="inline-flex items-center justify-center self-center rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-medium text-emerald-300 sm:self-end">
+            Exports as a flattened image (no hidden text)
+          </span>
+
+          <button
+            type="button"
+            onClick={runExport}
+            disabled={busy}
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-500 px-3.5 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {busy ? <Loader2 className="size-4 animate-spin" /> : <ShieldCheck className="size-4" />}
+            {busy ? 'Exporting…' : 'Export Redacted PDF'}
+          </button>
+        </div>
       </div>
 
       <div ref={stageRef} className="pdf-stage relative min-h-0 flex-1 overflow-auto p-3 sm:p-6">

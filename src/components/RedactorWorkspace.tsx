@@ -2,6 +2,7 @@ import { PrivacyProofBanner } from './PrivacyProofBanner'
 import { DropZone } from './DropZone'
 import { PdfViewer } from './PdfViewer'
 import { AdSlot } from './AdSlot'
+import { SecurityGuarantee } from './SecurityGuarantee'
 import { usePdfDocument } from '../hooks/usePdfDocument'
 
 interface RedactorWorkspaceProps {
@@ -51,6 +52,11 @@ export function RedactorWorkspace({
                 </p>
               </div>
               <DropZone onFile={open} loading={status === 'loading'} error={error} />
+              {/* Directly under the drop zone, in the same column width, so it
+                  reads as part of the tool rather than as page furniture. */}
+              <div className="mx-auto w-full max-w-2xl">
+                <SecurityGuarantee />
+              </div>
             </div>
           )}
         </div>
