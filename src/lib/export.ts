@@ -1,6 +1,6 @@
 import { jsPDF } from 'jspdf'
 import { OPS, type PDFDocumentProxy } from 'pdfjs-dist'
-import { loadPdfDocument } from './pdfjs'
+import { loadPdfDocument, readPageText } from './pdfjs'
 import { asArray, paintBoxes, type RedactionMap } from './redactions'
 
 /**
@@ -286,13 +286,13 @@ export async function verifyExport(blob: Blob): Promise<VerificationReport> {
       const page = await probe(`page ${pageNumber}`, () => check.getPage(pageNumber))
       if (!page) continue
 
-      // Text extraction. This is the call that throws in Safari on image-only
-      // pages; the fallback is an empty item list, and the miss is recorded.
-      const content = await probe('text extraction', () => page.getTextContent())
+      // Text extraction. Routed through readPageText because pdf.js's
+      // getTextContent async-iterates a ReadableStream, which Safari cannot do
+      // — that is what made this probe fail there.
+      const content = await probe('text extraction', () => readPageText(page))
       for (const item of asArray(content?.items)) {
-        if (item && 'str' in item && typeof item.str === 'string') {
-          textCharacters += item.str.trim().length
-        }
+        const str = (item as { str?: unknown } | null)?.str
+        if (typeof str === 'string') textCharacters += str.trim().length
       }
 
       // Content stream operators. `fnArray` is array-like but not always a real

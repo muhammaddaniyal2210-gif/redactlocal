@@ -1,4 +1,5 @@
 import { type PDFPageProxy } from 'pdfjs-dist'
+import { readPageText } from './pdfjs'
 import { asArray, type RedactionBox } from './redactions'
 
 /**
@@ -260,10 +261,12 @@ export async function sweepPage(
   // step that has already failed once in WebKit, so it fails loudly and by
   // name rather than looking like a page with nothing on it.
   let viewportTransform: number[]
-  let content: Awaited<ReturnType<PDFPageProxy['getTextContent']>> | null = null
+  let content: Awaited<ReturnType<typeof readPageText>> | null = null
   try {
     viewportTransform = page.getViewport({ scale: 1 }).transform
-    content = await page.getTextContent()
+    // Not getTextContent(): that async-iterates a ReadableStream, which Safari
+    // cannot do. See readPageText().
+    content = await readPageText(page)
   } catch (err) {
     console.error('Smart Sweep could not read the page text:', err)
     return {
@@ -277,7 +280,7 @@ export async function sweepPage(
     return { boxes, counts, unavailableReason: 'This page has no usable coordinate system.' }
   }
 
-  const styles = (content?.styles ?? {}) as Record<string, { fontFamily?: string } | undefined>
+  const styles = content?.styles ?? {}
 
   for (const rawItem of asArray(content?.items)) {
     if (!isTextItem(rawItem)) continue

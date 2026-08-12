@@ -1,5 +1,5 @@
 import * as pdfjs from 'pdfjs-dist'
-import type { PDFDocumentProxy } from 'pdfjs-dist'
+import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist'
 
 // The worker, the font data and the CMaps are all served from our own origin.
 // A CDN would work in development but would break the core promise of this app:
@@ -15,7 +15,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = workerUrl
 /** Copied from node_modules/pdfjs-dist at setup time — see `npm run sync:pdfjs`. */
 const ASSET_BASE = `${import.meta.env.BASE_URL}pdfjs/`
 
-export type { PDFDocumentProxy }
+export type { PDFDocumentProxy, PDFPageProxy }
 
 /**
  * Parse PDF bytes entirely in browser memory.
@@ -56,6 +56,71 @@ export function readFileBytes(file: File): Promise<Uint8Array> {
     reader.onerror = () => reject(reader.error ?? new Error('Could not read the file.'))
     reader.readAsArrayBuffer(file)
   })
+}
+
+export interface PageTextContent {
+  items: unknown[]
+  styles: Record<string, { fontFamily?: string } | undefined>
+}
+
+/**
+ * Read a page's text without pdf.js's `getTextContent()`.
+ *
+ * `getTextContent()` is implemented as `for await (const chunk of
+ * this.streamTextContent(...))`. Async-iterating a `ReadableStream` requires
+ * `ReadableStream.prototype[Symbol.asyncIterator]`, which Safari has never
+ * shipped: there the symbol is `undefined`, the loop tries to call it, and
+ * WebKit reports "undefined is not a function (near '...e of t...')" — the
+ * `...of...` in the snippet being the loop itself.
+ *
+ * Rendering is unaffected because it goes through `getOperatorList`, which is
+ * why a document displays perfectly on Safari and only text extraction dies.
+ *
+ * Pulling the same stream with an explicit reader gets identical data using
+ * only `getReader()` and `read()`, both supported everywhere ReadableStream is.
+ */
+export async function readPageText(page: PDFPageProxy): Promise<PageTextContent> {
+  const items: unknown[] = []
+  const styles: PageTextContent['styles'] = Object.create(null)
+
+  if (typeof page.streamTextContent === 'function') {
+    const stream = page.streamTextContent({ disableNormalization: false })
+    const reader = stream.getReader()
+    try {
+      for (;;) {
+        const { value, done } = await reader.read()
+        if (done) break
+        // Appended one at a time: spreading a chunk of tens of thousands of
+        // items into push() can blow the argument limit.
+        for (const item of asChunkItems(value)) items.push(item)
+        if (value && typeof value === 'object' && 'styles' in value) {
+          Object.assign(styles, (value as { styles?: object }).styles ?? {})
+        }
+      }
+    } finally {
+      // Releasing is best-effort; a cancelled read must not mask a real error.
+      try {
+        reader.releaseLock()
+      } catch {
+        // Ignored deliberately.
+      }
+    }
+    return { items, styles }
+  }
+
+  // Older builds without streamTextContent: fall back to the async-iterating
+  // implementation, which is fine on engines that support it.
+  const content = await page.getTextContent()
+  return {
+    items: Array.isArray(content?.items) ? content.items : [],
+    styles: (content?.styles ?? Object.create(null)) as PageTextContent['styles'],
+  }
+}
+
+function asChunkItems(value: unknown): unknown[] {
+  if (!value || typeof value !== 'object') return []
+  const items = (value as { items?: unknown }).items
+  return Array.isArray(items) ? items : []
 }
 
 export function isRenderCancelled(err: unknown): boolean {
