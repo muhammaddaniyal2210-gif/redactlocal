@@ -1,4 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { Analytics } from '@vercel/analytics/react'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { Layout } from './components/Layout'
 import { DocumentRedactorLanding } from './components/DocumentRedactorLanding'
@@ -26,6 +27,11 @@ export default function App() {
           </Route>
         </Routes>
       </BrowserRouter>
+
+      {/* Page-view analytics. Sends the URL, referrer and device class to a
+          same-origin Vercel endpoint — never the document, which is read and
+          flattened entirely in this tab. */}
+      <Analytics />
     </ErrorBoundary>
   )
 }
