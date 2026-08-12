@@ -20,9 +20,11 @@ type Status = { kind: 'idle' } | { kind: 'empty' } | { kind: 'error'; message: s
  * Auto-redaction menu: pick the categories, scan the visible page, drop black
  * boxes over what matched.
  *
- * The menu deliberately says what it cannot do. Automatic detection is an
- * assistant on a tool whose whole promise is that nothing sensitive survives,
- * and a user who trusts it blindly is worse off than one who never used it.
+ * Detection matches standard formats within a single pdf.js text item, so a
+ * value split across items or wrapped across lines will not be found. The menu
+ * therefore closes by asking the user to check the page: on a tool whose whole
+ * promise is that nothing sensitive survives, a blindly trusted auto-scan
+ * leaves someone worse off than no scan at all.
  */
 export function SmartSweep({ onSweep, disabled = false, pageNumber }: SmartSweepProps) {
   const [open, setOpen] = useState(false)
@@ -176,8 +178,8 @@ export function SmartSweep({ onSweep, disabled = false, pageNumber }: SmartSweep
             </button>
 
             <p className="text-[11px] leading-relaxed text-slate-500">
-              A helper, not a guarantee — text split across lines can be missed. Check the page
-              before you export.
+              Smart Sweep detects standard formats. For maximum security, always visually verify
+              your document before exporting.
             </p>
           </div>
         </div>
