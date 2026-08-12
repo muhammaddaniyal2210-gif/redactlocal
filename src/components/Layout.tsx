@@ -25,8 +25,15 @@ export function Layout() {
         </div>
       </main>
 
+      {/* The footer is the only place present in every app state and on every
+          route. A disclosure that disappears the moment someone opens a file
+          is not a disclosure. */}
       <footer className="border-t border-slate-800/80 px-4 py-4 text-center text-xs text-slate-500 sm:px-6">
-        Files are held in memory and discarded when you close the tab.
+        <p>Files are held in memory and discarded when you close the tab.</p>
+        <p className="mt-1.5 text-slate-600">
+          Note: Vercel Analytics logs page visits only. Your files remain 100% local and
+          off-network.
+        </p>
       </footer>
 
       <OfflineTestDialog open={offlineDialog} onClose={() => setOfflineDialog(false)} />
