@@ -106,7 +106,7 @@ export function SmartSweep({ onSweep, onError, disabled = false, pageNumber }: S
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-controls={open ? menuId : undefined}
-        className={`inline-flex items-center gap-2 rounded-xl border px-3.5 py-2 text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 disabled:cursor-not-allowed disabled:opacity-40 ${
+        className={`inline-flex min-h-11 items-center gap-2 rounded-xl border px-3.5 py-2 text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 disabled:cursor-not-allowed disabled:opacity-40 sm:min-h-9 ${
           open
             ? 'border-emerald-500/50 bg-emerald-500/15 text-emerald-300'
             : 'border-slate-700/60 bg-slate-800/40 text-slate-300 hover:border-slate-600 hover:bg-slate-800 hover:text-slate-100'
@@ -121,10 +121,12 @@ export function SmartSweep({ onSweep, onError, disabled = false, pageNumber }: S
           id={menuId}
           role="dialog"
           aria-label="Smart Sweep options"
-          // Bottom sheet on a phone, dropdown on a laptop. `fixed` also escapes
+          // Bottom sheet on a phone, dropdown from `sm` up. `fixed` also escapes
           // the viewer card's `overflow-hidden`, which would otherwise clip the
-          // menu on a short screen.
-          className="fixed inset-x-4 bottom-4 z-40 max-h-[75vh] overflow-y-auto rounded-2xl border border-slate-700/60 bg-slate-900 shadow-2xl shadow-black/60 ring-1 ring-black/20 sm:absolute sm:inset-x-auto sm:bottom-auto sm:right-0 sm:top-full sm:mt-2 sm:max-h-none sm:w-[19rem] sm:rounded-xl"
+          // menu on a short screen. The dropdown grows rightward from the
+          // trigger's left edge: the trigger lives in the left-hand cluster, so
+          // right-anchoring ran a 304px menu off the screen on a 768px iPad.
+          className="fixed inset-x-4 bottom-4 z-40 max-h-[75vh] overflow-y-auto rounded-2xl border border-slate-700/60 bg-slate-900 shadow-2xl shadow-black/60 ring-1 ring-black/20 sm:absolute sm:inset-x-auto sm:bottom-auto sm:left-0 sm:top-full sm:mt-2 sm:max-h-none sm:w-[19rem] sm:rounded-xl"
         >
           <div className="border-b border-slate-700/50 px-4 py-3.5">
             <p className="text-sm font-semibold tracking-tight text-slate-50">Smart Sweep</p>
@@ -139,7 +141,7 @@ export function SmartSweep({ onSweep, onError, disabled = false, pageNumber }: S
               return (
                 <label
                   key={category.id}
-                  className="flex cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2.5 transition-colors duration-150 hover:bg-slate-800/70"
+                  className="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2.5 transition-colors duration-150 hover:bg-slate-800/70 active:bg-slate-800"
                 >
                   <input
                     type="checkbox"
@@ -179,7 +181,7 @@ export function SmartSweep({ onSweep, onError, disabled = false, pageNumber }: S
               type="button"
               onClick={run}
               disabled={busy || selected.size === 0}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/20 transition-all duration-200 hover:bg-emerald-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
+              className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/20 transition-all duration-200 hover:bg-emerald-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
             >
               {busy && <Loader2 className="size-4 animate-spin" />}
               {busy ? 'Scanning…' : 'Redact Selected'}

@@ -229,8 +229,8 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-900/40 shadow-2xl shadow-black/20">
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-2.5 border-b border-slate-700/50 px-4 py-3">
-        <div className="flex min-w-0 items-center gap-2 text-sm">
+      <div className="no-scrollbar flex flex-nowrap items-center gap-x-3 gap-y-2.5 overflow-x-auto border-b border-slate-700/50 px-4 py-3 sm:flex-wrap sm:overflow-visible">
+        <div className="flex min-w-0 shrink items-center gap-2 text-sm">
           <FileText className="size-4 shrink-0 text-emerald-400/80" />
           <span className="truncate font-medium text-slate-200" title={doc.name}>
             {doc.name}
@@ -240,7 +240,7 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
           </span>
         </div>
 
-        <div className="ml-auto flex items-center gap-1 rounded-xl border border-slate-700/60 bg-slate-950/60 p-1">
+        <div className="ml-auto flex shrink-0 items-center gap-1 rounded-xl border border-slate-700/60 bg-slate-950/60 p-1">
           <ToolbarButton label="Previous page" onClick={() => goTo(pageNumber - 1)} disabled={pageNumber <= 1}>
             <ChevronLeft className="size-4" />
           </ToolbarButton>
@@ -251,7 +251,7 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
               onBlur={commitPageInput}
               onKeyDown={(e) => e.key === 'Enter' && commitPageInput()}
               aria-label="Page number"
-              className="w-10 rounded-lg border border-slate-700 bg-slate-900 px-1 py-1 text-center text-sm text-slate-100 transition-colors duration-150 focus:border-emerald-500/60 focus:outline-none"
+              className="min-h-11 w-11 rounded-lg border border-slate-700 bg-slate-900 px-1 py-1 text-center text-sm text-slate-100 transition-colors duration-150 focus:border-emerald-500/60 focus:outline-none sm:min-h-9 sm:w-10"
             />
             <span className="text-slate-500">/ {doc.pageCount}</span>
           </div>
@@ -264,7 +264,7 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
           </ToolbarButton>
         </div>
 
-        <div className="flex items-center gap-1 rounded-xl border border-slate-700/60 bg-slate-950/60 p-1">
+        <div className="flex shrink-0 items-center gap-1 rounded-xl border border-slate-700/60 bg-slate-950/60 p-1">
           <ToolbarButton
             label="Zoom out"
             onClick={() => setScale((s) => clampScale(s - ZOOM_STEP))}
@@ -276,7 +276,7 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
             type="button"
             onClick={() => setScale(1)}
             title="Reset zoom to 100%"
-            className="min-w-14 rounded-lg px-1.5 py-1 text-sm tabular-nums text-slate-300 transition-colors duration-150 hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/50"
+            className="min-h-11 min-w-14 rounded-lg px-1.5 py-1 text-sm tabular-nums text-slate-300 transition-colors duration-150 hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/50 sm:min-h-9"
           >
             {Math.round(scale * 100)}%
           </button>
@@ -295,7 +295,7 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
         <button
           type="button"
           onClick={onClose}
-          className="inline-flex items-center gap-1.5 rounded-xl border border-slate-700/60 bg-slate-800/40 px-3 py-2 text-sm text-slate-400 transition-all duration-200 hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/50"
+          className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl border border-slate-700/60 bg-slate-800/40 px-3 py-2 text-sm text-slate-400 transition-all duration-200 hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/50 sm:min-h-9"
         >
           <X className="size-4" />
           Close
@@ -309,7 +309,7 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
           onClick={() => setDrawMode((on) => !on)}
           aria-pressed={drawMode}
           disabled={busy}
-          className={`inline-flex items-center gap-2 rounded-xl border px-3.5 py-2 text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 disabled:opacity-40 ${
+          className={`inline-flex min-h-11 items-center gap-2 rounded-xl border px-3.5 py-2 text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 disabled:opacity-40 sm:min-h-9 ${
             drawMode
               ? 'border-emerald-500/50 bg-emerald-500/15 text-emerald-300'
               : 'border-slate-700/60 bg-slate-800/40 text-slate-400 hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200'
@@ -364,7 +364,7 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
             type="button"
             onClick={runExport}
             disabled={busy}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition-all duration-200 hover:bg-emerald-400 hover:shadow-emerald-400/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none"
+            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition-all duration-200 hover:bg-emerald-400 hover:shadow-emerald-400/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none"
           >
             {busy ? <Loader2 className="size-4 animate-spin" /> : <ShieldCheck className="size-4" />}
             {busy ? 'Exporting…' : 'Export Redacted PDF'}
@@ -384,7 +384,7 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
               type="button"
               onClick={() => setSweepError(null)}
               aria-label="Dismiss"
-              className="shrink-0 rounded px-1 text-red-300/80 transition-colors hover:text-red-200"
+              className="grid size-11 shrink-0 place-items-center rounded-lg text-red-300/80 transition-colors hover:bg-red-500/10 hover:text-red-200 sm:size-7"
             >
               <X className="size-3.5" />
             </button>
@@ -606,7 +606,7 @@ function ActionButton({
       disabled={disabled}
       title={label}
       aria-label={label}
-      className="inline-flex items-center gap-2 rounded-xl border border-slate-700/60 bg-slate-800/40 px-3.5 py-2 text-sm text-slate-300 transition-all duration-200 hover:border-slate-600 hover:bg-slate-800 hover:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/50 disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:border-slate-700/60 disabled:hover:bg-slate-800/40"
+      className="inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-xl border border-slate-700/60 bg-slate-800/40 px-3.5 py-2 text-sm text-slate-300 transition-all duration-200 hover:border-slate-600 hover:bg-slate-800 hover:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/50 disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:border-slate-700/60 disabled:hover:bg-slate-800/40 sm:min-h-9 sm:min-w-0"
     >
       {icon}
       {/* On a phone the toolbar is icons only; the labels would wrap to four rows. */}
@@ -633,7 +633,7 @@ function ToolbarButton({
       disabled={disabled}
       title={label}
       aria-label={label}
-      className="rounded-lg p-2 text-slate-300 transition-all duration-150 hover:bg-slate-800 hover:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/50 disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent"
+      className="grid size-11 place-items-center rounded-lg text-slate-300 transition-all duration-150 hover:bg-slate-800 hover:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/50 disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent sm:size-9"
     >
       {children}
     </button>

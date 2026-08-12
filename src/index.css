@@ -54,6 +54,19 @@ body {
   color: rgb(51 65 85);
 }
 
+/*
+ * Horizontal control strips on small screens: scrollable, but without a
+ * scrollbar eating 15px of a phone's toolbar height.
+ */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* Thin scrollbars that match the dark shell. */
 * {
   scrollbar-width: thin;
