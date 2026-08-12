@@ -14,6 +14,17 @@ export function useRedactions() {
     setBoxes((current) => ({ ...current, [page]: [...(current[page] ?? []), withId] }))
   }, [])
 
+  /**
+   * Append many boxes at once. Smart Sweep can find dozens on a page, and
+   * adding them one at a time would re-render (and repaint the overlay) for
+   * every single one.
+   */
+  const addBoxes = useCallback((page: number, incoming: readonly Omit<RedactionBox, 'id'>[]) => {
+    if (!incoming.length) return
+    const withIds: RedactionBox[] = incoming.map((box) => ({ ...box, id: `box-${++boxSeq}` }))
+    setBoxes((current) => ({ ...current, [page]: [...(current[page] ?? []), ...withIds] }))
+  }, [])
+
   const undoLast = useCallback((page: number) => {
     setBoxes((current) => {
       const pageBoxes = current[page]
@@ -37,5 +48,5 @@ export function useRedactions() {
 
   const total = useMemo(() => countBoxes(boxes), [boxes])
 
-  return { boxes, addBox, undoLast, clearPage, clearAll, total }
+  return { boxes, addBox, addBoxes, undoLast, clearPage, clearAll, total }
 }

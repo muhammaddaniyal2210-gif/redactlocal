@@ -27,7 +27,9 @@ import {
   type VerificationReport,
 } from '../lib/export'
 import { collectEnvironmentReport, summariseEnvironment } from '../lib/environment'
+import { sweepPage, type SweepCategoryId } from '../lib/detect'
 import { AdSlot } from './AdSlot'
+import { SmartSweep } from './SmartSweep'
 import { RedactionLayer } from './RedactionLayer'
 import { useRedactions } from '../hooks/useRedactions'
 import type { LoadedDoc } from '../hooks/usePdfDocument'
@@ -63,7 +65,7 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
   const [pageInput, setPageInput] = useState('1')
 
   const [drawMode, setDrawMode] = useState(true)
-  const { boxes, addBox, undoLast, clearPage, clearAll, total } = useRedactions()
+  const { boxes, addBox, addBoxes, undoLast, clearPage, clearAll, total } = useRedactions()
   const pageBoxes = boxes[pageNumber] ?? []
 
   const [exporting, setExporting] = useState<ExportProgress | null>(null)
@@ -168,6 +170,22 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
     if (Number.isNaN(parsed)) setPageInput(String(pageNumber))
     else goTo(parsed)
   }
+
+  /**
+   * Scan the page currently on screen and add a box over every match.
+   *
+   * Errors propagate to SmartSweep, which reports them and closes — a failed
+   * scan must never cost the user the boxes they drew by hand.
+   */
+  const runSweep = useCallback(
+    async (enabled: ReadonlySet<SweepCategoryId>) => {
+      const page = await doc.pdf.getPage(pageNumber)
+      const { boxes: found } = await sweepPage(page, enabled)
+      addBoxes(pageNumber, found)
+      return { added: found.length }
+    },
+    [addBoxes, doc.pdf, pageNumber],
+  )
 
   const runExport = useCallback(async () => {
     setExportError(null)
@@ -317,6 +335,8 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
           icon={<Trash2 className="size-4" />}
           label="Clear All Pages"
         />
+
+        <SmartSweep onSweep={runSweep} disabled={busy} pageNumber={pageNumber} />
 
         <span className="ml-1 text-xs text-slate-500">
           {pageBoxes.length} on this page · {total} in document
