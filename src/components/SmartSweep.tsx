@@ -1,20 +1,26 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
-import { Check, Loader2, ScanSearch, TriangleAlert } from 'lucide-react'
+import { Check, Loader2, ScanSearch } from 'lucide-react'
 import { SWEEP_CATEGORIES, type SweepCategoryId } from '../lib/detect'
 
 export interface SweepOutcome {
   /** Boxes actually added to the page. */
   added: number
+  /** Set when the page's text could not be read at all. */
+  unavailableReason?: string
 }
 
 interface SmartSweepProps {
   /** Runs the scan. Resolves with what was found; rejects if pdf.js fails. */
   onSweep: (enabled: ReadonlySet<SweepCategoryId>) => Promise<SweepOutcome>
+  /**
+   * Reports failures upward. The message is rendered by the toolbar on its own
+   * row — an absolutely positioned popover here would sit on top of the badge
+   * and the export button.
+   */
+  onError: (message: string | null) => void
   disabled?: boolean
   pageNumber: number
 }
-
-type Status = { kind: 'idle' } | { kind: 'empty' } | { kind: 'error'; message: string }
 
 /**
  * Auto-redaction menu: pick the categories, scan the visible page, drop black
@@ -26,10 +32,10 @@ type Status = { kind: 'idle' } | { kind: 'empty' } | { kind: 'error'; message: s
  * promise is that nothing sensitive survives, a blindly trusted auto-scan
  * leaves someone worse off than no scan at all.
  */
-export function SmartSweep({ onSweep, disabled = false, pageNumber }: SmartSweepProps) {
+export function SmartSweep({ onSweep, onError, disabled = false, pageNumber }: SmartSweepProps) {
   const [open, setOpen] = useState(false)
   const [busy, setBusy] = useState(false)
-  const [status, setStatus] = useState<Status>({ kind: 'idle' })
+  const [empty, setEmpty] = useState(false)
   const [selected, setSelected] = useState<Set<SweepCategoryId>>(
     () => new Set(SWEEP_CATEGORIES.map((category) => category.id)),
   )
@@ -37,8 +43,8 @@ export function SmartSweep({ onSweep, disabled = false, pageNumber }: SmartSweep
   const wrapperRef = useRef<HTMLDivElement>(null)
   const menuId = useId()
 
-  // Reset transient feedback when the user moves to another page.
-  useEffect(() => setStatus({ kind: 'idle' }), [pageNumber])
+  // Feedback is about the page that produced it.
+  useEffect(() => setEmpty(false), [pageNumber])
 
   // Dismiss on outside click and on Escape.
   useEffect(() => {
@@ -58,7 +64,7 @@ export function SmartSweep({ onSweep, disabled = false, pageNumber }: SmartSweep
   }, [open])
 
   const toggle = useCallback((id: SweepCategoryId) => {
-    setStatus({ kind: 'idle' })
+    setEmpty(false)
     setSelected((current) => {
       const next = new Set(current)
       if (next.has(id)) next.delete(id)
@@ -69,23 +75,27 @@ export function SmartSweep({ onSweep, disabled = false, pageNumber }: SmartSweep
 
   const run = useCallback(async () => {
     setBusy(true)
-    setStatus({ kind: 'idle' })
+    setEmpty(false)
+    onError(null)
     try {
-      const { added } = await onSweep(selected)
-      if (added > 0) setOpen(false)
-      else setStatus({ kind: 'empty' })
+      const { added, unavailableReason } = await onSweep(selected)
+      if (unavailableReason) {
+        onError(`This browser could not read the text on this page — ${unavailableReason}`)
+        setOpen(false)
+      } else if (added > 0) {
+        setOpen(false)
+      } else {
+        setEmpty(true)
+      }
     } catch (err) {
       // Never take the app down over a failed scan: the manual tools still work.
       console.error('Smart Sweep failed:', err)
-      setStatus({
-        kind: 'error',
-        message: err instanceof Error ? err.message : 'The scan could not finish.',
-      })
+      onError(err instanceof Error ? err.message : 'The scan could not finish.')
       setOpen(false)
     } finally {
       setBusy(false)
     }
-  }, [onSweep, selected])
+  }, [onError, onSweep, selected])
 
   return (
     <div ref={wrapperRef} className="relative">
@@ -96,44 +106,40 @@ export function SmartSweep({ onSweep, disabled = false, pageNumber }: SmartSweep
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-controls={open ? menuId : undefined}
-        className={`inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-35 ${
+        className={`inline-flex items-center gap-2 rounded-xl border px-3.5 py-2 text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 disabled:cursor-not-allowed disabled:opacity-40 ${
           open
-            ? 'border-emerald-500/40 bg-emerald-500/15 text-emerald-300'
-            : 'border-slate-800 bg-slate-950/60 text-slate-300 hover:border-slate-700 hover:text-slate-100'
+            ? 'border-emerald-500/50 bg-emerald-500/15 text-emerald-300'
+            : 'border-slate-700/60 bg-slate-800/40 text-slate-300 hover:border-slate-600 hover:bg-slate-800 hover:text-slate-100'
         }`}
       >
         <ScanSearch className="size-4" />
         Smart Sweep
       </button>
 
-      {status.kind === 'error' && !open && (
-        <p className="absolute right-0 top-full z-30 mt-1.5 flex w-max max-w-xs items-start gap-1.5 rounded-lg border border-red-500/30 bg-red-500/10 px-2.5 py-1.5 text-[11px] text-red-300">
-          <TriangleAlert className="mt-px size-3.5 shrink-0" />
-          {status.message}
-        </p>
-      )}
-
       {open && (
         <div
           id={menuId}
           role="dialog"
           aria-label="Smart Sweep options"
-          className="absolute right-0 top-full z-30 mt-2 w-72 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-slate-800 bg-slate-900 shadow-2xl shadow-black/60 ring-1 ring-black/20"
+          // Bottom sheet on a phone, dropdown on a laptop. `fixed` also escapes
+          // the viewer card's `overflow-hidden`, which would otherwise clip the
+          // menu on a short screen.
+          className="fixed inset-x-4 bottom-4 z-40 max-h-[75vh] overflow-y-auto rounded-2xl border border-slate-700/60 bg-slate-900 shadow-2xl shadow-black/60 ring-1 ring-black/20 sm:absolute sm:inset-x-auto sm:bottom-auto sm:right-0 sm:top-full sm:mt-2 sm:max-h-none sm:w-[19rem] sm:rounded-xl"
         >
-          <div className="border-b border-slate-800/80 px-4 py-3">
-            <p className="text-sm font-semibold text-slate-100">Smart Sweep</p>
-            <p className="mt-0.5 text-xs text-slate-400">
+          <div className="border-b border-slate-700/50 px-4 py-3.5">
+            <p className="text-sm font-semibold tracking-tight text-slate-50">Smart Sweep</p>
+            <p className="mt-1 text-xs text-slate-400">
               Find and cover matches on page {pageNumber}.
             </p>
           </div>
 
-          <div className="p-1.5">
+          <div className="space-y-0.5 p-2">
             {SWEEP_CATEGORIES.map((category) => {
               const checked = selected.has(category.id)
               return (
                 <label
                   key={category.id}
-                  className="flex cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2 transition hover:bg-slate-800/60"
+                  className="flex cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2.5 transition-colors duration-150 hover:bg-slate-800/70"
                 >
                   <input
                     type="checkbox"
@@ -143,7 +149,7 @@ export function SmartSweep({ onSweep, disabled = false, pageNumber }: SmartSweep
                   />
                   <span
                     aria-hidden="true"
-                    className={`grid size-4 shrink-0 place-items-center rounded border transition peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-500/60 ${
+                    className={`grid size-[18px] shrink-0 place-items-center rounded-[5px] border transition-all duration-150 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-500/60 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-slate-900 ${
                       checked
                         ? 'border-emerald-500 bg-emerald-500 text-slate-950'
                         : 'border-slate-600 bg-slate-950/60'
@@ -152,17 +158,19 @@ export function SmartSweep({ onSweep, disabled = false, pageNumber }: SmartSweep
                     {checked && <Check className="size-3" strokeWidth={3.5} />}
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block text-sm text-slate-200">{category.label}</span>
-                    <span className="block text-[11px] text-slate-500">{category.hint}</span>
+                    <span className="block text-sm font-medium text-slate-100">
+                      {category.label}
+                    </span>
+                    <span className="block text-xs text-slate-400">{category.hint}</span>
                   </span>
                 </label>
               )
             })}
           </div>
 
-          <div className="space-y-2 border-t border-slate-800/80 p-3">
-            {status.kind === 'empty' && (
-              <p className="rounded-lg border border-slate-700/70 bg-slate-950/60 px-2.5 py-1.5 text-[11px] text-slate-400">
+          <div className="space-y-2.5 border-t border-slate-700/50 bg-slate-950/30 p-3">
+            {empty && (
+              <p className="rounded-lg border border-slate-700/60 bg-slate-900 px-3 py-2 text-xs text-slate-300">
                 No matches found on this page.
               </p>
             )}
@@ -171,13 +179,13 @@ export function SmartSweep({ onSweep, disabled = false, pageNumber }: SmartSweep
               type="button"
               onClick={run}
               disabled={busy || selected.size === 0}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-500 px-3.5 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/20 transition-all duration-200 hover:bg-emerald-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
             >
               {busy && <Loader2 className="size-4 animate-spin" />}
               {busy ? 'Scanning…' : 'Redact Selected'}
             </button>
 
-            <p className="text-[11px] leading-relaxed text-slate-500">
+            <p className="text-xs leading-relaxed text-slate-400">
               Smart Sweep detects standard formats. For maximum security, always visually verify
               your document before exporting.
             </p>

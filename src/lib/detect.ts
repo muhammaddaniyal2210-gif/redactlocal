@@ -1,5 +1,26 @@
-import { Util, type PDFPageProxy } from 'pdfjs-dist'
+import { type PDFPageProxy } from 'pdfjs-dist'
 import { asArray, type RedactionBox } from './redactions'
+
+/**
+ * Multiply two PDF transformation matrices.
+ *
+ * This is what `pdfjs.Util.transform` does. It is inlined because `Util` is a
+ * utility class on the pdf.js entry point rather than part of the documented
+ * page API: if a future build tree-shakes it, renames it, or drops it from the
+ * export map, `Util.transform(...)` becomes "undefined is not a function" at
+ * the exact moment a user runs a scan. Six multiply-adds are not worth that
+ * coupling.
+ */
+function multiplyTransforms(m1: readonly number[], m2: readonly number[]): number[] {
+  return [
+    m1[0] * m2[0] + m1[2] * m2[1],
+    m1[1] * m2[0] + m1[3] * m2[1],
+    m1[0] * m2[2] + m1[2] * m2[3],
+    m1[1] * m2[2] + m1[3] * m2[3],
+    m1[0] * m2[4] + m1[2] * m2[5] + m1[4],
+    m1[1] * m2[4] + m1[3] * m2[5] + m1[5],
+  ]
+}
 
 export type SweepCategoryId = 'emails' | 'phones' | 'cards' | 'ssns'
 
@@ -123,7 +144,8 @@ function boxForMatch(
   matchLength: number,
   fontFamily: string,
 ): DetectedBox | null {
-  const tx = Util.transform(viewportTransform, item.transform)
+  if (!Array.isArray(item.transform) || item.transform.length < 6) return null
+  const tx = multiplyTransforms(viewportTransform, item.transform)
   const [a, b, c, d, e, f] = tx
   if (![a, b, c, d, e, f].every(Number.isFinite)) return null
 
@@ -209,6 +231,12 @@ export interface SweepResult {
   boxes: DetectedBox[]
   /** Matches per category, for feedback in the menu. */
   counts: Record<SweepCategoryId, number>
+  /**
+   * Set when the page's text could not be read at all, so the caller can say
+   * "this browser could not read the text" instead of the indistinguishable
+   * and far more dangerous "no matches found".
+   */
+  unavailableReason?: string
 }
 
 /**
@@ -228,14 +256,35 @@ export async function sweepPage(
 
   if (enabled.size === 0) return { boxes, counts }
 
-  const viewport = page.getViewport({ scale: 1 })
-  const content = await page.getTextContent()
+  // Reading the page's text is the one step with no fallback. It is also the
+  // step that has already failed once in WebKit, so it fails loudly and by
+  // name rather than looking like a page with nothing on it.
+  let viewportTransform: number[]
+  let content: Awaited<ReturnType<PDFPageProxy['getTextContent']>> | null = null
+  try {
+    viewportTransform = page.getViewport({ scale: 1 }).transform
+    content = await page.getTextContent()
+  } catch (err) {
+    console.error('Smart Sweep could not read the page text:', err)
+    return {
+      boxes,
+      counts,
+      unavailableReason: err instanceof Error ? err.message : String(err),
+    }
+  }
+
+  if (!Array.isArray(viewportTransform) || viewportTransform.length < 6) {
+    return { boxes, counts, unavailableReason: 'This page has no usable coordinate system.' }
+  }
+
   const styles = (content?.styles ?? {}) as Record<string, { fontFamily?: string } | undefined>
 
   for (const rawItem of asArray(content?.items)) {
     if (!isTextItem(rawItem)) continue
     const { str } = rawItem
-    if (!str || str.length > MAX_ITEM_LENGTH) continue
+    // Explicit, even though isTextItem already narrowed it: this is the value
+    // every regex below is about to be called on.
+    if (typeof str !== 'string' || str.length === 0 || str.length > MAX_ITEM_LENGTH) continue
 
     // pdf.js reports the substitute family it would use for this font.
     const fontFamily = styles[rawItem.fontName ?? '']?.fontFamily || 'sans-serif'
@@ -244,6 +293,8 @@ export async function sweepPage(
       if (!enabled.has(category.id)) continue
 
       const regex = category.pattern()
+      if (!(regex instanceof RegExp)) continue
+
       let match: RegExpExecArray | null
       while ((match = regex.exec(str)) !== null) {
         // A zero-length match would loop forever.
@@ -252,13 +303,15 @@ export async function sweepPage(
           continue
         }
 
-        const box = boxForMatch(
-          rawItem,
-          viewport.transform,
-          match.index,
-          match[0].length,
-          fontFamily,
-        )
+        // One malformed item must not abandon the rest of the page.
+        let box: DetectedBox | null = null
+        try {
+          box = boxForMatch(rawItem, viewportTransform, match.index, match[0].length, fontFamily)
+        } catch (err) {
+          console.error('Smart Sweep skipped a text item:', err)
+          continue
+        }
+
         if (box && box.width > 0 && box.height > 0) {
           boxes.push(box)
           counts[category.id] += 1

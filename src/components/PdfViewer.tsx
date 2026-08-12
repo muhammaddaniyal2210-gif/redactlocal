@@ -13,6 +13,7 @@ import {
   ShieldAlert,
   SquareDashedMousePointer,
   Trash2,
+  TriangleAlert,
   Undo2,
   X,
   ZoomIn,
@@ -68,6 +69,7 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
   const { boxes, addBox, addBoxes, undoLast, clearPage, clearAll, total } = useRedactions()
   const pageBoxes = boxes[pageNumber] ?? []
 
+  const [sweepError, setSweepError] = useState<string | null>(null)
   const [exporting, setExporting] = useState<ExportProgress | null>(null)
   const [exportError, setExportError] = useState<ExportErrorState | null>(null)
   const [report, setReport] = useState<VerificationReport | null>(null)
@@ -80,9 +82,13 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
     clearAll()
     setReport(null)
     setExportError(null)
+    setSweepError(null)
   }, [doc, clearAll])
 
-  useEffect(() => setPageInput(String(pageNumber)), [pageNumber])
+  useEffect(() => {
+    setPageInput(String(pageNumber))
+    setSweepError(null)
+  }, [pageNumber])
 
   const goTo = useCallback(
     (next: number) => setPageNumber(Math.min(doc.pageCount, Math.max(1, next))),
@@ -180,9 +186,9 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
   const runSweep = useCallback(
     async (enabled: ReadonlySet<SweepCategoryId>) => {
       const page = await doc.pdf.getPage(pageNumber)
-      const { boxes: found } = await sweepPage(page, enabled)
+      const { boxes: found, unavailableReason } = await sweepPage(page, enabled)
       addBoxes(pageNumber, found)
-      return { added: found.length }
+      return { added: found.length, unavailableReason }
     },
     [addBoxes, doc.pdf, pageNumber],
   )
@@ -222,8 +228,8 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
   const busy = exporting !== null
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/40">
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-slate-800 px-3 py-2.5">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-900/40 shadow-2xl shadow-black/20">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2.5 border-b border-slate-700/50 px-4 py-3">
         <div className="flex min-w-0 items-center gap-2 text-sm">
           <FileText className="size-4 shrink-0 text-emerald-400/80" />
           <span className="truncate font-medium text-slate-200" title={doc.name}>
@@ -234,7 +240,7 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
           </span>
         </div>
 
-        <div className="ml-auto flex items-center gap-1 rounded-lg border border-slate-800 bg-slate-950/60 p-1">
+        <div className="ml-auto flex items-center gap-1 rounded-xl border border-slate-700/60 bg-slate-950/60 p-1">
           <ToolbarButton label="Previous page" onClick={() => goTo(pageNumber - 1)} disabled={pageNumber <= 1}>
             <ChevronLeft className="size-4" />
           </ToolbarButton>
@@ -245,7 +251,7 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
               onBlur={commitPageInput}
               onKeyDown={(e) => e.key === 'Enter' && commitPageInput()}
               aria-label="Page number"
-              className="w-9 rounded border border-slate-700 bg-slate-900 px-1 py-0.5 text-center text-sm focus:border-emerald-500/60 focus:outline-none"
+              className="w-10 rounded-lg border border-slate-700 bg-slate-900 px-1 py-1 text-center text-sm text-slate-100 transition-colors duration-150 focus:border-emerald-500/60 focus:outline-none"
             />
             <span className="text-slate-500">/ {doc.pageCount}</span>
           </div>
@@ -258,7 +264,7 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
           </ToolbarButton>
         </div>
 
-        <div className="flex items-center gap-1 rounded-lg border border-slate-800 bg-slate-950/60 p-1">
+        <div className="flex items-center gap-1 rounded-xl border border-slate-700/60 bg-slate-950/60 p-1">
           <ToolbarButton
             label="Zoom out"
             onClick={() => setScale((s) => clampScale(s - ZOOM_STEP))}
@@ -270,7 +276,7 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
             type="button"
             onClick={() => setScale(1)}
             title="Reset zoom to 100%"
-            className="min-w-14 rounded px-1 py-0.5 text-sm tabular-nums text-slate-300 transition hover:bg-slate-800"
+            className="min-w-14 rounded-lg px-1.5 py-1 text-sm tabular-nums text-slate-300 transition-colors duration-150 hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/50"
           >
             {Math.round(scale * 100)}%
           </button>
@@ -289,7 +295,7 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
         <button
           type="button"
           onClick={onClose}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-slate-800 bg-slate-950/60 px-2.5 py-1.5 text-sm text-slate-400 transition hover:border-slate-700 hover:text-slate-200"
+          className="inline-flex items-center gap-1.5 rounded-xl border border-slate-700/60 bg-slate-800/40 px-3 py-2 text-sm text-slate-400 transition-all duration-200 hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/50"
         >
           <X className="size-4" />
           Close
@@ -297,16 +303,16 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
       </div>
 
       {/* Redaction toolbar */}
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-2 border-b border-slate-800 bg-slate-950/40 px-3 py-2.5">
+      <div className="flex flex-wrap items-center gap-x-2.5 gap-y-2.5 border-b border-slate-700/50 bg-slate-950/40 px-4 py-3">
         <button
           type="button"
           onClick={() => setDrawMode((on) => !on)}
           aria-pressed={drawMode}
           disabled={busy}
-          className={`inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm font-medium transition disabled:opacity-40 ${
+          className={`inline-flex items-center gap-2 rounded-xl border px-3.5 py-2 text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 disabled:opacity-40 ${
             drawMode
-              ? 'border-emerald-500/40 bg-emerald-500/15 text-emerald-300'
-              : 'border-slate-800 bg-slate-950/60 text-slate-400 hover:text-slate-200'
+              ? 'border-emerald-500/50 bg-emerald-500/15 text-emerald-300'
+              : 'border-slate-700/60 bg-slate-800/40 text-slate-400 hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200'
           }`}
         >
           {drawMode ? (
@@ -336,16 +342,21 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
           label="Clear All Pages"
         />
 
-        <SmartSweep onSweep={runSweep} disabled={busy} pageNumber={pageNumber} />
+        <SmartSweep
+          onSweep={runSweep}
+          onError={setSweepError}
+          disabled={busy}
+          pageNumber={pageNumber}
+        />
 
-        <span className="ml-1 text-xs text-slate-500">
+        <span className="ml-0.5 text-xs tabular-nums text-slate-400">
           {pageBoxes.length} on this page · {total} in document
         </span>
 
         {/* The badge sits with the button as one unit, so the claim and the
             action it describes can never drift apart when the toolbar wraps. */}
-        <div className="ml-auto flex flex-col items-stretch gap-1.5 sm:items-end">
-          <span className="inline-flex items-center justify-center self-center rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-medium text-emerald-300 sm:self-end">
+        <div className="ml-auto flex flex-col items-stretch gap-2 sm:items-end">
+          <span className="inline-flex items-center justify-center self-center rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[11px] font-medium tracking-wide text-emerald-300 sm:self-end">
             Exports as a flattened image (no hidden text)
           </span>
 
@@ -353,12 +364,32 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
             type="button"
             onClick={runExport}
             disabled={busy}
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-500 px-3.5 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition-all duration-200 hover:bg-emerald-400 hover:shadow-emerald-400/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none"
           >
             {busy ? <Loader2 className="size-4 animate-spin" /> : <ShieldCheck className="size-4" />}
             {busy ? 'Exporting…' : 'Export Redacted PDF'}
           </button>
         </div>
+
+        {/* Full width, so it takes its own line in the wrapping toolbar rather
+            than being layered over the badge and the button. */}
+        {sweepError && (
+          <p
+            role="status"
+            className="flex w-full items-start gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs leading-relaxed text-red-200"
+          >
+            <TriangleAlert className="mt-px size-3.5 shrink-0 text-red-300" />
+            <span className="min-w-0 flex-1">{sweepError}</span>
+            <button
+              type="button"
+              onClick={() => setSweepError(null)}
+              aria-label="Dismiss"
+              className="shrink-0 rounded px-1 text-red-300/80 transition-colors hover:text-red-200"
+            >
+              <X className="size-3.5" />
+            </button>
+          </p>
+        )}
       </div>
 
       <div ref={stageRef} className="pdf-stage relative min-h-0 flex-1 overflow-auto p-3 sm:p-6">
@@ -406,7 +437,7 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
       {busy && <ExportProgressBar progress={exporting} />}
 
       {(report || exportError) && !busy && (
-        <div className="border-t border-slate-800 px-3 py-2.5">
+        <div className="border-t border-slate-700/50 px-4 py-3">
           {exportError ? (
             <ExportErrorPanel error={exportError} />
           ) : report ? (
@@ -537,7 +568,7 @@ function ExportProgressBar({ progress }: { progress: ExportProgress }) {
   const percent = Math.min(100, Math.round(((done + partial) / progress.total) * 100))
 
   return (
-    <div className="border-t border-slate-800 px-3 py-2.5" role="status" aria-live="polite">
+    <div className="border-t border-slate-700/50 px-4 py-3" role="status" aria-live="polite">
       <div className="flex items-center justify-between gap-3 text-sm">
         <span className="flex items-center gap-2 text-slate-300">
           <Loader2 className="size-4 shrink-0 animate-spin text-emerald-400" />
@@ -575,7 +606,7 @@ function ActionButton({
       disabled={disabled}
       title={label}
       aria-label={label}
-      className="inline-flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-950/60 px-3 py-1.5 text-sm text-slate-300 transition hover:border-slate-700 hover:text-slate-100 disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:border-slate-800"
+      className="inline-flex items-center gap-2 rounded-xl border border-slate-700/60 bg-slate-800/40 px-3.5 py-2 text-sm text-slate-300 transition-all duration-200 hover:border-slate-600 hover:bg-slate-800 hover:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/50 disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:border-slate-700/60 disabled:hover:bg-slate-800/40"
     >
       {icon}
       {/* On a phone the toolbar is icons only; the labels would wrap to four rows. */}
@@ -602,7 +633,7 @@ function ToolbarButton({
       disabled={disabled}
       title={label}
       aria-label={label}
-      className="rounded p-1.5 text-slate-300 transition hover:bg-slate-800 hover:text-slate-100 disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent"
+      className="rounded-lg p-2 text-slate-300 transition-all duration-150 hover:bg-slate-800 hover:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/50 disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent"
     >
       {children}
     </button>
