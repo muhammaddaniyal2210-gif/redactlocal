@@ -302,52 +302,63 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
         </button>
       </div>
 
-      {/* Redaction toolbar */}
-      <div className="flex flex-wrap items-center gap-x-2.5 gap-y-2.5 border-b border-slate-700/50 bg-slate-950/40 px-4 py-3">
-        <button
-          type="button"
-          onClick={() => setDrawMode((on) => !on)}
-          aria-pressed={drawMode}
-          disabled={busy}
-          className={`inline-flex min-h-11 items-center gap-2 rounded-xl border px-3.5 py-2 text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 disabled:opacity-40 sm:min-h-9 ${
-            drawMode
-              ? 'border-emerald-500/50 bg-emerald-500/15 text-emerald-300'
-              : 'border-slate-700/60 bg-slate-800/40 text-slate-400 hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200'
-          }`}
-        >
-          {drawMode ? (
-            <SquareDashedMousePointer className="size-4" />
-          ) : (
-            <MousePointer2 className="size-4" />
-          )}
-          {drawMode ? 'Draw Mode: on' : 'Draw Mode: off'}
-        </button>
+      {/* Redaction toolbar: what you add, then what you take back. */}
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-2.5 border-b border-slate-700/50 bg-slate-950/40 px-4 py-3">
+        {/* Cluster 1 — creation */}
+        <div className="flex shrink-0 items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setDrawMode((on) => !on)}
+            aria-pressed={drawMode}
+            disabled={busy}
+            className={`inline-flex min-h-11 items-center gap-2 rounded-xl border px-3.5 py-2 text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 disabled:opacity-40 sm:min-h-9 ${
+              drawMode
+                ? 'border-emerald-500/50 bg-emerald-500/15 text-emerald-300'
+                : 'border-slate-700/60 bg-slate-800/40 text-slate-400 hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200'
+            }`}
+          >
+            {drawMode ? (
+              <SquareDashedMousePointer className="size-4" />
+            ) : (
+              <MousePointer2 className="size-4" />
+            )}
+            {drawMode ? 'Draw Mode: on' : 'Draw Mode: off'}
+          </button>
 
-        <ActionButton
-          onClick={() => undoLast(pageNumber)}
-          disabled={busy || pageBoxes.length === 0}
-          icon={<Undo2 className="size-4" />}
-          label="Undo Last Box"
-        />
-        <ActionButton
-          onClick={() => clearPage(pageNumber)}
-          disabled={busy || pageBoxes.length === 0}
-          icon={<Eraser className="size-4" />}
-          label="Clear Page"
-        />
-        <ActionButton
-          onClick={clearAll}
-          disabled={busy || total === 0}
-          icon={<Trash2 className="size-4" />}
-          label="Clear All Pages"
-        />
+          <SmartSweep
+            onSweep={runSweep}
+            onError={setSweepError}
+            disabled={busy}
+            pageNumber={pageNumber}
+          />
+        </div>
 
-        <SmartSweep
-          onSweep={runSweep}
-          onError={setSweepError}
-          disabled={busy}
-          pageNumber={pageNumber}
-        />
+        {/* Hidden once the toolbar starts wrapping: a vertical rule between two
+            stacked rows separates nothing. */}
+        <div aria-hidden="true" className="mx-2 hidden h-6 w-px bg-slate-700 lg:block" />
+
+        {/* Cluster 2 — correction. Ghost buttons: these undo work rather than
+            create it, so they stay quiet until you look for them. */}
+        <div className="flex shrink-0 items-center gap-1">
+          <ActionButton
+            onClick={() => undoLast(pageNumber)}
+            disabled={busy || pageBoxes.length === 0}
+            icon={<Undo2 className="size-4" />}
+            label="Undo Last Box"
+          />
+          <ActionButton
+            onClick={() => clearPage(pageNumber)}
+            disabled={busy || pageBoxes.length === 0}
+            icon={<Eraser className="size-4" />}
+            label="Clear Page"
+          />
+          <ActionButton
+            onClick={clearAll}
+            disabled={busy || total === 0}
+            icon={<Trash2 className="size-4" />}
+            label="Clear All Pages"
+          />
+        </div>
 
         <span className="ml-0.5 text-xs tabular-nums text-slate-400">
           {pageBoxes.length} on this page · {total} in document
@@ -606,7 +617,7 @@ function ActionButton({
       disabled={disabled}
       title={label}
       aria-label={label}
-      className="inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-xl border border-slate-700/60 bg-slate-800/40 px-3.5 py-2 text-sm text-slate-300 transition-all duration-200 hover:border-slate-600 hover:bg-slate-800 hover:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/50 disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:border-slate-700/60 disabled:hover:bg-slate-800/40 sm:min-h-9 sm:min-w-0"
+      className="inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-xl border border-transparent px-3 py-2 text-sm text-slate-400 transition-all duration-200 hover:bg-slate-800 hover:text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/50 disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent disabled:hover:text-slate-400 sm:min-h-9 sm:min-w-0"
     >
       {icon}
       {/* On a phone the toolbar is icons only; the labels would wrap to four rows. */}

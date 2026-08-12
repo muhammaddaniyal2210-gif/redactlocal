@@ -106,13 +106,19 @@ export function SmartSweep({ onSweep, onError, disabled = false, pageNumber }: S
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-controls={open ? menuId : undefined}
-        className={`inline-flex min-h-11 items-center gap-2 rounded-xl border px-3.5 py-2 text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 disabled:cursor-not-allowed disabled:opacity-40 sm:min-h-9 ${
+        // Emerald-tinted on a dark ground: reads as the intelligent action
+        // without becoming a second filled button competing with Export.
+        className={`group inline-flex min-h-11 items-center gap-2 rounded-xl border px-3.5 py-2 text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 disabled:cursor-not-allowed disabled:opacity-40 sm:min-h-9 ${
           open
-            ? 'border-emerald-500/50 bg-emerald-500/15 text-emerald-300'
-            : 'border-slate-700/60 bg-slate-800/40 text-slate-300 hover:border-slate-600 hover:bg-slate-800 hover:text-slate-100'
+            ? 'border-emerald-500/50 bg-emerald-500/15 text-emerald-200 shadow-lg shadow-emerald-500/10'
+            : 'border-emerald-500/30 bg-slate-900/60 text-slate-200 hover:border-emerald-500/50 hover:bg-emerald-500/10 hover:text-emerald-200 hover:shadow-lg hover:shadow-emerald-500/10'
         }`}
       >
-        <ScanSearch className="size-4" />
+        <ScanSearch
+          className={`size-4 transition-colors duration-200 ${
+            open ? 'text-emerald-300' : 'text-emerald-400 group-hover:text-emerald-300'
+          }`}
+        />
         Smart Sweep
       </button>
 
