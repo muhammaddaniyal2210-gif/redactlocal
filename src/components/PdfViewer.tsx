@@ -233,20 +233,27 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-900/40 shadow-2xl shadow-black/20">
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-2.5 border-b border-slate-700/50 px-4 py-3">
-        {/* Its own full-width line on a phone: sharing a row with the page and
-            zoom controls crushed the filename down to the file size alone. */}
-        <div className="order-1 flex min-w-0 flex-1 items-center gap-2 text-sm">
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2.5 border-b border-slate-700/50 px-4 py-3">
+        {/* Name and size are one truncating line, not two spans.
+            Previously the size was `shrink-0`: once the name had truncated away
+            there was nothing left to give, so the size overflowed this wrapper
+            and painted straight over the Close button. A single run of text
+            with `truncate` can always give ground, ending in an ellipsis. */}
+        <div className="order-1 flex w-full min-w-0 items-center gap-2 text-sm sm:w-auto sm:flex-1">
           <FileText className="size-4 shrink-0 text-emerald-400/80" />
-          <span className="min-w-0 truncate font-medium text-slate-200" title={doc.name}>
-            {doc.name}
-          </span>
-          <span className="shrink-0 text-xs text-slate-400">
-            {formatBytes(doc.size)} · {doc.pageCount} {doc.pageCount === 1 ? 'page' : 'pages'}
+          <span
+            className="min-w-0 flex-1 truncate"
+            title={`${doc.name} · ${formatBytes(doc.size)} · ${doc.pageCount} ${doc.pageCount === 1 ? 'page' : 'pages'}`}
+          >
+            <span className="font-medium text-slate-200">{doc.name}</span>
+            <span className="text-xs text-slate-400">
+              {' · '}
+              {formatBytes(doc.size)} · {doc.pageCount} {doc.pageCount === 1 ? 'page' : 'pages'}
+            </span>
           </span>
         </div>
 
-        <div className="order-3 flex shrink-0 items-center gap-1 rounded-xl border border-slate-700/60 bg-slate-950/60 p-1 sm:order-2">
+        <div className="order-2 flex shrink-0 items-center gap-1 rounded-xl border border-slate-700/60 bg-slate-950/60 p-1">
           <ToolbarButton label="Previous page" onClick={() => goTo(pageNumber - 1)} disabled={pageNumber <= 1}>
             <ChevronLeft className="size-4" />
           </ToolbarButton>
@@ -302,7 +309,7 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
         <button
           type="button"
           onClick={onClose}
-          className="order-2 inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl border border-slate-700/60 bg-slate-800/40 px-3 py-2 text-sm text-slate-400 transition-all duration-200 hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/50 sm:order-4 sm:min-h-9"
+          className="order-3 inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl border border-slate-700/60 bg-slate-800/40 px-3 py-2 text-sm text-slate-400 transition-all duration-200 hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/50 sm:order-4 sm:min-h-9"
         >
           <X className="size-4" />
           Close
