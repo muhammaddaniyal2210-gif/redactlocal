@@ -62,19 +62,23 @@ for (const { dir, tags } of routes) {
   await writeFile(path.join(outDir, 'index.html'), render(template, tags), 'utf8')
 }
 
-const sitemap = [
-  '<?xml version="1.0" encoding="UTF-8"?>',
-  '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
-  ...routes.map(({ tags }) => `  <url><loc>${tags.canonical}</loc></url>`),
-  '</urlset>',
-].join('\n')
-await writeFile(path.join(DIST, 'sitemap.xml'), sitemap, 'utf8')
-
-await writeFile(
-  path.join(DIST, 'robots.txt'),
-  `User-agent: *\nAllow: /\nSitemap: ${SITE_URL}/sitemap.xml\n`,
-  'utf8',
-)
+// sitemap.xml and robots.txt are checked-in static files in public/, copied to
+// dist by Vite. They are not generated here: writing them from this script
+// would silently overwrite the committed versions, so whatever you edited in
+// public/ would never reach production.
+//
+// The trade is that adding a route means adding its <loc> to public/sitemap.xml
+// by hand. This check makes that impossible to forget quietly.
+const sitemapPath = path.join(DIST, 'sitemap.xml')
+const sitemap = await readFile(sitemapPath, 'utf8').catch(() => '')
+const missing = routes.map(({ tags }) => tags.canonical).filter((url) => !sitemap.includes(url))
 
 console.log(`prerendered ${routes.length} routes → ${routes.map((r) => r.dir).join(', ')}`)
-console.log(`sitemap.xml and robots.txt written for ${SITE_URL}`)
+
+if (!sitemap) {
+  console.warn('warning: dist/sitemap.xml is missing — is public/sitemap.xml present?')
+} else if (missing.length) {
+  console.warn(`warning: not listed in public/sitemap.xml:\n  ${missing.join('\n  ')}`)
+} else {
+  console.log(`sitemap.xml lists all ${routes.length} routes for ${SITE_URL}`)
+}

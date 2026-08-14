@@ -10,7 +10,7 @@ const NODE_ENV_URL = (globalThis as { process?: { env?: Record<string, string | 
 export const SITE_URL = (
   import.meta.env?.VITE_SITE_URL ??
   NODE_ENV_URL ??
-  'https://redactlocal.app'
+  'https://redactlocal.org'
 ).replace(/\/$/, '')
 
 export const SITE_NAME = 'RedactLocal'
