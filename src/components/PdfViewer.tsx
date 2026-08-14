@@ -20,6 +20,7 @@ import {
   ZoomOut,
 } from 'lucide-react'
 import { formatBytes, isRenderCancelled } from '../lib/pdfjs'
+import { backingStoreScale } from '../lib/canvasBudget'
 import {
   downloadBlob,
   exportRedactedPdf,
@@ -126,8 +127,11 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
         setPageSize({ width: base.width, height: base.height })
 
         // Render at device resolution so text stays sharp on HiDPI screens,
-        // then scale the canvas back down with CSS.
-        const dpr = Math.min(window.devicePixelRatio || 1, 2)
+        // then scale the canvas back down with CSS. The ratio drops on a phone,
+        // or at deep zoom, so the bitmap stays inside what the device can hold:
+        // a 595x842pt page at 400% would otherwise be a 32 megapixel canvas.
+        // The page takes the larger share; the overlay only draws rectangles.
+        const dpr = backingStoreScale(viewport.width, viewport.height, { budgetShare: 0.7 })
         canvas.width = Math.floor(viewport.width * dpr)
         canvas.height = Math.floor(viewport.height * dpr)
         // Width only — `h-auto` then derives the height from the canvas's own

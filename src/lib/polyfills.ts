@@ -19,6 +19,17 @@ declare global {
       reject: (reason?: unknown) => void
     }
   }
+
+  // TC39 "upsert" proposal. Chromium shipped it very recently; most Android
+  // browsers, Safari and Firefox have not.
+  interface Map<K, V> {
+    getOrInsert?(key: K, value: V): V
+    getOrInsertComputed?(key: K, callback: (key: K) => V): V
+  }
+  interface WeakMap<K extends WeakKey, V> {
+    getOrInsert?(key: K, value: V): V
+    getOrInsertComputed?(key: K, callback: (key: K) => V): V
+  }
 }
 
 /**
@@ -28,6 +39,60 @@ declare global {
  * browser you cannot reproduce on.
  */
 export const INSTALLED_POLYFILLS: string[] = []
+
+/**
+ * `Map`/`WeakMap` upsert helpers, used 16 times in pdf.js's main bundle and 15
+ * times in its worker. They come from the TC39 upsert proposal, which only very
+ * recent Chromium ships — an Android browser one release behind throws
+ * "this[#t].getOrInsertComputed is not a function" the instant a PDF is parsed.
+ *
+ * Both are defined non-enumerably, matching how the engine would install them,
+ * so nothing that walks these prototypes sees a surprise own-property.
+ */
+function installUpsert(target: object, label: string) {
+  const proto = target as {
+    getOrInsert?: unknown
+    getOrInsertComputed?: unknown
+    get(key: unknown): unknown
+    set(key: unknown, value: unknown): unknown
+    has(key: unknown): boolean
+  }
+
+  const define = (name: string, value: (this: typeof proto, ...args: never[]) => unknown) => {
+    Object.defineProperty(proto, name, { value, writable: true, configurable: true })
+  }
+
+  if (typeof proto.getOrInsert !== 'function') {
+    INSTALLED_POLYFILLS.push(`${label}.getOrInsert`)
+    define('getOrInsert', function (this: typeof proto, key: never, value: never) {
+      if (this.has(key)) return this.get(key)
+      this.set(key, value)
+      return value
+    })
+  }
+
+  if (typeof proto.getOrInsertComputed !== 'function') {
+    INSTALLED_POLYFILLS.push(`${label}.getOrInsertComputed`)
+    define(
+      'getOrInsertComputed',
+      function (this: typeof proto, key: never, callback: (key: never) => unknown) {
+        if (this.has(key)) return this.get(key)
+        if (typeof callback !== 'function') {
+          throw new TypeError('getOrInsertComputed: callback is not a function')
+        }
+        // Per spec the callback receives the key, and the map is re-checked
+        // afterwards because the callback may have inserted it itself.
+        const computed = callback(key)
+        if (this.has(key)) return this.get(key)
+        this.set(key, computed)
+        return computed
+      },
+    )
+  }
+}
+
+installUpsert(Map.prototype, 'Map')
+installUpsert(WeakMap.prototype, 'WeakMap')
 
 if (typeof Promise.withResolvers !== 'function') {
   INSTALLED_POLYFILLS.push('Promise.withResolvers')

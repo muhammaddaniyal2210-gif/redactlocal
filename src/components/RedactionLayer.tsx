@@ -6,6 +6,7 @@ import {
   paintBoxes,
   type RedactionBox,
 } from '../lib/redactions'
+import { backingStoreScale } from '../lib/canvasBudget'
 
 interface RedactionLayerProps {
   /** Page size in unscaled PDF units — the space boxes are stored in. */
@@ -166,7 +167,13 @@ export function RedactionLayer({
   useLayoutEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
-    const dpr = Math.min(window.devicePixelRatio || 1, 2)
+    // Solid axis-aligned rectangles need no subpixel precision, so this canvas
+    // runs at a lower ratio and a smaller share of the budget than the page it
+    // sits on. Both are alive at once; together they must still fit.
+    const dpr = backingStoreScale(baseWidth * scale, baseHeight * scale, {
+      maxRatio: 1.5,
+      budgetShare: 0.3,
+    })
     canvas.width = Math.floor(baseWidth * scale * dpr)
     canvas.height = Math.floor(baseHeight * scale * dpr)
 

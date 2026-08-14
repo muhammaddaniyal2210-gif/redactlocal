@@ -1,6 +1,7 @@
 import { jsPDF } from 'jspdf'
 import { OPS, type PDFDocumentProxy } from 'pdfjs-dist'
 import { loadPdfDocument, readPageText } from './pdfjs'
+import { canvasPixelBudget, MAX_CANVAS_SIDE } from './canvasBudget'
 import { asArray, paintBoxes, type RedactionMap } from './redactions'
 
 /**
@@ -11,24 +12,24 @@ import { asArray, paintBoxes, type RedactionMap } from './redactions'
 export const EXPORT_SCALE = 2
 
 /**
- * WebKit refuses to back a canvas larger than roughly 16.7 million pixels, and
- * caps each axis well below what other engines allow. Over the limit it does
- * not throw — it hands back a blank bitmap, and `toDataURL` returns the empty
- * `"data:,"`. That would produce a silently blank "redacted" page, which for
- * this tool is the worst possible failure, so oversized pages are rasterised at
- * a reduced density instead. A2 and smaller are unaffected at EXPORT_SCALE.
+ * Largest scale at which this page still fits inside the canvas limits.
+ *
+ * An engine over its limit does not throw — it hands back a blank bitmap and
+ * `toDataURL` returns the empty `"data:,"`. That would produce a silently blank
+ * "redacted" page, the worst possible failure for this tool, so an oversized
+ * page is rasterised at reduced density instead. A2 and smaller are unaffected
+ * on a desktop; a phone's budget is much lower and bites sooner.
  */
-const MAX_CANVAS_AREA = 16_777_216
-const MAX_CANVAS_SIDE = 8_192
-
-/** Largest scale at which this page still fits inside the canvas limits. */
 function fitExportScale(baseWidth: number, baseHeight: number): number {
   if (!(baseWidth > 0) || !(baseHeight > 0)) return EXPORT_SCALE
+  // Only one export canvas exists at a time, so it may use the whole budget —
+  // which on a phone is far below the desktop ceiling.
+  const budget = canvasPixelBudget()
   return Math.min(
     EXPORT_SCALE,
     MAX_CANVAS_SIDE / baseWidth,
     MAX_CANVAS_SIDE / baseHeight,
-    Math.sqrt(MAX_CANVAS_AREA / (baseWidth * baseHeight)),
+    Math.sqrt(budget / (baseWidth * baseHeight)),
   )
 }
 
