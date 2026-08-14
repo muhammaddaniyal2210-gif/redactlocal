@@ -233,18 +233,20 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-900/40 shadow-2xl shadow-black/20">
-      <div className="no-scrollbar flex flex-nowrap items-center gap-x-3 gap-y-2.5 overflow-x-auto border-b border-slate-700/50 px-4 py-3 sm:flex-wrap sm:overflow-visible">
-        <div className="flex min-w-0 shrink items-center gap-2 text-sm">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2.5 border-b border-slate-700/50 px-4 py-3">
+        {/* Its own full-width line on a phone: sharing a row with the page and
+            zoom controls crushed the filename down to the file size alone. */}
+        <div className="order-1 flex min-w-0 flex-1 items-center gap-2 text-sm">
           <FileText className="size-4 shrink-0 text-emerald-400/80" />
-          <span className="truncate font-medium text-slate-200" title={doc.name}>
+          <span className="min-w-0 truncate font-medium text-slate-200" title={doc.name}>
             {doc.name}
           </span>
-          <span className="shrink-0 text-xs text-slate-500">
+          <span className="shrink-0 text-xs text-slate-400">
             {formatBytes(doc.size)} · {doc.pageCount} {doc.pageCount === 1 ? 'page' : 'pages'}
           </span>
         </div>
 
-        <div className="ml-auto flex shrink-0 items-center gap-1 rounded-xl border border-slate-700/60 bg-slate-950/60 p-1">
+        <div className="order-3 flex shrink-0 items-center gap-1 rounded-xl border border-slate-700/60 bg-slate-950/60 p-1 sm:order-2">
           <ToolbarButton label="Previous page" onClick={() => goTo(pageNumber - 1)} disabled={pageNumber <= 1}>
             <ChevronLeft className="size-4" />
           </ToolbarButton>
@@ -268,7 +270,7 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
           </ToolbarButton>
         </div>
 
-        <div className="flex shrink-0 items-center gap-1 rounded-xl border border-slate-700/60 bg-slate-950/60 p-1">
+        <div className="order-4 flex shrink-0 items-center gap-1 rounded-xl border border-slate-700/60 bg-slate-950/60 p-1 sm:order-3">
           <ToolbarButton
             label="Zoom out"
             onClick={() => setScale((s) => clampScale(s - ZOOM_STEP))}
@@ -291,7 +293,8 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
           >
             <ZoomIn className="size-4" />
           </ToolbarButton>
-          <ToolbarButton label="Fit to width" onClick={fitToWidth}>
+          {/* The page is already width-fitted by `max-w-full` on a phone. */}
+          <ToolbarButton label="Fit to width" onClick={fitToWidth} className="hidden sm:grid">
             <Maximize2 className="size-4" />
           </ToolbarButton>
         </div>
@@ -299,7 +302,7 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
         <button
           type="button"
           onClick={onClose}
-          className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl border border-slate-700/60 bg-slate-800/40 px-3 py-2 text-sm text-slate-400 transition-all duration-200 hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/50 sm:min-h-9"
+          className="order-2 inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl border border-slate-700/60 bg-slate-800/40 px-3 py-2 text-sm text-slate-400 transition-all duration-200 hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/50 sm:order-4 sm:min-h-9"
         >
           <X className="size-4" />
           Close
@@ -407,7 +410,10 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
         )}
       </div>
 
-      <div ref={stageRef} className="pdf-stage relative min-h-0 flex-1 overflow-auto p-3 sm:p-6">
+      {/* px-8 on a phone leaves ~32px of dead space either side of the page.
+          The canvas swallows touches so it can be drawn on; without a gutter
+          there is nowhere left to start a scroll. */}
+      <div ref={stageRef} className="pdf-stage relative min-h-0 flex-1 overflow-auto px-8 py-4 sm:p-6">
         {rendering && (
           <div className="pointer-events-none absolute right-4 top-4 z-10 flex items-center gap-2 rounded-lg bg-slate-950/85 px-3 py-1.5 text-xs text-slate-300 ring-1 ring-slate-800">
             <Loader2 className="size-3.5 animate-spin text-emerald-400" />
@@ -634,11 +640,13 @@ function ToolbarButton({
   label,
   onClick,
   disabled,
+  className = '',
   children,
 }: {
   label: string
   onClick: () => void
   disabled?: boolean
+  className?: string
   children: React.ReactNode
 }) {
   return (
@@ -648,7 +656,7 @@ function ToolbarButton({
       disabled={disabled}
       title={label}
       aria-label={label}
-      className="grid size-11 place-items-center rounded-lg text-slate-300 transition-all duration-150 hover:bg-slate-800 hover:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/50 disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent sm:size-9"
+      className={`grid size-11 place-items-center rounded-lg text-slate-300 transition-all duration-150 hover:bg-slate-800 hover:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/50 disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent sm:size-9 ${className}`}
     >
       {children}
     </button>

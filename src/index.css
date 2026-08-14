@@ -16,9 +16,11 @@ body {
 
 /* The checkerboard-free page backdrop the canvas sits on. */
 .pdf-stage {
-  /* Keeps a drag that reaches the stage edge from scrolling the page behind it
-     or triggering pull-to-refresh on Android. */
-  overscroll-behavior: contain;
+  /* Horizontal only. `contain` on both axes also swallowed vertical drags that
+     the stage itself could not use, which left the thumb gutters unable to
+     scroll the page — the exact thing they exist for. Vertical drags chain
+     normally; the canvas still refuses them via `touch-action: none`. */
+  overscroll-behavior-x: contain;
   background-image: radial-gradient(circle at 1px 1px, rgb(51 65 85 / 0.55) 1px, transparent 0);
   background-size: 22px 22px;
 }
