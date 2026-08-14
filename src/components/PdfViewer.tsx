@@ -9,11 +9,11 @@ import {
   Loader2,
   Maximize2,
   MousePointer2,
+  Search,
   ShieldCheck,
   ShieldAlert,
   SquareDashedMousePointer,
   Trash2,
-  TriangleAlert,
   Undo2,
   X,
   ZoomIn,
@@ -29,8 +29,8 @@ import {
   type VerificationReport,
 } from '../lib/export'
 import { collectEnvironmentReport, summariseEnvironment } from '../lib/environment'
-import { sweepPage, type SweepCategoryId } from '../lib/detect'
-import { SmartSweep } from './SmartSweep'
+import { scanDocument, type ScanMatch, type SweepCategoryId } from '../lib/detect'
+import { FindRedactPanel } from './FindRedactPanel'
 import { RedactionLayer } from './RedactionLayer'
 import { useRedactions } from '../hooks/useRedactions'
 import type { LoadedDoc } from '../hooks/usePdfDocument'
@@ -69,7 +69,7 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
   const { boxes, addBox, addBoxes, undoLast, clearPage, clearAll, total } = useRedactions()
   const pageBoxes = boxes[pageNumber] ?? []
 
-  const [sweepError, setSweepError] = useState<string | null>(null)
+  const [panelOpen, setPanelOpen] = useState(false)
   const [exporting, setExporting] = useState<ExportProgress | null>(null)
   const [exportError, setExportError] = useState<ExportErrorState | null>(null)
   const [report, setReport] = useState<VerificationReport | null>(null)
@@ -82,13 +82,10 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
     clearAll()
     setReport(null)
     setExportError(null)
-    setSweepError(null)
+    setPanelOpen(false)
   }, [doc, clearAll])
 
-  useEffect(() => {
-    setPageInput(String(pageNumber))
-    setSweepError(null)
-  }, [pageNumber])
+  useEffect(() => setPageInput(String(pageNumber)), [pageNumber])
 
   const goTo = useCallback(
     (next: number) => setPageNumber(Math.min(doc.pageCount, Math.max(1, next))),
@@ -181,19 +178,27 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
   }
 
   /**
-   * Scan the page currently on screen and add a box over every match.
-   *
-   * Errors propagate to SmartSweep, which reports them and closes — a failed
-   * scan must never cost the user the boxes they drew by hand.
+   * Scan every page for confidential patterns. Nothing is drawn here — the
+   * panel reviews the findings first.
    */
-  const runSweep = useCallback(
-    async (enabled: ReadonlySet<SweepCategoryId>) => {
-      const page = await doc.pdf.getPage(pageNumber)
-      const { boxes: found, unavailableReason } = await sweepPage(page, enabled)
-      addBoxes(pageNumber, found)
-      return { added: found.length, unavailableReason }
+  const runScan = useCallback(
+    (enabled: ReadonlySet<SweepCategoryId>, onProgress: (page: number, total: number) => void) =>
+      scanDocument(doc.pdf, enabled, onProgress),
+    [doc.pdf],
+  )
+
+  /** Draw the matches the user confirmed, grouped so each page updates once. */
+  const applyMatches = useCallback(
+    (matches: ScanMatch[]) => {
+      const byPage = new Map<number, ScanMatch['box'][]>()
+      for (const match of matches) {
+        const list = byPage.get(match.page) ?? []
+        list.push(match.box)
+        byPage.set(match.page, list)
+      }
+      for (const [page, boxes] of byPage) addBoxes(page, boxes)
     },
-    [addBoxes, doc.pdf, pageNumber],
+    [addBoxes],
   )
 
   const runExport = useCallback(async () => {
@@ -231,7 +236,10 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
   const busy = exporting !== null
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-900/40 shadow-2xl shadow-black/20">
+    // The panel is a column beside the editor from `lg` up and a stacked block
+    // below it on anything narrower, so a phone never loses the page to it.
+    <div className="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-900/40 shadow-2xl shadow-black/20">
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2.5 border-b border-slate-700/50 px-4 py-3">
         {/* Name and size are one truncating line, not two spans.
             Previously the size was `shrink-0`: once the name had truncated away
@@ -338,12 +346,24 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
             {drawMode ? 'Draw Mode: on' : 'Draw Mode: off'}
           </button>
 
-          <SmartSweep
-            onSweep={runSweep}
-            onError={setSweepError}
+          <button
+            type="button"
+            onClick={() => setPanelOpen((open) => !open)}
+            aria-pressed={panelOpen}
             disabled={busy}
-            pageNumber={pageNumber}
-          />
+            className={`group inline-flex min-h-11 items-center gap-2 rounded-xl border px-3.5 py-2 text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 disabled:cursor-not-allowed disabled:opacity-40 sm:min-h-9 ${
+              panelOpen
+                ? 'border-emerald-500/50 bg-emerald-500/15 text-emerald-200 shadow-lg shadow-emerald-500/10'
+                : 'border-emerald-500/30 bg-slate-900/60 text-slate-200 hover:border-emerald-500/50 hover:bg-emerald-500/10 hover:text-emerald-200 hover:shadow-lg hover:shadow-emerald-500/10'
+            }`}
+          >
+            <Search
+              className={`size-4 transition-colors duration-200 ${
+                panelOpen ? 'text-emerald-300' : 'text-emerald-400 group-hover:text-emerald-300'
+              }`}
+            />
+            Find &amp; Redact
+          </button>
         </div>
 
         {/* Hidden once the toolbar starts wrapping: a vertical rule between two
@@ -395,25 +415,6 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
           </button>
         </div>
 
-        {/* Full width, so it takes its own line in the wrapping toolbar rather
-            than being layered over the badge and the button. */}
-        {sweepError && (
-          <p
-            role="status"
-            className="flex w-full items-start gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs leading-relaxed text-red-200"
-          >
-            <TriangleAlert className="mt-px size-3.5 shrink-0 text-red-300" />
-            <span className="min-w-0 flex-1">{sweepError}</span>
-            <button
-              type="button"
-              onClick={() => setSweepError(null)}
-              aria-label="Dismiss"
-              className="grid size-11 shrink-0 place-items-center rounded-lg text-red-300/80 transition-colors hover:bg-red-500/10 hover:text-red-200 sm:size-7"
-            >
-              <X className="size-3.5" />
-            </button>
-          </p>
-        )}
       </div>
 
       {/* px-8 on a phone leaves ~32px of dead space either side of the page.
@@ -471,6 +472,22 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
             <VerificationPanel report={report} />
           ) : null}
         </div>
+      )}
+      </div>
+
+      {panelOpen && (
+        <aside className="min-h-0 shrink-0 lg:h-full lg:w-80">
+          <div className="h-[24rem] min-h-0 lg:h-full">
+            <FindRedactPanel
+              onScan={runScan}
+              onRedact={applyMatches}
+              onReveal={goTo}
+              onClose={() => setPanelOpen(false)}
+              disabled={busy}
+              documentKey={`${doc.name}:${doc.size}`}
+            />
+          </div>
+        </aside>
       )}
     </div>
   )

@@ -23,10 +23,32 @@ function multiplyTransforms(m1: readonly number[], m2: readonly number[]): numbe
   ]
 }
 
-export type SweepCategoryId = 'emails' | 'phones' | 'cards' | 'ssns'
+export type SweepGroupId = 'communications' | 'identifiers' | 'financial'
+
+export type SweepCategoryId =
+  | 'emails'
+  | 'phones'
+  | 'ssns'
+  | 'ein'
+  | 'govIds'
+  | 'cards'
+  | 'iban'
+  | 'accounts'
+
+export interface SweepGroup {
+  id: SweepGroupId
+  label: string
+}
+
+export const SWEEP_GROUPS: readonly SweepGroup[] = [
+  { id: 'communications', label: 'Communications' },
+  { id: 'identifiers', label: 'Official identifiers' },
+  { id: 'financial', label: 'Financial data' },
+]
 
 export interface SweepCategory {
   id: SweepCategoryId
+  group: SweepGroupId
   label: string
   hint: string
   /**
@@ -34,32 +56,78 @@ export interface SweepCategory {
    * between calls, so reusing one across text items silently skips matches.
    */
   pattern: () => RegExp
+  /**
+   * When set, the box covers this capture group rather than the whole match,
+   * so a context-anchored pattern blacks out the number and not the label
+   * that found it.
+   */
+  capture?: number
 }
 
+/**
+ * Patterns are deliberately a little greedy. Every hit is reviewed by hand in
+ * the panel before anything is drawn, so a false positive costs one click,
+ * while a missed identifier costs a leak.
+ */
 export const SWEEP_CATEGORIES: readonly SweepCategory[] = [
   {
     id: 'emails',
-    label: 'Emails',
+    group: 'communications',
+    label: 'Email addresses',
     hint: 'name@domain.com',
     pattern: () => /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g,
   },
   {
     id: 'phones',
-    label: 'Phone Numbers',
+    group: 'communications',
+    label: 'Phone numbers',
     hint: '+1 (555) 123-4567',
     pattern: () => /\b(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/g,
   },
   {
+    id: 'ssns',
+    group: 'identifiers',
+    label: 'Social security numbers',
+    hint: '123-45-6789',
+    pattern: () => /\b\d{3}-\d{2}-\d{4}\b/g,
+  },
+  {
+    id: 'ein',
+    group: 'identifiers',
+    label: 'Tax IDs (EIN)',
+    hint: '12-3456789',
+    pattern: () => /\b\d{2}-\d{7}\b/g,
+  },
+  {
+    id: 'govIds',
+    group: 'identifiers',
+    label: 'Passport & national IDs',
+    hint: 'AB1234567, 35202-8847193-7',
+    pattern: () => /\b(?:\d{5}-\d{7}-\d|[A-Z]{1,2}\d{6,8})\b/g,
+  },
+  {
     id: 'cards',
-    label: 'Credit Cards',
-    hint: '13–16 digit numbers',
+    group: 'financial',
+    label: 'Card numbers',
+    hint: '13-16 digit numbers',
     pattern: () => /\b(?:\d[ -]*?){13,16}\b/g,
   },
   {
-    id: 'ssns',
-    label: 'SSNs / ID Numbers',
-    hint: '123-45-6789',
-    pattern: () => /\b\d{3}-\d{2}-\d{4}\b/g,
+    id: 'iban',
+    group: 'financial',
+    label: 'IBAN / SWIFT',
+    hint: 'GB29NWBK60161331926819',
+    pattern: () => /\b[A-Z]{2}\d{2}[A-Z0-9]{10,28}\b/g,
+  },
+  {
+    id: 'accounts',
+    group: 'financial',
+    label: 'Account & routing numbers',
+    hint: 'labelled account digits',
+    // Anchored on the label so ordinary long numbers are not swept up; the
+    // capture group keeps the box on the digits.
+    pattern: () => /(?:a\/c|acct\.?|account|routing|sort code|iban)\s*(?:no\.?|number|#)?\s*[:#-]?\s*(\d[\d -]{5,20}\d)/gi,
+    capture: 1,
   },
 ]
 
@@ -217,21 +285,21 @@ function boxForMatch(
   return { x: left, y: top, width: Math.max(right - left, 0), height }
 }
 
-/** Drops boxes that are effectively the same rectangle (two patterns, one hit). */
-function dedupe(boxes: DetectedBox[]): DetectedBox[] {
-  const seen = new Set<string>()
-  return boxes.filter((box) => {
-    const key = [box.x, box.y, box.width, box.height].map((n) => n.toFixed(1)).join(':')
-    if (seen.has(key)) return false
-    seen.add(key)
-    return true
-  })
+export interface ScanMatch {
+  id: string
+  category: SweepCategoryId
+  group: SweepGroupId
+  /** 1-based page the match was found on. */
+  page: number
+  /** The matched text itself. */
+  text: string
+  /** Surrounding line, for judging a false positive at a glance. */
+  snippet: string
+  box: DetectedBox
 }
 
-export interface SweepResult {
-  boxes: DetectedBox[]
-  /** Matches per category, for feedback in the menu. */
-  counts: Record<SweepCategoryId, number>
+export interface PageScan {
+  matches: ScanMatch[]
   /**
    * Set when the page's text could not be read at all, so the caller can say
    * "this browser could not read the text" instead of the indistinguishable
@@ -240,22 +308,59 @@ export interface SweepResult {
   unavailableReason?: string
 }
 
+/** Stop rather than lock the tab up on a pathological document. */
+const MAX_MATCHES = 2000
+
+const SNIPPET_PAD = 28
+
+function buildSnippet(str: string, index: number, length: number): string {
+  const from = Math.max(0, index - SNIPPET_PAD)
+  const to = Math.min(str.length, index + length + SNIPPET_PAD)
+  return `${from > 0 ? '…' : ''}${str.slice(from, to).trim()}${to < str.length ? '…' : ''}`
+}
+
 /**
- * Scan one page's text for the selected categories and return redaction boxes.
+ * Where inside the whole match the reported span sits.
+ *
+ * With a capture group the box should cover the group, not the label that
+ * anchored the pattern. `d`-flag indices give that exactly; without them the
+ * whole match is covered instead, which over-covers rather than under-covers.
+ */
+function spanFor(match: RegExpExecArray, capture: number | undefined) {
+  if (!capture) return { index: match.index, length: match[0].length }
+
+  const group = match[capture]
+  if (typeof group !== 'string' || group.length === 0) {
+    return { index: match.index, length: match[0].length }
+  }
+
+  const indices = (match as RegExpExecArray & { indices?: Array<[number, number] | undefined> })
+    .indices
+  const pair = indices?.[capture]
+  if (pair) return { index: pair[0], length: pair[1] - pair[0] }
+
+  const offset = match[0].indexOf(group)
+  if (offset < 0) return { index: match.index, length: match[0].length }
+  return { index: match.index + offset, length: group.length }
+}
+
+let matchSeq = 0
+
+/**
+ * Scan one page's text and return every match with its box and context.
  *
  * Detection runs per text item. pdf.js splits a visual line into several items
  * whenever the font or positioning changes, so a value broken across items —
  * or across a line wrap — will not match. This assists the user; it does not
  * replace looking at the page.
  */
-export async function sweepPage(
+export async function scanPage(
   page: PDFPageProxy,
+  pageNumber: number,
   enabled: ReadonlySet<SweepCategoryId>,
-): Promise<SweepResult> {
-  const counts: Record<SweepCategoryId, number> = { emails: 0, phones: 0, cards: 0, ssns: 0 }
-  const boxes: DetectedBox[] = []
-
-  if (enabled.size === 0) return { boxes, counts }
+): Promise<PageScan> {
+  const matches: ScanMatch[] = []
+  if (enabled.size === 0) return { matches }
 
   // Reading the page's text is the one step with no fallback. It is also the
   // step that has already failed once in WebKit, so it fails loudly and by
@@ -268,19 +373,16 @@ export async function sweepPage(
     // cannot do. See readPageText().
     content = await readPageText(page)
   } catch (err) {
-    console.error('Smart Sweep could not read the page text:', err)
-    return {
-      boxes,
-      counts,
-      unavailableReason: err instanceof Error ? err.message : String(err),
-    }
+    console.error('Find & Redact could not read the page text:', err)
+    return { matches, unavailableReason: err instanceof Error ? err.message : String(err) }
   }
 
   if (!Array.isArray(viewportTransform) || viewportTransform.length < 6) {
-    return { boxes, counts, unavailableReason: 'This page has no usable coordinate system.' }
+    return { matches, unavailableReason: 'This page has no usable coordinate system.' }
   }
 
   const styles = content?.styles ?? {}
+  const seen = new Set<string>()
 
   for (const rawItem of asArray(content?.items)) {
     if (!isTextItem(rawItem)) continue
@@ -300,28 +402,111 @@ export async function sweepPage(
 
       let match: RegExpExecArray | null
       while ((match = regex.exec(str)) !== null) {
-        // A zero-length match would loop forever.
         if (match[0].length === 0) {
           regex.lastIndex += 1
           continue
         }
+        if (matches.length >= MAX_MATCHES) return { matches }
 
-        // One malformed item must not abandon the rest of the page.
+        const { index, length } = spanFor(match, category.capture)
+
         let box: DetectedBox | null = null
         try {
-          box = boxForMatch(rawItem, viewportTransform, match.index, match[0].length, fontFamily)
+          box = boxForMatch(rawItem, viewportTransform, index, length, fontFamily)
         } catch (err) {
-          console.error('Smart Sweep skipped a text item:', err)
+          console.error('Find & Redact skipped a text item:', err)
           continue
         }
+        if (!box || box.width <= 0 || box.height <= 0) continue
 
-        if (box && box.width > 0 && box.height > 0) {
-          boxes.push(box)
-          counts[category.id] += 1
-        }
+        // Two patterns hitting the same characters is one finding, not two.
+        const key = [box.x, box.y, box.width, box.height].map((n) => n.toFixed(1)).join(':')
+        if (seen.has(key)) continue
+        seen.add(key)
+
+        matches.push({
+          id: `match-${++matchSeq}`,
+          category: category.id,
+          group: category.group,
+          page: pageNumber,
+          text: str.slice(index, index + length),
+          snippet: buildSnippet(str, index, length),
+          box,
+        })
       }
     }
   }
 
-  return { boxes: dedupe(boxes), counts }
+  return { matches: dropContained(matches) }
+}
+
+/**
+ * Drop a finding whose box sits entirely inside another's.
+ *
+ * Patterns overlap by design — the phone matcher happily takes the first
+ * thirteen characters of a national ID. The wider match already covers those
+ * characters, so the narrower one is a duplicate row for the same ink, not a
+ * second finding.
+ */
+function dropContained(matches: ScanMatch[]): ScanMatch[] {
+  const T = 0.5
+  return matches.filter((candidate) =>
+    !matches.some((other) => {
+      if (other === candidate || other.page !== candidate.page) return false
+      const widerThan =
+        other.box.width * other.box.height > candidate.box.width * candidate.box.height
+      if (!widerThan) return false
+      return (
+        candidate.box.x >= other.box.x - T &&
+        candidate.box.y >= other.box.y - T &&
+        candidate.box.x + candidate.box.width <= other.box.x + other.box.width + T &&
+        candidate.box.y + candidate.box.height <= other.box.y + other.box.height + T
+      )
+    }),
+  )
+}
+
+export interface DocumentScan {
+  matches: ScanMatch[]
+  pagesScanned: number
+  /** Pages whose text could not be read, by page number. */
+  unreadablePages: number[]
+}
+
+/**
+ * Scan every page. Pages are read one at a time and released immediately —
+ * holding a whole document's text content at once is what makes a phone
+ * discard the tab.
+ */
+export async function scanDocument(
+  pdf: { numPages: number; getPage: (n: number) => Promise<PDFPageProxy> },
+  enabled: ReadonlySet<SweepCategoryId>,
+  onProgress?: (page: number, total: number) => void,
+): Promise<DocumentScan> {
+  const matches: ScanMatch[] = []
+  const unreadablePages: number[] = []
+  const total = pdf.numPages
+
+  for (let pageNumber = 1; pageNumber <= total; pageNumber++) {
+    onProgress?.(pageNumber, total)
+    let page: PDFPageProxy | null = null
+    try {
+      page = await pdf.getPage(pageNumber)
+      const scan = await scanPage(page, pageNumber, enabled)
+      if (scan.unavailableReason) unreadablePages.push(pageNumber)
+      for (const m of scan.matches) matches.push(m)
+    } catch (err) {
+      console.error(`Find & Redact could not scan page ${pageNumber}:`, err)
+      unreadablePages.push(pageNumber)
+    } finally {
+      try {
+        page?.cleanup()
+      } catch {
+        // Housekeeping only.
+      }
+    }
+    if (matches.length >= MAX_MATCHES) break
+  }
+
+  return { matches, pagesScanned: total, unreadablePages }
 }
