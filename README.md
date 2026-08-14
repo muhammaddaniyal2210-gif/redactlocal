@@ -90,16 +90,13 @@ y = 142 pt.
   collapsible three-bullet explanation of why this beats a cloud tool. It is an inline
   disclosure rather than an overlay — a second modal on top of the existing "Test
   Offline" dialog would be one dialog too many, and it reads better on a phone.
-- **Ad slots** (`.adsense-slot-container`): a 300 × 250 sidebar (`hidden lg:block`) and
-  a 728 × 90 post-download banner. Both reserve their box unconditionally and set
-  `contain: layout paint`.
 - **Progress**: "Processing Page X of Y…" with a determinate bar, then a verify step.
 
 ### Layout stability
 
 The export progress and the result sit *below* the page stage, not above it. Above it,
-every ad and success message would push the canvas down at the exact moment the user is
-still working on it. Measured across a 5-page export: the canvas top-left stayed at
+every success and error message would push the canvas down at the exact moment the user
+is still working on it. Measured across a 5-page export: the canvas top-left stayed at
 (261, 356) and its width at 595 px, with two 0.00025 layout-shift entries recorded by
 `PerformanceObserver` — a total CLS of 0.017 for the whole session, against Google's 0.1
 "good" threshold.
@@ -108,12 +105,13 @@ still working on it. Measured across a 5-page export: the canvas top-left stayed
 flex item refuses to shrink below its content and the whole page scrolls, pushing the
 toolbars and the export result off-screen.
 
-### The ad slots are inert
+### No ad slots
 
-No ad script is loaded. Adding one would put a third-party request — and its tracking —
-on a page whose entire pitch is that it makes none, and would break the offline test in
-the banner directly above it. The slots reserve layout only; wiring a network in is a
-decision with a real privacy cost attached.
+Phase 3 reserved a 300 × 250 sidebar and a 728 × 90 post-download banner. Both are gone.
+They unbalanced the landing page — pushing the drop zone off centre to make room for an
+empty box — and an ad script was never going to be loaded anyway: a third-party request
+on a page whose entire pitch is that it makes none would break the offline test in the
+banner directly above it.
 
 ## Phase 4 (done)
 
@@ -153,7 +151,8 @@ The script imports `landings.ts` and `seo.ts` directly — Node 24 strips the ty
 the build.
 
 Set `VITE_SITE_URL` (build) or `SITE_URL` (prerender) to control the origin used
-in canonical and OpenGraph URLs. It defaults to `https://redactlocal.app`.
+in canonical and OpenGraph URLs. It defaults to `https://redactlocal.org`, the
+production domain.
 
 ### Schema
 

@@ -30,7 +30,6 @@ import {
 } from '../lib/export'
 import { collectEnvironmentReport, summariseEnvironment } from '../lib/environment'
 import { sweepPage, type SweepCategoryId } from '../lib/detect'
-import { AdSlot } from './AdSlot'
 import { SmartSweep } from './SmartSweep'
 import { RedactionLayer } from './RedactionLayer'
 import { useRedactions } from '../hooks/useRedactions'
@@ -469,11 +468,7 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
           {exportError ? (
             <ExportErrorPanel error={exportError} />
           ) : report ? (
-            <>
-              <VerificationPanel report={report} />
-              {/* Reserved below the success state, where it interrupts nothing. */}
-              {report.cleanAsFarAsChecked && <AdSlot variant="post-download" className="mx-auto mt-3" />}
-            </>
+            <VerificationPanel report={report} />
           ) : null}
         </div>
       )}

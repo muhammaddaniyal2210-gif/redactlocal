@@ -1,7 +1,6 @@
 import { PrivacyProofBanner } from './PrivacyProofBanner'
 import { DropZone } from './DropZone'
 import { PdfViewer } from './PdfViewer'
-import { AdSlot } from './AdSlot'
 import { SecurityGuarantee } from './SecurityGuarantee'
 import { usePdfDocument } from '../hooks/usePdfDocument'
 
@@ -16,7 +15,7 @@ interface RedactorWorkspaceProps {
 }
 
 /**
- * The tool itself — privacy banner, drop zone, editor, sidebar ad slot.
+ * The tool itself — privacy banner, drop zone, editor.
  *
  * Every route mounts this same component, so a visitor arriving on
  * /redact-bank-statement gets the identical editor as the home page rather than
@@ -35,9 +34,7 @@ export function RedactorWorkspace({
     <>
       <PrivacyProofBanner />
 
-      {/* Editor and its reserved sidebar. The sidebar only exists from `lg`
-          up, so the editor is never squeezed on a laptop or a phone. */}
-      <div className={`mt-5 flex min-h-0 gap-6 ${editorHeightClass}`}>
+      <div className={`mt-5 flex min-h-0 ${editorHeightClass}`}>
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
           {doc && status === 'ready' ? (
             <PdfViewer doc={doc} onClose={close} />
@@ -60,10 +57,6 @@ export function RedactorWorkspace({
             </div>
           )}
         </div>
-
-        <aside className="hidden lg:block">
-          <AdSlot variant="sidebar" className="sticky top-24" />
-        </aside>
       </div>
     </>
   )
