@@ -240,7 +240,7 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
     // below it on anything narrower, so a phone never loses the page to it.
     <div className="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row">
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-900/40 shadow-2xl shadow-black/20">
-      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2.5 border-b border-slate-700/50 px-4 py-3">
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2.5 border-b border-slate-700/50 px-4 py-3 lg:py-2">
         {/* Name and size are one truncating line, not two spans.
             Previously the size was `shrink-0`: once the name had truncated away
             there was nothing left to give, so the size overflowed this wrapper
@@ -324,7 +324,7 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
       </div>
 
       {/* Redaction toolbar: what you add, then what you take back. */}
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-2.5 border-b border-slate-700/50 bg-slate-950/40 px-4 py-3">
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-2.5 border-b border-slate-700/50 bg-slate-950/40 px-4 py-3 lg:py-2">
         {/* Cluster 1 — creation */}
         <div className="flex shrink-0 items-center gap-2">
           <button
@@ -400,10 +400,6 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
         {/* The badge sits with the button as one unit, so the claim and the
             action it describes can never drift apart when the toolbar wraps. */}
         <div className="ml-auto flex flex-col items-stretch gap-2 sm:items-end">
-          <span className="inline-flex items-center justify-center self-center rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[11px] font-medium tracking-wide text-emerald-300 sm:self-end">
-            Exports as a flattened image (no hidden text)
-          </span>
-
           <button
             type="button"
             onClick={runExport}
@@ -457,11 +453,16 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
                 />
               )}
             </div>
-            <p className="mt-3 text-center text-xs text-slate-500">
-              {drawMode
-                ? 'Drag on the page to cover anything sensitive. Esc cancels the box you are drawing.'
-                : 'Manual Mode is off — turn it on to draw redaction boxes by hand.'}
-            </p>
+            <div className="mt-3 flex flex-col items-center gap-2">
+              <span className="inline-flex items-center rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[11px] font-medium tracking-wide text-emerald-300">
+                Exports as a flattened image (no hidden text)
+              </span>
+              <p className="text-center text-xs text-slate-500">
+                {drawMode
+                  ? 'Drag on the page to cover anything sensitive. Esc cancels the box you are drawing.'
+                  : 'Manual Mode is off — turn it on to draw redaction boxes by hand.'}
+              </p>
+            </div>
           </div>
         )}
       </div>

@@ -37,7 +37,7 @@ export function PrivacyProofBanner() {
 
   return (
     <section className="overflow-hidden rounded-2xl border border-emerald-500/30 bg-emerald-500/10">
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-3 px-4 py-3.5 sm:px-5">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-3 px-4 py-3.5 sm:px-5 lg:py-2.5">
         {/* Takes its own row until there is width to share, otherwise it gets
             crushed into a two-word column beside the badge and the button. */}
         <p className="w-full text-sm leading-relaxed text-emerald-100 sm:w-auto sm:min-w-70 sm:flex-1 sm:text-[0.95rem]">

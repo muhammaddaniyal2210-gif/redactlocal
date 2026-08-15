@@ -24,7 +24,7 @@ export function Layout() {
             calm centred column the drop zone establishes before upload, so the
             page changed shape the moment a file was opened. One container width
             for both states keeps the margins consistent. */}
-        <div className="mx-auto flex min-h-full w-full max-w-6xl flex-col px-4 py-6 sm:px-6">
+        <div className="mx-auto flex min-h-full w-full max-w-6xl flex-col px-4 py-6 sm:px-6 lg:py-4">
           <Outlet />
         </div>
       </main>
