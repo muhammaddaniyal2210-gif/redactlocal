@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
-import { ShieldCheck, WifiOff } from 'lucide-react'
+import { WifiOff } from 'lucide-react'
+import { BrandMark } from './BrandMark'
 
 interface HeaderProps {
   onTestOffline: () => void
@@ -12,9 +13,7 @@ export function Header({ onTestOffline }: HeaderProps) {
         {/* Router link, not an anchor: a full reload here would throw away the
             document the user is in the middle of redacting. */}
         <Link to="/" className="flex items-center gap-2.5">
-          <span className="grid size-9 place-items-center rounded-lg bg-emerald-500/10 ring-1 ring-emerald-500/30">
-            <ShieldCheck className="size-5 text-emerald-400" strokeWidth={2.2} />
-          </span>
+          <BrandMark className="h-7 w-auto shrink-0" />
           <span className="text-lg font-semibold tracking-tight">
             Redact<span className="text-emerald-400">Local</span>
           </span>
