@@ -420,7 +420,14 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
       {/* px-8 on a phone leaves ~32px of dead space either side of the page.
           The canvas swallows touches so it can be drawn on; without a gutter
           there is nowhere left to start a scroll. */}
-      <div ref={stageRef} className="pdf-stage relative min-h-0 flex-1 overflow-auto px-8 py-4 lg:p-6">
+      {/* `overflow-auto` scrolls the page here rather than moving the whole
+          window, so the toolbars stay put. The deep bottom padding is part of
+          the scrollable content: without it the last of the page sits flush
+          against the container edge and reads as clipped. */}
+      <div
+        ref={stageRef}
+        className="pdf-stage relative min-h-0 flex-1 overflow-y-auto overflow-x-auto px-8 pt-4 pb-16 lg:px-6 lg:pt-6"
+      >
         {rendering && (
           <div className="pointer-events-none absolute right-4 top-4 z-10 flex items-center gap-2 rounded-lg bg-slate-950/85 px-3 py-1.5 text-xs text-slate-300 ring-1 ring-slate-800">
             <Loader2 className="size-3.5 animate-spin text-emerald-400" />
