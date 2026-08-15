@@ -63,7 +63,7 @@ export function PrivacyProofBanner() {
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
           aria-controls="privacy-proof-details"
-          className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-3.5 py-1.5 text-sm font-medium text-emerald-200 transition-all duration-200 hover:bg-emerald-500/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60 sm:min-h-9"
+          className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-3.5 py-1.5 text-sm font-medium text-emerald-200 transition-all duration-200 hover:bg-emerald-500/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60 lg:min-h-9"
         >
           Why this is safer
           <ChevronDown className={`size-4 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />

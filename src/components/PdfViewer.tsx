@@ -271,7 +271,7 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
               onBlur={commitPageInput}
               onKeyDown={(e) => e.key === 'Enter' && commitPageInput()}
               aria-label="Page number"
-              className="min-h-11 w-11 rounded-lg border border-slate-700 bg-slate-900 px-1 py-1 text-center text-sm text-slate-100 transition-colors duration-150 focus:border-emerald-500/60 focus:outline-none sm:min-h-9 sm:w-10"
+              className="min-h-11 w-11 rounded-lg border border-slate-700 bg-slate-900 px-1 py-1 text-center text-sm text-slate-100 transition-colors duration-150 focus:border-emerald-500/60 focus:outline-none lg:min-h-9 lg:w-10"
             />
             <span className="text-slate-500">/ {doc.pageCount}</span>
           </div>
@@ -296,7 +296,7 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
             type="button"
             onClick={() => setScale(1)}
             title="Reset zoom to 100%"
-            className="min-h-11 min-w-14 rounded-lg px-1.5 py-1 text-sm tabular-nums text-slate-300 transition-colors duration-150 hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/50 sm:min-h-9"
+            className="min-h-11 min-w-14 rounded-lg px-1.5 py-1 text-sm tabular-nums text-slate-300 transition-colors duration-150 hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/50 lg:min-h-9"
           >
             {Math.round(scale * 100)}%
           </button>
@@ -316,7 +316,7 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
         <button
           type="button"
           onClick={onClose}
-          className="order-3 inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl border border-slate-700/60 bg-slate-800/40 px-3 py-2 text-sm text-slate-400 transition-all duration-200 hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/50 sm:order-4 sm:min-h-9"
+          className="order-3 inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl border border-slate-700/60 bg-slate-800/40 px-3 py-2 text-sm text-slate-400 transition-all duration-200 hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/50 sm:order-4 lg:min-h-9"
         >
           <X className="size-4" />
           Close
@@ -332,7 +332,7 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
             onClick={() => setDrawMode((on) => !on)}
             aria-pressed={drawMode}
             disabled={busy}
-            className={`inline-flex min-h-11 items-center gap-2 rounded-xl border px-3.5 py-2 text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 disabled:opacity-40 sm:min-h-9 ${
+            className={`inline-flex min-h-11 items-center gap-2 rounded-xl border px-3.5 py-2 text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 disabled:opacity-40 lg:min-h-9 ${
               drawMode
                 ? 'border-emerald-500/50 bg-emerald-500/15 text-emerald-300'
                 : 'border-slate-700/60 bg-slate-800/40 text-slate-400 hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200'
@@ -351,7 +351,7 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
             onClick={() => setPanelOpen((open) => !open)}
             aria-pressed={panelOpen}
             disabled={busy}
-            className={`group inline-flex min-h-11 items-center gap-2 rounded-xl border px-3.5 py-2 text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 disabled:cursor-not-allowed disabled:opacity-40 sm:min-h-9 ${
+            className={`group inline-flex min-h-11 items-center gap-2 rounded-xl border px-3.5 py-2 text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 disabled:cursor-not-allowed disabled:opacity-40 lg:min-h-9 ${
               panelOpen
                 ? 'border-emerald-500/50 bg-emerald-500/15 text-emerald-200 shadow-lg shadow-emerald-500/10'
                 : 'border-emerald-500/30 bg-slate-900/60 text-slate-200 hover:border-emerald-500/50 hover:bg-emerald-500/10 hover:text-emerald-200 hover:shadow-lg hover:shadow-emerald-500/10'
@@ -420,7 +420,7 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
       {/* px-8 on a phone leaves ~32px of dead space either side of the page.
           The canvas swallows touches so it can be drawn on; without a gutter
           there is nowhere left to start a scroll. */}
-      <div ref={stageRef} className="pdf-stage relative min-h-0 flex-1 overflow-auto px-8 py-4 sm:p-6">
+      <div ref={stageRef} className="pdf-stage relative min-h-0 flex-1 overflow-auto px-8 py-4 lg:p-6">
         {rendering && (
           <div className="pointer-events-none absolute right-4 top-4 z-10 flex items-center gap-2 rounded-lg bg-slate-950/85 px-3 py-1.5 text-xs text-slate-300 ring-1 ring-slate-800">
             <Loader2 className="size-3.5 animate-spin text-emerald-400" />
@@ -650,7 +650,7 @@ function ActionButton({
       disabled={disabled}
       title={label}
       aria-label={label}
-      className="inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-xl border border-transparent px-3 py-2 text-sm text-slate-400 transition-all duration-200 hover:bg-slate-800 hover:text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/50 disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent disabled:hover:text-slate-400 sm:min-h-9 sm:min-w-0"
+      className="inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-xl border border-transparent px-3 py-2 text-sm text-slate-400 transition-all duration-200 hover:bg-slate-800 hover:text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/50 disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent disabled:hover:text-slate-400 lg:min-h-9 lg:min-w-0"
     >
       {icon}
       {/* On a phone the toolbar is icons only; the labels would wrap to four rows. */}
@@ -679,7 +679,7 @@ function ToolbarButton({
       disabled={disabled}
       title={label}
       aria-label={label}
-      className={`grid size-11 place-items-center rounded-lg text-slate-300 transition-all duration-150 hover:bg-slate-800 hover:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/50 disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent sm:size-9 ${className}`}
+      className={`grid size-11 place-items-center rounded-lg text-slate-300 transition-all duration-150 hover:bg-slate-800 hover:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/50 disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent lg:size-9 ${className}`}
     >
       {children}
     </button>

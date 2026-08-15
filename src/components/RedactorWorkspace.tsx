@@ -34,15 +34,16 @@ export function RedactorWorkspace({
     <>
       <PrivacyProofBanner />
 
-      {/* With a document open the editor row takes a definite height, so the
-          page canvas and the Find & Redact panel each scroll inside themselves
-          and stay the same height. Left to grow it reached 1146px against a
-          764px viewport area, which scrolled the page instead. The empty state
-          keeps its flexible height so the drop zone stays centred. */}
+      {/* From lg up — where Find & Redact sits beside the page — the row takes
+          a definite height so the canvas and the panel each scroll inside
+          themselves and match. Left to grow it reached 1146px against a 764px
+          viewport area and scrolled the page instead. Below lg the panel stacks
+          under the editor and the two share the row, so a fixed height there
+          squeezes the toolbar out of the card; the row grows instead. */}
       <div
         className={`mt-5 flex min-h-0 ${
           doc && status === 'ready'
-            ? 'h-[calc(100dvh-17rem)] min-h-[26rem]'
+            ? 'lg:h-[calc(100dvh-17rem)] lg:min-h-[26rem]'
             : editorHeightClass
         }`}
       >
