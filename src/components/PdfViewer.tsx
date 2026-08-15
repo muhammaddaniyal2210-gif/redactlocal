@@ -343,7 +343,7 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
             ) : (
               <MousePointer2 className="size-4" />
             )}
-            {drawMode ? 'Draw Mode: on' : 'Draw Mode: off'}
+            Manual Mode
           </button>
 
           <button
@@ -453,7 +453,7 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
             <p className="mt-3 text-center text-xs text-slate-500">
               {drawMode
                 ? 'Drag on the page to cover anything sensitive. Esc cancels the box you are drawing.'
-                : 'Draw Mode is off — turn it on to add redaction boxes.'}
+                : 'Manual Mode is off — turn it on to draw redaction boxes by hand.'}
             </p>
           </div>
         )}
