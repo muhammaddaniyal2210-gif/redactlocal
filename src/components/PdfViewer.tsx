@@ -55,6 +55,8 @@ const clampScale = (value: number) => Math.min(MAX_SCALE, Math.max(MIN_SCALE, va
 /** Stable empty set, so an unloaded document does not remount the review list. */
 const EMPTY_SET: ReadonlySet<string> = new Set()
 
+type SidebarTab = 'queue' | 'find'
+
 interface ExportErrorState {
   message: string
   /** Stack, failure phase and engine capabilities, ready to paste into a report. */
@@ -84,7 +86,10 @@ export function PdfViewer({ doc, onClose, queue }: PdfViewerProps) {
   )
   const pageBoxes = boxes[pageNumber] ?? []
 
-  const [panelOpen, setPanelOpen] = useState(false)
+  // One sidebar, one tab at a time. Stacking the queue above Find & Redact
+  // gave each a third of a 636px column — a two-row switcher above a two-match
+  // review list, with both sets of actions competing for the same footer.
+  const [sidebar, setSidebar] = useState<SidebarTab | null>(null)
   const [exporting, setExporting] = useState<ExportProgress | null>(null)
   const [exportError, setExportError] = useState<ExportErrorState | null>(null)
   const [report, setReport] = useState<VerificationReport | null>(null)
@@ -102,6 +107,12 @@ export function PdfViewer({ doc, onClose, queue }: PdfViewerProps) {
   }, [doc])
 
   useEffect(() => setPageInput(String(pageNumber)), [pageNumber])
+
+  // A batch opens on the queue: the first thing to do with several files is see
+  // them. A single file has no queue, so the tab would be an empty room.
+  useEffect(() => {
+    if (isBatch) setSidebar((current) => current ?? 'queue')
+  }, [isBatch])
 
   const goTo = useCallback(
     (next: number) => setPageNumber(Math.min(doc.pageCount, Math.max(1, next))),
@@ -241,13 +252,13 @@ export function PdfViewer({ doc, onClose, queue }: PdfViewerProps) {
     // below it on anything narrower, so a phone never loses the page to it.
     <div className="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row">
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-900/40 shadow-2xl shadow-black/20">
-      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2.5 border-b border-slate-700/50 px-4 py-3 lg:py-2">
+      <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-2.5 border-b border-slate-700/50 px-4 py-3 lg:py-2">
         {/* Name and size are one truncating line, not two spans.
             Previously the size was `shrink-0`: once the name had truncated away
             there was nothing left to give, so the size overflowed this wrapper
             and painted straight over the Close button. A single run of text
             with `truncate` can always give ground, ending in an ellipsis. */}
-        <div className="order-1 flex w-full min-w-0 items-center gap-2 text-sm sm:w-auto sm:flex-1">
+        <div className="order-1 flex w-full min-w-0 items-center gap-2 text-sm sm:w-auto sm:min-w-28 sm:flex-1">
           <FileText className="size-4 shrink-0 text-emerald-400/80" />
           {isBatch && (
             <span className="shrink-0 rounded-full bg-slate-800 px-2 py-0.5 text-[11px] font-medium tabular-nums text-slate-300">
@@ -302,7 +313,7 @@ export function PdfViewer({ doc, onClose, queue }: PdfViewerProps) {
             type="button"
             onClick={() => setScale(1)}
             title="Reset zoom to 100%"
-            className="min-h-11 min-w-14 rounded-lg px-1.5 py-1 text-sm tabular-nums text-slate-300 transition-colors duration-150 hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/50 lg:min-h-9"
+            className="min-h-11 min-w-12 rounded-lg px-1.5 py-1 text-sm tabular-nums text-slate-300 transition-colors duration-150 hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/50 lg:min-h-9"
           >
             {Math.round(scale * 100)}%
           </button>
@@ -319,13 +330,27 @@ export function PdfViewer({ doc, onClose, queue }: PdfViewerProps) {
           </ToolbarButton>
         </div>
 
+        {/* Export lives with the document-level controls, not with the drawing
+            tools. It is also the tallest control in the toolbar, and having it
+            here lets the tool row below collapse to a single line. */}
+        <button
+          type="button"
+          onClick={runExport}
+          disabled={busy}
+          className="order-5 ml-auto inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition-all duration-200 hover:bg-emerald-400 hover:shadow-emerald-400/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none sm:order-3 lg:min-h-9"
+        >
+          {busy ? <Loader2 className="size-4 animate-spin" /> : <ShieldCheck className="size-4" />}
+          {busy ? 'Exporting…' : 'Export Redacted PDF'}
+        </button>
+
         <button
           type="button"
           onClick={onClose}
-          className="order-3 inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl border border-slate-700/60 bg-slate-800/40 px-3 py-2 text-sm text-slate-400 transition-all duration-200 hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/50 sm:order-4 lg:min-h-9"
+          title={isBatch ? 'Close all documents' : 'Close this document'}
+          aria-label={isBatch ? 'Close all documents' : 'Close this document'}
+          className="order-3 grid size-11 shrink-0 place-items-center rounded-xl border border-slate-700/60 bg-slate-800/40 text-slate-400 transition-all duration-200 hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/50 sm:order-4 lg:size-9"
         >
           <X className="size-4" />
-          {isBatch ? 'Close all' : 'Close'}
         </button>
       </div>
 
@@ -357,18 +382,18 @@ export function PdfViewer({ doc, onClose, queue }: PdfViewerProps) {
 
           <button
             type="button"
-            onClick={() => setPanelOpen((open) => !open)}
-            aria-pressed={panelOpen}
+            onClick={() => setSidebar((current) => (current === 'find' ? null : 'find'))}
+            aria-pressed={sidebar === 'find'}
             disabled={busy}
             className={`group inline-flex min-h-11 items-center gap-2 rounded-xl border px-3.5 py-2 text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 disabled:cursor-not-allowed disabled:opacity-40 lg:min-h-9 ${
-              panelOpen
+              sidebar === 'find'
                 ? 'border-emerald-500/50 bg-emerald-500/15 text-emerald-200 shadow-lg shadow-emerald-500/10'
                 : 'border-emerald-500/30 bg-slate-900/60 text-slate-200 hover:border-emerald-500/50 hover:bg-emerald-500/10 hover:text-emerald-200 hover:shadow-lg hover:shadow-emerald-500/10'
             }`}
           >
             <Search
               className={`size-4 transition-colors duration-200 ${
-                panelOpen ? 'text-emerald-300' : 'text-emerald-400 group-hover:text-emerald-300'
+                sidebar === 'find' ? 'text-emerald-300' : 'text-emerald-400 group-hover:text-emerald-300'
               }`}
             />
             Find &amp; Redact
@@ -386,7 +411,6 @@ export function PdfViewer({ doc, onClose, queue }: PdfViewerProps) {
             className="inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-xl border border-slate-700/60 bg-slate-800/40 px-3 py-2 text-sm font-medium text-slate-400 transition-all duration-200 hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 disabled:cursor-not-allowed disabled:opacity-40 lg:min-h-9 lg:min-w-0"
           >
             <Plus className="size-4" />
-            <span className="hidden sm:inline">Add PDFs</span>
           </button>
           <input
             ref={addFilesRef}
@@ -407,10 +431,6 @@ export function PdfViewer({ doc, onClose, queue }: PdfViewerProps) {
               be, not what the existing ones are. */}
           <StampSelector value={queue.stamp} onChange={queue.setStamp} disabled={busy} />
         </div>
-
-        {/* Hidden once the toolbar starts wrapping: a vertical rule between two
-            stacked rows separates nothing. */}
-        <div aria-hidden="true" className="mx-2 hidden h-6 w-px bg-slate-700 lg:block" />
 
         {/* Cluster 2 — correction. Ghost buttons: these undo work rather than
             create it, so they stay quiet until you look for them. */}
@@ -435,23 +455,12 @@ export function PdfViewer({ doc, onClose, queue }: PdfViewerProps) {
           />
         </div>
 
-        <span className="ml-0.5 text-xs tabular-nums text-slate-400">
-          {pageBoxes.length} on this page · {total} in document
+        <span
+          className="ml-0.5 shrink-0 text-xs tabular-nums text-slate-400"
+          title={`${pageBoxes.length} redactions on this page, ${total} in this document`}
+        >
+          {pageBoxes.length}<span className="text-slate-600"> / </span>{total}
         </span>
-
-        {/* The badge sits with the button as one unit, so the claim and the
-            action it describes can never drift apart when the toolbar wraps. */}
-        <div className="ml-auto flex flex-col items-stretch gap-2 sm:items-end">
-          <button
-            type="button"
-            onClick={runExport}
-            disabled={busy}
-            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition-all duration-200 hover:bg-emerald-400 hover:shadow-emerald-400/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none"
-          >
-            {busy ? <Loader2 className="size-4 animate-spin" /> : <ShieldCheck className="size-4" />}
-            {busy ? 'Exporting…' : 'Export Redacted PDF'}
-          </button>
-        </div>
 
       </div>
 
@@ -527,18 +536,26 @@ export function PdfViewer({ doc, onClose, queue }: PdfViewerProps) {
       )}
       </div>
 
-      {(panelOpen || isBatch) && (
+      {sidebar && (
         <aside className="min-h-0 shrink-0 lg:h-full lg:w-80">
           {/* Capped against the viewport so the panel can never drive the row's
               height. Uncapped, its content grew to 1146px inside a 764px area,
               pushing the primary action off screen and making the page scroll
               instead of the panel. */}
-          {/* Queue on top, review below, each scrolling inside its own share of
-              the column — so a forty-file batch and a four-hundred-match review
-              list can both be open without either one pushing the other out. */}
-          <div className="flex h-[60dvh] max-h-[70dvh] min-h-[18rem] flex-col gap-3 lg:h-full lg:max-h-[calc(100dvh-9rem)]">
-            {isBatch && (
-              <div className="min-h-0 flex-1">
+          <div className="flex h-[60dvh] max-h-[70dvh] min-h-[18rem] flex-col overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-900/40 lg:h-full lg:max-h-[calc(100dvh-9rem)]">
+            {isBatch ? (
+              <SidebarTabs
+                active={sidebar}
+                onChange={setSidebar}
+                onClose={() => setSidebar(null)}
+                queueCount={queue.items.length}
+                matchCount={activeItem?.scan?.matches.length ?? null}
+                documentName={doc.name}
+              />
+            ) : null}
+
+            <div className="min-h-0 flex-1">
+              {sidebar === 'queue' ? (
                 <DocumentQueuePanel
                   items={queue.items}
                   activeId={queue.activeId}
@@ -552,12 +569,9 @@ export function PdfViewer({ doc, onClose, queue }: PdfViewerProps) {
                   bulkSummary={queue.bulkSummary}
                   onDismissSummary={queue.dismissSummary}
                   disabled={exporting !== null}
+                  embedded
                 />
-              </div>
-            )}
-
-            {panelOpen && (
-              <div className="min-h-0 flex-[1.35]">
+              ) : (
                 <FindRedactPanel
                   enabled={queue.enabled}
                   onToggleCategory={queue.toggleCategory}
@@ -570,15 +584,99 @@ export function PdfViewer({ doc, onClose, queue }: PdfViewerProps) {
                   onScan={() => void queue.scanActive()}
                   onRedact={queue.applySelected}
                   onReveal={goTo}
-                  onClose={() => setPanelOpen(false)}
+                  onClose={() => setSidebar(null)}
                   disabled={busy}
                   documentName={isBatch ? doc.name : undefined}
+                  embedded={isBatch}
                 />
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </aside>
       )}
+    </div>
+  )
+}
+
+/**
+ * Sidebar tabs: manage the batch, or work the current document.
+ *
+ * Two jobs that are never done at the same moment — you pick a file, then you
+ * redact it — so they take turns in the column instead of splitting it. The
+ * active document's name sits under the tabs because it is the one fact both
+ * views are read against.
+ */
+function SidebarTabs({
+  active,
+  onChange,
+  onClose,
+  queueCount,
+  matchCount,
+  documentName,
+}: {
+  active: SidebarTab
+  onChange: (tab: SidebarTab) => void
+  onClose: () => void
+  queueCount: number
+  matchCount: number | null
+  documentName: string
+}) {
+  const tabs = [
+    { id: 'queue' as const, label: 'Queue', badge: String(queueCount) },
+    {
+      id: 'find' as const,
+      label: 'Find & Redact',
+      badge: matchCount === null ? null : String(matchCount),
+    },
+  ]
+
+  return (
+    <div className="shrink-0 border-b border-slate-700/50">
+      <div className="flex items-center gap-1 px-2 pt-2">
+        <div role="tablist" aria-label="Sidebar" className="flex min-w-0 flex-1 items-center gap-1">
+          {tabs.map(({ id, label, badge }) => {
+            const on = active === id
+            return (
+              <button
+                key={id}
+                type="button"
+                role="tab"
+                aria-selected={on}
+                onClick={() => onChange(id)}
+                className={`inline-flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/60 lg:min-h-9 ${
+                  on
+                    ? 'bg-emerald-500/15 text-emerald-200 ring-1 ring-emerald-500/40'
+                    : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'
+                }`}
+              >
+                <span className="truncate">{label}</span>
+                {badge !== null && (
+                  <span
+                    className={`shrink-0 rounded-full px-1.5 text-[10px] tabular-nums ${
+                      on ? 'bg-emerald-500/25 text-emerald-100' : 'bg-slate-800 text-slate-400'
+                    }`}
+                  >
+                    {badge}
+                  </span>
+                )}
+              </button>
+            )
+          })}
+        </div>
+
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close sidebar"
+          className="grid size-11 shrink-0 place-items-center rounded-lg text-slate-400 transition-all duration-200 hover:bg-slate-800 hover:text-slate-200 lg:size-8"
+        >
+          <X className="size-4" />
+        </button>
+      </div>
+
+      <p className="truncate px-3 pb-2 pt-1.5 text-[11px] text-slate-500" title={documentName}>
+        Working on <span className="text-slate-300">{documentName}</span>
+      </p>
     </div>
   )
 }
@@ -742,11 +840,9 @@ function ActionButton({
       disabled={disabled}
       title={label}
       aria-label={label}
-      className="inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-xl border border-transparent px-3 py-2 text-sm text-slate-400 transition-all duration-200 hover:bg-slate-800 hover:text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/50 disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent disabled:hover:text-slate-400 lg:min-h-9 lg:min-w-0"
+      className="inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-xl border border-transparent px-2 py-2 text-sm text-slate-400 transition-all duration-200 hover:bg-slate-800 hover:text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/50 disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent disabled:hover:text-slate-400 lg:min-h-9 lg:min-w-0"
     >
       {icon}
-      {/* On a phone the toolbar is icons only; the labels would wrap to four rows. */}
-      <span className="hidden sm:inline">{label}</span>
     </button>
   )
 }

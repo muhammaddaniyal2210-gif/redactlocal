@@ -28,6 +28,8 @@ interface DocumentQueuePanelProps {
   bulkSummary: BulkExportSummary | null
   onDismissSummary: () => void
   disabled?: boolean
+  /** Rendered inside the tabbed sidebar, which supplies the card and the title. */
+  embedded?: boolean
 }
 
 function isPdf(file: File) {
@@ -55,6 +57,7 @@ export function DocumentQueuePanel({
   bulkSummary,
   onDismissSummary,
   disabled = false,
+  embedded = false,
 }: DocumentQueuePanelProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [mode, setMode] = useState<BulkExportMode>('zip')
@@ -64,20 +67,25 @@ export function DocumentQueuePanel({
   const totalMatches = items.reduce((n, item) => n + (item.scan?.matches.length ?? 0), 0)
 
   return (
-    <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-900/40">
-      <div className="flex shrink-0 items-center gap-2 border-b border-slate-700/50 px-4 py-3">
-        <Layers className="size-4 shrink-0 text-emerald-400/80" />
+    <div
+      className={
+        embedded
+          ? 'flex h-full min-h-0 flex-col overflow-hidden'
+          : 'flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-900/40'
+      }
+    >
+      <div className="flex shrink-0 items-center gap-2 border-b border-slate-700/50 px-4 py-2.5">
+        {!embedded && <Layers className="size-4 shrink-0 text-emerald-400/80" />}
         <div className="min-w-0 flex-1">
-          <h2 className="truncate text-sm font-semibold text-slate-100">Document Queue</h2>
-          {scanned > 0 && (
-            <p className="truncate text-[11px] tabular-nums text-slate-500">
-              {scanned} of {items.length} scanned · {totalMatches} matches
-            </p>
+          {!embedded && (
+            <h2 className="truncate text-sm font-semibold text-slate-100">Document Queue</h2>
           )}
+          <p className="truncate text-[11px] tabular-nums text-slate-400">
+            {scanned > 0
+              ? `${scanned} of ${items.length} scanned · ${totalMatches} matches`
+              : `${items.length} documents · not scanned yet`}
+          </p>
         </div>
-        <span className="shrink-0 rounded-full bg-slate-800 px-2 py-0.5 text-[11px] font-medium tabular-nums text-slate-300">
-          {items.length}
-        </span>
         <button
           type="button"
           onClick={() => inputRef.current?.click()}

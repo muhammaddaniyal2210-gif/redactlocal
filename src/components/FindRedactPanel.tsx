@@ -33,6 +33,12 @@ interface FindRedactPanelProps {
   disabled?: boolean
   /** Shown when a batch is open, so findings are never read against the wrong file. */
   documentName?: string
+  /**
+   * Rendered inside the tabbed sidebar, which already provides the card, the
+   * title and the close control. Without this the panel would draw a second
+   * border and a second header immediately below the tabs.
+   */
+  embedded?: boolean
 }
 
 const CATEGORY_LABEL = new Map(SWEEP_CATEGORIES.map((c) => [c.id, c.label]))
@@ -68,6 +74,7 @@ export function FindRedactPanel({
   onClose,
   disabled = false,
   documentName,
+  embedded = false,
 }: FindRedactPanelProps) {
   const scanning = scanProgress !== null
   const matches = scan?.matches ?? NO_MATCHES
@@ -85,26 +92,34 @@ export function FindRedactPanel({
   }, [matches])
 
   return (
-    <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-900/40">
-      <div className="flex shrink-0 items-center gap-2 border-b border-slate-700/50 px-4 py-3">
-        <Search className="size-4 shrink-0 text-emerald-400/80" />
-        <div className="min-w-0 flex-1">
-          <h2 className="truncate text-sm font-semibold text-slate-100">Find &amp; Redact</h2>
-          {documentName && (
-            <p className="truncate text-[11px] text-slate-500" title={documentName}>
-              {documentName}
-            </p>
-          )}
+    <div
+      className={
+        embedded
+          ? 'flex h-full min-h-0 flex-col overflow-hidden'
+          : 'flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-900/40'
+      }
+    >
+      {!embedded && (
+        <div className="flex shrink-0 items-center gap-2 border-b border-slate-700/50 px-4 py-3">
+          <Search className="size-4 shrink-0 text-emerald-400/80" />
+          <div className="min-w-0 flex-1">
+            <h2 className="truncate text-sm font-semibold text-slate-100">Find &amp; Redact</h2>
+            {documentName && (
+              <p className="truncate text-[11px] text-slate-500" title={documentName}>
+                {documentName}
+              </p>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close Find and Redact"
+            className="grid size-11 shrink-0 place-items-center rounded-lg text-slate-400 transition-all duration-200 hover:bg-slate-800 hover:text-slate-200 lg:size-8"
+          >
+            <X className="size-4" />
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Close Find and Redact"
-          className="grid size-11 shrink-0 place-items-center rounded-lg text-slate-400 transition-all duration-200 hover:bg-slate-800 hover:text-slate-200 lg:size-8"
-        >
-          <X className="size-4" />
-        </button>
-      </div>
+      )}
 
       <div className="min-h-0 flex-1 overflow-y-auto">
         <details className="border-b border-slate-700/50" open={scan === null}>
