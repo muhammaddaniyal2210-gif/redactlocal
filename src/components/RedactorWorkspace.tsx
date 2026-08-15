@@ -34,7 +34,18 @@ export function RedactorWorkspace({
     <>
       <PrivacyProofBanner />
 
-      <div className={`mt-5 flex min-h-0 ${editorHeightClass}`}>
+      {/* With a document open the editor row takes a definite height, so the
+          page canvas and the Find & Redact panel each scroll inside themselves
+          and stay the same height. Left to grow it reached 1146px against a
+          764px viewport area, which scrolled the page instead. The empty state
+          keeps its flexible height so the drop zone stays centred. */}
+      <div
+        className={`mt-5 flex min-h-0 ${
+          doc && status === 'ready'
+            ? 'h-[calc(100dvh-17rem)] min-h-[26rem]'
+            : editorHeightClass
+        }`}
+      >
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
           {doc && status === 'ready' ? (
             <PdfViewer doc={doc} onClose={close} />

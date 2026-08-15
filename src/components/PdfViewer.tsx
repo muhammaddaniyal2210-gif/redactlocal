@@ -477,7 +477,11 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
 
       {panelOpen && (
         <aside className="min-h-0 shrink-0 lg:h-full lg:w-80">
-          <div className="h-[24rem] min-h-0 lg:h-full">
+          {/* Capped against the viewport so the panel can never drive the row's
+              height. Uncapped, its content grew to 1146px inside a 764px area,
+              pushing the primary action off screen and making the page scroll
+              instead of the panel. */}
+          <div className="h-[60dvh] max-h-[70dvh] min-h-[18rem] lg:h-full lg:max-h-[calc(100dvh-9rem)]">
             <FindRedactPanel
               onScan={runScan}
               onRedact={applyMatches}

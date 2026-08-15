@@ -129,7 +129,7 @@ export function FindRedactPanel({
           type="button"
           onClick={onClose}
           aria-label="Close Find and Redact"
-          className="grid size-11 shrink-0 place-items-center rounded-lg text-slate-400 transition-all duration-200 hover:bg-slate-800 hover:text-slate-200 sm:size-8"
+          className="grid size-11 shrink-0 place-items-center rounded-lg text-slate-400 transition-all duration-200 hover:bg-slate-800 hover:text-slate-200 lg:size-8"
         >
           <X className="size-4" />
         </button>
@@ -145,7 +145,7 @@ export function FindRedactPanel({
             </span>
           </summary>
 
-          <div className="space-y-3 px-4 pb-4">
+          <div className="max-h-60 space-y-3 overflow-y-auto px-4 pb-4">
             {SWEEP_GROUPS.map((group) => (
               <div key={group.id}>
                 <p className="mb-1 text-[11px] font-medium tracking-wide text-slate-500 uppercase">
@@ -156,7 +156,7 @@ export function FindRedactPanel({
                   return (
                     <label
                       key={category.id}
-                      className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-lg px-1.5 transition-colors hover:bg-slate-800/60 sm:min-h-9"
+                      className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-lg px-1.5 transition-colors hover:bg-slate-800/60 lg:min-h-9"
                     >
                       <input
                         type="checkbox"
@@ -249,7 +249,7 @@ export function FindRedactPanel({
           <button
             type="button"
             onClick={runScan}
-            className="min-h-11 w-full rounded-lg py-1 text-[11px] text-slate-400 transition-colors hover:bg-slate-800/60 hover:text-slate-200 sm:min-h-8"
+            className="min-h-11 w-full rounded-lg py-1 text-[11px] text-slate-400 transition-colors hover:bg-slate-800/60 hover:text-slate-200 lg:min-h-8"
           >
             Scan again
           </button>
@@ -309,7 +309,7 @@ function MatchList({
                         : 'border-slate-800 bg-slate-950/40 hover:border-slate-700'
                     }`}
                   >
-                    <label className="-my-2 -ml-1 flex min-h-11 min-w-11 cursor-pointer items-center justify-center sm:my-0 sm:ml-0 sm:min-h-0 sm:min-w-0 sm:items-start sm:justify-start sm:pt-0.5">
+                    <label className="-my-2 -ml-1 flex min-h-11 min-w-11 cursor-pointer items-center justify-center lg:my-0 lg:ml-0 lg:min-h-0 lg:min-w-0 lg:items-start lg:justify-start lg:pt-0.5">
                       <input
                         type="checkbox"
                         checked={checked}
@@ -343,7 +343,7 @@ function MatchList({
                         <button
                           type="button"
                           onClick={() => onReveal(match.page)}
-                          className="-my-3 inline-flex min-h-11 items-center justify-center rounded px-2.5 text-emerald-400/80 underline-offset-2 transition-colors hover:text-emerald-300 hover:underline sm:my-0 sm:min-h-0 sm:px-0.5"
+                          className="-my-3 inline-flex min-h-11 items-center justify-center rounded px-2.5 text-emerald-400/80 underline-offset-2 transition-colors hover:text-emerald-300 hover:underline lg:my-0 lg:min-h-0 lg:px-0.5"
                         >
                           page {match.page}
                         </button>
