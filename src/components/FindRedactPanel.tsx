@@ -156,7 +156,7 @@ export function FindRedactPanel({
                   return (
                     <label
                       key={category.id}
-                      className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-lg px-1.5 transition-colors hover:bg-slate-800/60 lg:min-h-9"
+                      className="relative flex min-h-11 cursor-pointer items-center gap-2.5 rounded-lg px-1.5 transition-colors hover:bg-slate-800/60 lg:min-h-9"
                     >
                       <input
                         type="checkbox"
@@ -309,7 +309,7 @@ function MatchList({
                         : 'border-slate-800 bg-slate-950/40 hover:border-slate-700'
                     }`}
                   >
-                    <label className="-my-2 -ml-1 flex min-h-11 min-w-11 cursor-pointer items-center justify-center lg:my-0 lg:ml-0 lg:min-h-0 lg:min-w-0 lg:items-start lg:justify-start lg:pt-0.5">
+                    <label className="relative -my-2 -ml-1 flex min-h-11 min-w-11 cursor-pointer items-center justify-center lg:my-0 lg:ml-0 lg:min-h-0 lg:min-w-0 lg:items-start lg:justify-start lg:pt-0.5">
                       <input
                         type="checkbox"
                         checked={checked}
