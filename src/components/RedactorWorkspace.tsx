@@ -43,7 +43,7 @@ export function RedactorWorkspace({
       <div
         className={`mt-5 flex min-h-0 ${
           doc && status === 'ready'
-            ? 'lg:h-[calc(100dvh-17rem)] lg:min-h-[26rem]'
+            ? 'lg:h-[calc(100dvh-18rem)] lg:min-h-[26rem]'
             : editorHeightClass
         }`}
       >
