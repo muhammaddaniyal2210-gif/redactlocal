@@ -17,6 +17,7 @@ import { SWEEP_CATEGORIES, scanDocument, type ScanMatch, type SweepCategoryId } 
 import { downloadBlob, exportRedactedPdf, ExportFailure, type ExportProgress } from '../lib/export'
 import { createZip, sanitizeFileName, uniqueName } from '../lib/zip'
 import type { RedactionBox, RedactionMap } from '../lib/redactions'
+import { NO_STAMP, stampTextFor, type StampSelection } from '../lib/stamps'
 
 export type DocStatus = 'empty' | 'loading' | 'ready' | 'error'
 
@@ -77,6 +78,10 @@ export function useDocumentQueue() {
   const [enabled, setEnabled] = useState<Set<SweepCategoryId>>(
     () => new Set(SWEEP_CATEGORIES.map((c) => c.id)),
   )
+  // The stamp is a tool setting, not a document's property: it is shared across
+  // the queue so a batch comes out marked consistently, and it is read only at
+  // the moment a box is created.
+  const [stamp, setStamp] = useState<StampSelection>(NO_STAMP)
   const [scanningAll, setScanningAll] = useState(false)
   const [bulkExport, setBulkExport] = useState<BulkExportProgress | null>(null)
   const [bulkSummary, setBulkSummary] = useState<BulkExportSummary | null>(null)
@@ -89,6 +94,8 @@ export function useDocumentQueue() {
   activeIdRef.current = activeId
   const enabledRef = useRef(enabled)
   enabledRef.current = enabled
+  const stampRef = useRef(stamp)
+  stampRef.current = stamp
 
   /** The parsed active document, so teardown never runs inside a state updater. */
   const openDoc = useRef<PDFDocumentProxy | null>(null)
@@ -281,7 +288,8 @@ export function useDocumentQueue() {
       if (!id) return
       // Minted outside the updater: updaters must stay pure, or React re-running
       // them (as it does in StrictMode) burns ids.
-      const withId: RedactionBox = { ...box, id: `box-${++boxSeq}` }
+      const label = stampTextFor(stampRef.current)
+      const withId: RedactionBox = { ...box, id: `box-${++boxSeq}`, ...(label ? { label } : {}) }
       patch(id, (item) => ({
         boxes: { ...item.boxes, [page]: [...(item.boxes[page] ?? []), withId] },
       }))
@@ -293,7 +301,12 @@ export function useDocumentQueue() {
     (page: number, incoming: readonly Omit<RedactionBox, 'id'>[]) => {
       const id = activeIdRef.current
       if (!id || incoming.length === 0) return
-      const withIds: RedactionBox[] = incoming.map((box) => ({ ...box, id: `box-${++boxSeq}` }))
+      const label = stampTextFor(stampRef.current)
+      const withIds: RedactionBox[] = incoming.map((box) => ({
+        ...box,
+        id: `box-${++boxSeq}`,
+        ...(label ? { label } : {}),
+      }))
       patch(id, (item) => ({
         boxes: { ...item.boxes, [page]: [...(item.boxes[page] ?? []), ...withIds] },
       }))
@@ -551,6 +564,10 @@ export function useDocumentQueue() {
     clearPage,
     clearAll,
     totalBoxes,
+
+    // stamps
+    stamp,
+    setStamp,
 
     // find & redact
     enabled,

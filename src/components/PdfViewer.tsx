@@ -31,7 +31,9 @@ import {
 } from '../lib/export'
 import { collectEnvironmentReport, summariseEnvironment } from '../lib/environment'
 import { sanitizeFileName } from '../lib/zip'
+import { stampTextFor } from '../lib/stamps'
 import { FindRedactPanel } from './FindRedactPanel'
+import { StampSelector } from './StampSelector'
 import { DocumentQueuePanel } from './DocumentQueuePanel'
 import { RedactionLayer } from './RedactionLayer'
 import type { DocumentQueue, LoadedDoc } from '../hooks/useDocumentQueue'
@@ -74,6 +76,7 @@ export function PdfViewer({ doc, onClose, queue }: PdfViewerProps) {
 
   const [drawMode, setDrawMode] = useState(true)
   const { boxes, addBox, undoLast, clearPage, clearAll, activeItem, isBatch } = queue
+  const stampText = stampTextFor(queue.stamp)
   // Boxes are counted for this document alone; the queue tracks the batch total.
   const total = useMemo(
     () => Object.values(boxes).reduce((n, list) => n + list.length, 0),
@@ -328,8 +331,11 @@ export function PdfViewer({ doc, onClose, queue }: PdfViewerProps) {
 
       {/* Redaction toolbar: what you add, then what you take back. */}
       <div className="flex flex-wrap items-center gap-x-2 gap-y-2.5 border-b border-slate-700/50 bg-slate-950/40 px-4 py-3 lg:py-2">
-        {/* Cluster 1 — creation */}
-        <div className="flex shrink-0 items-center gap-2">
+        {/* Cluster 1 — creation. Wraps rather than shrinking: with the stamp
+            selector added, a no-wrap cluster ran 569px wide inside a 375px
+            phone, putting the selector off-screen with nothing to scroll to
+            reach it. */}
+        <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={() => setDrawMode((on) => !on)}
@@ -396,6 +402,10 @@ export function PdfViewer({ doc, onClose, queue }: PdfViewerProps) {
               e.target.value = ''
             }}
           />
+
+          {/* Sits with the creation controls: it changes what the next box will
+              be, not what the existing ones are. */}
+          <StampSelector value={queue.stamp} onChange={queue.setStamp} disabled={busy} />
         </div>
 
         {/* Hidden once the toolbar starts wrapping: a vertical rule between two
@@ -491,7 +501,9 @@ export function PdfViewer({ doc, onClose, queue }: PdfViewerProps) {
               </span>
               <p className="text-center text-xs text-slate-500">
                 {drawMode
-                  ? 'Drag on the page to cover anything sensitive. Esc cancels the box you are drawing.'
+                  ? stampText
+                    ? `Drag on the page to cover anything sensitive. New boxes are stamped “${stampText}”.`
+                    : 'Drag on the page to cover anything sensitive. Esc cancels the box you are drawing.'
                   : 'Manual Mode is off — turn it on to draw redaction boxes by hand.'}
               </p>
             </div>
