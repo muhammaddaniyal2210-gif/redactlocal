@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { Check, ChevronDown, Loader2, Search, TriangleAlert, X } from 'lucide-react'
 import {
   SWEEP_CATEGORIES,
@@ -9,31 +9,36 @@ import {
 } from '../lib/detect'
 
 interface FindRedactPanelProps {
-  /** Runs the scan across the whole document. Rejects only on a hard failure. */
-  onScan: (
-    enabled: ReadonlySet<SweepCategoryId>,
-    onProgress: (page: number, total: number) => void,
-  ) => Promise<DocumentScan>
-  /** Draws the chosen matches. Called with the full match objects. */
-  onRedact: (matches: ScanMatch[]) => void
+  /** Which patterns to look for. Shared across the queue, so Scan All agrees. */
+  enabled: ReadonlySet<SweepCategoryId>
+  onToggleCategory: (id: SweepCategoryId) => void
+
+  /** Findings for the *active* document. Null until it has been scanned. */
+  scan: DocumentScan | null
+  scanError: string | null
+  /** Non-null while this document is being scanned. */
+  scanProgress: { page: number; total: number } | null
+
+  selected: ReadonlySet<string>
+  redacted: ReadonlySet<string>
+  onToggleMatch: (id: string) => void
+
+  /** Scan the active document. */
+  onScan: () => void
+  /** Draw every ticked-but-not-yet-drawn match. */
+  onRedact: () => void
   /** Jump the viewer to a match's page so the user can see it in place. */
   onReveal: (page: number) => void
   onClose: () => void
   disabled?: boolean
-  /** Resets the panel when a different document is opened. */
-  documentKey: string
+  /** Shown when a batch is open, so findings are never read against the wrong file. */
+  documentName?: string
 }
 
 const CATEGORY_LABEL = new Map(SWEEP_CATEGORIES.map((c) => [c.id, c.label]))
 
 /** Stable identity so the memos below do not recompute on every render. */
 const NO_MATCHES: ScanMatch[] = []
-
-type Phase =
-  | { kind: 'idle' }
-  | { kind: 'scanning'; page: number; total: number }
-  | { kind: 'done'; scan: DocumentScan }
-  | { kind: 'failed'; message: string }
 
 /**
  * Find & Redact: scan the document for confidential patterns, review every hit,
@@ -43,62 +48,33 @@ type Phase =
  * document into uselessness or quietly misses something; showing each match
  * with its surrounding line lets the person who knows the document decide,
  * which is the only party who actually can.
+ *
+ * The panel holds no findings of its own. They belong to the document, so that
+ * switching to another file in the queue and back brings the same review list
+ * with the same ticks still on it.
  */
 export function FindRedactPanel({
+  enabled,
+  onToggleCategory,
+  scan,
+  scanError,
+  scanProgress,
+  selected,
+  redacted,
+  onToggleMatch,
   onScan,
   onRedact,
   onReveal,
   onClose,
   disabled = false,
-  documentKey,
+  documentName,
 }: FindRedactPanelProps) {
-  const [phase, setPhase] = useState<Phase>({ kind: 'idle' })
-  const [enabled, setEnabled] = useState<Set<SweepCategoryId>>(
-    () => new Set(SWEEP_CATEGORIES.map((c) => c.id)),
-  )
-  const [selected, setSelected] = useState<Set<string>>(new Set())
-  const [redactedIds, setRedactedIds] = useState<Set<string>>(new Set())
+  const scanning = scanProgress !== null
+  const matches = scan?.matches ?? NO_MATCHES
 
-  // A new document invalidates every finding from the previous one.
-  useEffect(() => {
-    setPhase({ kind: 'idle' })
-    setSelected(new Set())
-    setRedactedIds(new Set())
-  }, [documentKey])
-
-  const toggleCategory = useCallback((id: SweepCategoryId) => {
-    setEnabled((current) => {
-      const next = new Set(current)
-      if (next.has(id)) next.delete(id)
-      else next.add(id)
-      return next
-    })
-  }, [])
-
-  const runScan = useCallback(async () => {
-    setPhase({ kind: 'scanning', page: 0, total: 0 })
-    try {
-      const scan = await onScan(enabled, (page, total) =>
-        setPhase({ kind: 'scanning', page, total }),
-      )
-      // Everything found starts checked: the common case is confirming, not
-      // hunting for the one hit worth keeping.
-      setSelected(new Set(scan.matches.map((m) => m.id)))
-      setRedactedIds(new Set())
-      setPhase({ kind: 'done', scan })
-    } catch (err) {
-      console.error('Find & Redact failed:', err)
-      setPhase({
-        kind: 'failed',
-        message: err instanceof Error ? err.message : 'The scan could not finish.',
-      })
-    }
-  }, [enabled, onScan])
-
-  const matches = phase.kind === 'done' ? phase.scan.matches : NO_MATCHES
   const pending = useMemo(
-    () => matches.filter((m) => selected.has(m.id) && !redactedIds.has(m.id)),
-    [matches, redactedIds, selected],
+    () => matches.filter((m) => selected.has(m.id) && !redacted.has(m.id)),
+    [matches, redacted, selected],
   )
 
   const grouped = useMemo(() => {
@@ -108,23 +84,18 @@ export function FindRedactPanel({
     })).filter((g) => g.items.length > 0)
   }, [matches])
 
-  const applySelected = useCallback(() => {
-    if (pending.length === 0) return
-    onRedact(pending)
-    setRedactedIds((current) => {
-      const next = new Set(current)
-      for (const m of pending) next.add(m.id)
-      return next
-    })
-  }, [onRedact, pending])
-
   return (
     <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-900/40">
-      <div className="flex items-center gap-2 border-b border-slate-700/50 px-4 py-3">
+      <div className="flex shrink-0 items-center gap-2 border-b border-slate-700/50 px-4 py-3">
         <Search className="size-4 shrink-0 text-emerald-400/80" />
-        <h2 className="min-w-0 flex-1 truncate text-sm font-semibold text-slate-100">
-          Find &amp; Redact
-        </h2>
+        <div className="min-w-0 flex-1">
+          <h2 className="truncate text-sm font-semibold text-slate-100">Find &amp; Redact</h2>
+          {documentName && (
+            <p className="truncate text-[11px] text-slate-500" title={documentName}>
+              {documentName}
+            </p>
+          )}
+        </div>
         <button
           type="button"
           onClick={onClose}
@@ -136,7 +107,7 @@ export function FindRedactPanel({
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto">
-        <details className="border-b border-slate-700/50" open={phase.kind !== 'done'}>
+        <details className="border-b border-slate-700/50" open={scan === null}>
           <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-3 text-xs font-medium tracking-wide text-slate-400 transition-colors hover:text-slate-200">
             <ChevronDown className="size-3.5 transition-transform duration-200" />
             What to look for
@@ -161,7 +132,7 @@ export function FindRedactPanel({
                       <input
                         type="checkbox"
                         checked={on}
-                        onChange={() => toggleCategory(category.id)}
+                        onChange={() => onToggleCategory(category.id)}
                         className="peer sr-only"
                       />
                       <span
@@ -185,34 +156,27 @@ export function FindRedactPanel({
           </div>
         </details>
 
-        {phase.kind === 'done' && (
+        {scan && (
           <MatchList
             grouped={grouped}
             selected={selected}
-            redactedIds={redactedIds}
-            onToggle={(id) =>
-              setSelected((current) => {
-                const next = new Set(current)
-                if (next.has(id)) next.delete(id)
-                else next.add(id)
-                return next
-              })
-            }
+            redacted={redacted}
+            onToggle={onToggleMatch}
             onReveal={onReveal}
-            unreadablePages={phase.scan.unreadablePages}
+            unreadablePages={scan.unreadablePages}
           />
         )}
 
-        {phase.kind === 'failed' && (
+        {scanError && (
           <p className="m-4 flex items-start gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs leading-relaxed text-red-200">
             <TriangleAlert className="mt-px size-3.5 shrink-0" />
-            {phase.message}
+            {scanError}
           </p>
         )}
       </div>
 
-      <div className="space-y-2 border-t border-slate-700/50 bg-slate-950/30 p-3">
-        {phase.kind === 'done' && (
+      <div className="shrink-0 space-y-2 border-t border-slate-700/50 bg-slate-950/30 p-3">
+        {scan && (
           <p className="text-center text-[11px] text-slate-400">
             {matches.length === 0
               ? 'No matches found in this document.'
@@ -220,10 +184,10 @@ export function FindRedactPanel({
           </p>
         )}
 
-        {phase.kind === 'done' && matches.length > 0 ? (
+        {scan && matches.length > 0 ? (
           <button
             type="button"
-            onClick={applySelected}
+            onClick={onRedact}
             disabled={disabled || pending.length === 0}
             className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/20 transition-all duration-200 hover:bg-emerald-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
           >
@@ -232,24 +196,25 @@ export function FindRedactPanel({
         ) : (
           <button
             type="button"
-            onClick={runScan}
-            disabled={disabled || enabled.size === 0 || phase.kind === 'scanning'}
+            onClick={onScan}
+            disabled={disabled || enabled.size === 0 || scanning}
             className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/20 transition-all duration-200 hover:bg-emerald-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
           >
-            {phase.kind === 'scanning' && <Loader2 className="size-4 animate-spin" />}
-            {phase.kind === 'scanning'
-              ? phase.total
-                ? `Scanning page ${phase.page} of ${phase.total}…`
+            {scanning && <Loader2 className="size-4 animate-spin" />}
+            {scanning
+              ? scanProgress.total
+                ? `Scanning page ${scanProgress.page} of ${scanProgress.total}…`
                 : 'Scanning…'
               : 'Scan document'}
           </button>
         )}
 
-        {phase.kind === 'done' && matches.length > 0 && (
+        {scan && matches.length > 0 && (
           <button
             type="button"
-            onClick={runScan}
-            className="min-h-11 w-full rounded-lg py-1 text-[11px] text-slate-400 transition-colors hover:bg-slate-800/60 hover:text-slate-200 lg:min-h-8"
+            onClick={onScan}
+            disabled={disabled || scanning}
+            className="min-h-11 w-full rounded-lg py-1 text-[11px] text-slate-400 transition-colors hover:bg-slate-800/60 hover:text-slate-200 disabled:opacity-50 lg:min-h-8"
           >
             Scan again
           </button>
@@ -267,14 +232,14 @@ export function FindRedactPanel({
 function MatchList({
   grouped,
   selected,
-  redactedIds,
+  redacted,
   onToggle,
   onReveal,
   unreadablePages,
 }: {
   grouped: { group: { id: string; label: string }; items: ScanMatch[] }[]
-  selected: Set<string>
-  redactedIds: Set<string>
+  selected: ReadonlySet<string>
+  redacted: ReadonlySet<string>
   onToggle: (id: string) => void
   onReveal: (page: number) => void
   unreadablePages: number[]
@@ -298,7 +263,7 @@ function MatchList({
 
           <ul className="space-y-1">
             {items.map((match) => {
-              const done = redactedIds.has(match.id)
+              const done = redacted.has(match.id)
               const checked = selected.has(match.id)
               return (
                 <li key={match.id}>
@@ -360,3 +325,5 @@ function MatchList({
     </div>
   )
 }
+
+export type { DocumentScan }

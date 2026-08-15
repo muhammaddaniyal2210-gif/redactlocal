@@ -2,7 +2,7 @@ import { PrivacyProofBanner } from './PrivacyProofBanner'
 import { DropZone } from './DropZone'
 import { PdfViewer } from './PdfViewer'
 import { SecurityGuarantee } from './SecurityGuarantee'
-import { usePdfDocument } from '../hooks/usePdfDocument'
+import { useDocumentQueue } from '../hooks/useDocumentQueue'
 
 interface RedactorWorkspaceProps {
   /** Headline above the tool. The landing routes pass their own H1. */
@@ -27,7 +27,8 @@ export function RedactorWorkspace({
   editorHeightClass = 'flex-1',
   headingLevel = 'h1',
 }: RedactorWorkspaceProps) {
-  const { status, error, doc, open, close } = usePdfDocument()
+  const queue = useDocumentQueue()
+  const { status, error, doc, addFiles, closeAll } = queue
   const Heading = headingLevel
 
   return (
@@ -42,14 +43,18 @@ export function RedactorWorkspace({
           squeezes the toolbar out of the card; the row grows instead. */}
       <div
         className={`mt-5 flex min-h-0 ${
-          doc && status === 'ready'
+          doc
             ? 'lg:h-[calc(100dvh-16.5rem)] lg:min-h-[26rem]'
             : editorHeightClass
         }`}
       >
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-          {doc && status === 'ready' ? (
-            <PdfViewer doc={doc} onClose={close} />
+          {/* `doc`, not `status === 'ready'`: during a queue switch the status
+              goes back to loading while the previous document is still on
+              screen, and keying the editor off that would unmount it — and the
+              panel, the zoom and the mode with it — on every click in the queue. */}
+          {doc ? (
+            <PdfViewer doc={doc} onClose={closeAll} queue={queue} />
           ) : (
             <div className="flex flex-1 flex-col justify-center py-4">
               <div className="mb-8 text-center">
@@ -60,7 +65,7 @@ export function RedactorWorkspace({
                   {subheading}
                 </p>
               </div>
-              <DropZone onFile={open} loading={status === 'loading'} error={error} />
+              <DropZone onFiles={addFiles} loading={status === 'loading'} error={error} />
               {/* Directly under the drop zone, in the same column width, so it
                   reads as part of the tool rather than as page furniture. */}
               <div className="mx-auto w-full max-w-2xl">

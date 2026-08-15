@@ -89,16 +89,22 @@ export interface ExportResult {
  * objects, fonts, vector paths and metadata of the source simply have no path
  * into the output.
  */
+export interface ExportOptions {
+  /** Name for the downloaded file. Batch exports pass one per source document. */
+  fileName?: string
+}
+
 export async function exportRedactedPdf(
   pdf: PDFDocumentProxy,
   redactions: RedactionMap,
   onProgress?: (progress: ExportProgress) => void,
+  options?: ExportOptions,
 ): Promise<ExportResult> {
   // Tracks where we were when something threw, so a failure can name the page
   // and phase even when the stack is minified beyond recognition.
   const context = { phase: 'render' as ExportProgress['phase'], page: 0, total: pdf.numPages }
   try {
-    return await runExport(pdf, redactions, context, onProgress)
+    return await runExport(pdf, redactions, context, onProgress, options)
   } catch (err) {
     console.error('Export Stack:', err)
     throw new ExportFailure(err, context)
@@ -135,6 +141,7 @@ async function runExport(
   redactions: RedactionMap,
   context: { phase: ExportProgress['phase']; page: number; total: number },
   onProgress?: (progress: ExportProgress) => void,
+  options?: ExportOptions,
 ): Promise<ExportResult> {
   const total = pdf.numPages
   let doc: jsPDF | null = null
@@ -226,7 +233,7 @@ async function runExport(
   onProgress?.({ phase: 'verify', page: total, total })
   const verification = await verifyExport(blob)
 
-  return { blob, fileName: 'redacted_document.pdf', verification }
+  return { blob, fileName: options?.fileName ?? 'redacted_document.pdf', verification }
 }
 
 /**

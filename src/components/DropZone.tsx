@@ -2,7 +2,8 @@ import { useCallback, useRef, useState } from 'react'
 import { FileWarning, Loader2, Lock, MonitorSmartphone, UploadCloud } from 'lucide-react'
 
 interface DropZoneProps {
-  onFile: (file: File) => void
+  /** Receives every PDF that was dropped or picked, in the order given. */
+  onFiles: (files: File[]) => void
   loading: boolean
   error: string | null
 }
@@ -17,23 +18,44 @@ function isPdf(file: File) {
   return file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')
 }
 
-export function DropZone({ onFile, loading, error }: DropZoneProps) {
+export function DropZone({ onFiles, loading, error }: DropZoneProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [dragging, setDragging] = useState(false)
   const [rejected, setRejected] = useState<string | null>(null)
   const dragDepth = useRef(0)
 
+  /**
+   * Take the PDFs and say plainly what was left behind.
+   *
+   * Dropping a folder's worth of files onto a batch tool and having the
+   * non-PDFs vanish without a word is how someone ends up believing a document
+   * was redacted when it was never opened.
+   */
   const accept = useCallback(
-    (file: File | undefined) => {
-      if (!file) return
-      if (!isPdf(file)) {
-        setRejected(`“${file.name}” is not a PDF.`)
+    (list: FileList | null | undefined) => {
+      const all = Array.from(list ?? [])
+      if (all.length === 0) return
+
+      const pdfs = all.filter(isPdf)
+      const skipped = all.length - pdfs.length
+
+      if (pdfs.length === 0) {
+        setRejected(
+          all.length === 1
+            ? `“${all[0].name}” is not a PDF.`
+            : `None of those ${all.length} files are PDFs.`,
+        )
         return
       }
-      setRejected(null)
-      onFile(file)
+
+      setRejected(
+        skipped > 0
+          ? `Skipped ${skipped} ${skipped === 1 ? 'file that is' : 'files that are'} not a PDF.`
+          : null,
+      )
+      onFiles(pdfs)
     },
-    [onFile],
+    [onFiles],
   )
 
   return (
@@ -54,7 +76,7 @@ export function DropZone({ onFile, loading, error }: DropZoneProps) {
           e.preventDefault()
           dragDepth.current = 0
           setDragging(false)
-          accept(e.dataTransfer?.files?.[0])
+          accept(e.dataTransfer?.files)
         }}
         onClick={() => !loading && inputRef.current?.click()}
         onKeyDown={(e) => {
@@ -65,7 +87,7 @@ export function DropZone({ onFile, loading, error }: DropZoneProps) {
         }}
         role="button"
         tabIndex={0}
-        aria-label="Choose a PDF, or drag one here"
+        aria-label="Choose one or more PDFs, or drag them here"
         aria-busy={loading}
         className={`group grid cursor-pointer place-items-center rounded-2xl border-2 border-dashed px-6 py-16 text-center transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/60 ${
           dragging
@@ -76,10 +98,11 @@ export function DropZone({ onFile, loading, error }: DropZoneProps) {
         <input
           ref={inputRef}
           type="file"
+          multiple
           accept="application/pdf,.pdf"
           className="hidden"
           onChange={(e) => {
-            accept(e.target.files?.[0])
+            accept(e.target.files)
             e.target.value = ''
           }}
         />
@@ -99,10 +122,16 @@ export function DropZone({ onFile, loading, error }: DropZoneProps) {
         </span>
 
         <p className="mt-5 text-base font-medium text-slate-100">
-          {loading ? 'Reading in memory…' : dragging ? 'Drop it — it stays on this device' : 'Drop a PDF here'}
+          {loading
+            ? 'Reading in memory…'
+            : dragging
+              ? 'Drop them — they stay on this device'
+              : 'Drop your PDFs here'}
         </p>
         <p className="mt-1.5 text-sm text-slate-400">
-          {loading ? 'No upload is happening.' : 'or click to browse. Single .pdf file.'}
+          {loading
+            ? 'No upload is happening.'
+            : 'or click to browse. One .pdf, or many for a batch.'}
         </p>
       </div>
 

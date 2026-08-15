@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { RenderTask } from 'pdfjs-dist'
 import {
   CheckCircle2,
@@ -9,6 +9,7 @@ import {
   Loader2,
   Maximize2,
   MousePointer2,
+  Plus,
   Search,
   ShieldCheck,
   ShieldAlert,
@@ -29,15 +30,17 @@ import {
   type VerificationReport,
 } from '../lib/export'
 import { collectEnvironmentReport, summariseEnvironment } from '../lib/environment'
-import { scanDocument, type ScanMatch, type SweepCategoryId } from '../lib/detect'
+import { sanitizeFileName } from '../lib/zip'
 import { FindRedactPanel } from './FindRedactPanel'
+import { DocumentQueuePanel } from './DocumentQueuePanel'
 import { RedactionLayer } from './RedactionLayer'
-import { useRedactions } from '../hooks/useRedactions'
-import type { LoadedDoc } from '../hooks/usePdfDocument'
+import type { DocumentQueue, LoadedDoc } from '../hooks/useDocumentQueue'
 
 interface PdfViewerProps {
   doc: LoadedDoc
   onClose: () => void
+  /** Everything the batch owns: the queue, and this document's boxes and findings. */
+  queue: DocumentQueue
 }
 
 const MIN_SCALE = 0.25
@@ -47,16 +50,20 @@ const STAGE_PADDING = 48
 
 const clampScale = (value: number) => Math.min(MAX_SCALE, Math.max(MIN_SCALE, value))
 
+/** Stable empty set, so an unloaded document does not remount the review list. */
+const EMPTY_SET: ReadonlySet<string> = new Set()
+
 interface ExportErrorState {
   message: string
   /** Stack, failure phase and engine capabilities, ready to paste into a report. */
   details: string
 }
 
-export function PdfViewer({ doc, onClose }: PdfViewerProps) {
+export function PdfViewer({ doc, onClose, queue }: PdfViewerProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
   const renderTask = useRef<RenderTask | null>(null)
+  const addFilesRef = useRef<HTMLInputElement>(null)
 
   const [pageNumber, setPageNumber] = useState(1)
   const [scale, setScale] = useState(1)
@@ -66,24 +73,30 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
   const [pageInput, setPageInput] = useState('1')
 
   const [drawMode, setDrawMode] = useState(true)
-  const { boxes, addBox, addBoxes, undoLast, clearPage, clearAll, total } = useRedactions()
+  const { boxes, addBox, undoLast, clearPage, clearAll, activeItem, isBatch } = queue
+  // Boxes are counted for this document alone; the queue tracks the batch total.
+  const total = useMemo(
+    () => Object.values(boxes).reduce((n, list) => n + list.length, 0),
+    [boxes],
+  )
   const pageBoxes = boxes[pageNumber] ?? []
 
   const [panelOpen, setPanelOpen] = useState(false)
   const [exporting, setExporting] = useState<ExportProgress | null>(null)
   const [exportError, setExportError] = useState<ExportErrorState | null>(null)
   const [report, setReport] = useState<VerificationReport | null>(null)
+  const [exportedName, setExportedName] = useState('redacted_document.pdf')
 
-  // A new document starts clean: page 1, 100 %, no redactions carried over.
+  // Switching documents resets the *view* — page 1, 100 %, last export result
+  // cleared. It must not touch the redactions or the findings: those belong to
+  // the document, and coming back to it has to bring the work back with it.
   useEffect(() => {
     setPageNumber(1)
     setPageInput('1')
     setScale(1)
-    clearAll()
     setReport(null)
     setExportError(null)
-    setPanelOpen(false)
-  }, [doc, clearAll])
+  }, [doc])
 
   useEffect(() => setPageInput(String(pageNumber)), [pageNumber])
 
@@ -177,36 +190,18 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
     else goTo(parsed)
   }
 
-  /**
-   * Scan every page for confidential patterns. Nothing is drawn here — the
-   * panel reviews the findings first.
-   */
-  const runScan = useCallback(
-    (enabled: ReadonlySet<SweepCategoryId>, onProgress: (page: number, total: number) => void) =>
-      scanDocument(doc.pdf, enabled, onProgress),
-    [doc.pdf],
-  )
-
-  /** Draw the matches the user confirmed, grouped so each page updates once. */
-  const applyMatches = useCallback(
-    (matches: ScanMatch[]) => {
-      const byPage = new Map<number, ScanMatch['box'][]>()
-      for (const match of matches) {
-        const list = byPage.get(match.page) ?? []
-        list.push(match.box)
-        byPage.set(match.page, list)
-      }
-      for (const [page, boxes] of byPage) addBoxes(page, boxes)
-    },
-    [addBoxes],
-  )
-
   const runExport = useCallback(async () => {
     setExportError(null)
     setReport(null)
+    // In a batch the file name has to say which document this is, or five
+    // downloads all called redacted_document.pdf land on top of each other.
+    const fileName = isBatch
+      ? `redacted_${sanitizeFileName(doc.name)}.pdf`
+      : 'redacted_document.pdf'
     try {
-      const result = await exportRedactedPdf(doc.pdf, boxes, setExporting)
+      const result = await exportRedactedPdf(doc.pdf, boxes, setExporting, { fileName })
       downloadBlob(result.blob, result.fileName)
+      setExportedName(result.fileName)
       setReport(result.verification)
     } catch (err) {
       // The whole diagnostic goes on screen: message, stack, and what this
@@ -231,9 +226,12 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
     } finally {
       setExporting(null)
     }
-  }, [boxes, doc.pdf])
+  }, [boxes, doc.pdf, doc.name, isBatch])
 
-  const busy = exporting !== null
+  // Batch work locks the manual tools too: a scan or export sweeping the queue
+  // is reading these same documents, and editing boxes underneath it would mean
+  // exporting a document that no longer matches what is on screen.
+  const busy = exporting !== null || queue.busy
 
   return (
     // The panel is a column beside the editor from `lg` up and a stacked block
@@ -248,6 +246,11 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
             with `truncate` can always give ground, ending in an ellipsis. */}
         <div className="order-1 flex w-full min-w-0 items-center gap-2 text-sm sm:w-auto sm:flex-1">
           <FileText className="size-4 shrink-0 text-emerald-400/80" />
+          {isBatch && (
+            <span className="shrink-0 rounded-full bg-slate-800 px-2 py-0.5 text-[11px] font-medium tabular-nums text-slate-300">
+              {queue.items.findIndex((item) => item.id === queue.activeId) + 1}/{queue.items.length}
+            </span>
+          )}
           <span
             className="min-w-0 flex-1 truncate"
             title={`${doc.name} · ${formatBytes(doc.size)} · ${doc.pageCount} ${doc.pageCount === 1 ? 'page' : 'pages'}`}
@@ -319,7 +322,7 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
           className="order-3 inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl border border-slate-700/60 bg-slate-800/40 px-3 py-2 text-sm text-slate-400 transition-all duration-200 hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/50 sm:order-4 lg:min-h-9"
         >
           <X className="size-4" />
-          Close
+          {isBatch ? 'Close all' : 'Close'}
         </button>
       </div>
 
@@ -364,6 +367,35 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
             />
             Find &amp; Redact
           </button>
+
+          {/* The only way into a batch from here. Without it, opening a single
+              file is a one-way door: the queue's own "add" button does not
+              exist until there is a queue to put it in. */}
+          <button
+            type="button"
+            onClick={() => addFilesRef.current?.click()}
+            disabled={busy}
+            title="Add more PDFs to the queue"
+            aria-label="Add more PDFs to the queue"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-xl border border-slate-700/60 bg-slate-800/40 px-3 py-2 text-sm font-medium text-slate-400 transition-all duration-200 hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 disabled:cursor-not-allowed disabled:opacity-40 lg:min-h-9 lg:min-w-0"
+          >
+            <Plus className="size-4" />
+            <span className="hidden sm:inline">Add PDFs</span>
+          </button>
+          <input
+            ref={addFilesRef}
+            type="file"
+            multiple
+            accept="application/pdf,.pdf"
+            className="hidden"
+            onChange={(e) => {
+              const picked = Array.from(e.target.files ?? []).filter(
+                (file) => file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'),
+              )
+              queue.addFiles(picked)
+              e.target.value = ''
+            }}
+          />
         </div>
 
         {/* Hidden once the toolbar starts wrapping: a vertical rule between two
@@ -470,34 +502,68 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
       {/* Progress and the result sit *below* the stage. Anything inserted above
           it would push the page canvas down mid-gesture; from here the canvas
           keeps its position and only the scroll area gives up height. */}
-      {busy && <ExportProgressBar progress={exporting} />}
+      {exporting && <ExportProgressBar progress={exporting} />}
 
       {(report || exportError) && !busy && (
         <div className="border-t border-slate-700/50 px-4 py-3">
           {exportError ? (
             <ExportErrorPanel error={exportError} />
           ) : report ? (
-            <VerificationPanel report={report} />
+            <VerificationPanel report={report} fileName={exportedName} />
           ) : null}
         </div>
       )}
       </div>
 
-      {panelOpen && (
+      {(panelOpen || isBatch) && (
         <aside className="min-h-0 shrink-0 lg:h-full lg:w-80">
           {/* Capped against the viewport so the panel can never drive the row's
               height. Uncapped, its content grew to 1146px inside a 764px area,
               pushing the primary action off screen and making the page scroll
               instead of the panel. */}
-          <div className="h-[60dvh] max-h-[70dvh] min-h-[18rem] lg:h-full lg:max-h-[calc(100dvh-9rem)]">
-            <FindRedactPanel
-              onScan={runScan}
-              onRedact={applyMatches}
-              onReveal={goTo}
-              onClose={() => setPanelOpen(false)}
-              disabled={busy}
-              documentKey={`${doc.name}:${doc.size}`}
-            />
+          {/* Queue on top, review below, each scrolling inside its own share of
+              the column — so a forty-file batch and a four-hundred-match review
+              list can both be open without either one pushing the other out. */}
+          <div className="flex h-[60dvh] max-h-[70dvh] min-h-[18rem] flex-col gap-3 lg:h-full lg:max-h-[calc(100dvh-9rem)]">
+            {isBatch && (
+              <div className="min-h-0 flex-1">
+                <DocumentQueuePanel
+                  items={queue.items}
+                  activeId={queue.activeId}
+                  onActivate={queue.activate}
+                  onRemove={queue.remove}
+                  onAddFiles={queue.addFiles}
+                  onScanAll={() => void queue.scanAll()}
+                  onExportAll={(mode) => void queue.exportAll(mode)}
+                  scanningAll={queue.scanningAll}
+                  bulkExport={queue.bulkExport}
+                  bulkSummary={queue.bulkSummary}
+                  onDismissSummary={queue.dismissSummary}
+                  disabled={exporting !== null}
+                />
+              </div>
+            )}
+
+            {panelOpen && (
+              <div className="min-h-0 flex-[1.35]">
+                <FindRedactPanel
+                  enabled={queue.enabled}
+                  onToggleCategory={queue.toggleCategory}
+                  scan={activeItem?.scan ?? null}
+                  scanError={activeItem?.scanError ?? null}
+                  scanProgress={activeItem?.scanProgress ?? null}
+                  selected={activeItem?.selected ?? EMPTY_SET}
+                  redacted={activeItem?.redacted ?? EMPTY_SET}
+                  onToggleMatch={queue.toggleMatch}
+                  onScan={() => void queue.scanActive()}
+                  onRedact={queue.applySelected}
+                  onReveal={goTo}
+                  onClose={() => setPanelOpen(false)}
+                  disabled={busy}
+                  documentName={isBatch ? doc.name : undefined}
+                />
+              </div>
+            )}
           </div>
         </aside>
       )}
@@ -512,7 +578,13 @@ export function PdfViewer({ doc, onClose }: PdfViewerProps) {
  * could not run on this browser" are different claims, and collapsing them into
  * one green banner would tell the user a file was verified when it was not.
  */
-function VerificationPanel({ report }: { report: VerificationReport }) {
+function VerificationPanel({
+  report,
+  fileName,
+}: {
+  report: VerificationReport
+  fileName: string
+}) {
   const pageWord = report.pages === 1 ? 'page' : 'pages'
 
   if (report.clean) {
@@ -520,7 +592,7 @@ function VerificationPanel({ report }: { report: VerificationReport }) {
       <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2.5">
         <p className="flex items-center gap-2 text-sm font-medium text-emerald-300">
           <CheckCircle2 className="size-4 shrink-0" />
-          Download complete — redacted_document.pdf
+          Download complete — {fileName}
         </p>
         <p className="mt-1 pl-6 text-sm text-emerald-300/80">
           Re-opened and checked: {report.pages} flattened {pageWord}, 0 selectable characters, 0
@@ -535,7 +607,7 @@ function VerificationPanel({ report }: { report: VerificationReport }) {
       <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2.5">
         <p className="flex items-center gap-2 text-sm font-medium text-amber-300">
           <ShieldAlert className="size-4 shrink-0" />
-          Download complete — redacted_document.pdf, partly verified
+          Download complete — {fileName}, partly verified
         </p>
         <p className="mt-1 pl-6 text-sm text-amber-300/90">
           The redaction itself is done: every page was flattened to an image before the file was
