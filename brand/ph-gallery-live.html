@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>RedactLocal — Product Hunt gallery</title>
+<style>
+  /* ============================================================
+     RedactLocal — Product Hunt gallery slide (1270 x 760)
+     LIVE VARIANT
+
+     Identical to ph-gallery.html except the product slot holds an
+     <iframe> of the running app instead of a static PNG. Useful while
+     the layout is being tuned: the preview updates as the app does.
+
+     Requires the dev server. For the shipped asset use ph-gallery.html,
+     which has no runtime dependency.
+     ============================================================ */
+
+  :root {
+    /* Straight from DESIGN.md so the slide and the product match. */
+    --sealed-slate: #020617;
+    --chamber: #0f172a;
+    --seam: #334155;
+    --edge: #475569;
+    --containment-green: #34d399;
+    --text-primary: #f1f5f9;
+    --text-muted: #94a3b8;
+
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto,
+            Helvetica, Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #05070d;          /* Just the page around the slide. */
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+  }
+
+  /* ---------- the slide: a strict, non-negotiable 1270 x 760 ---------- */
+
+  .slide {
+    position: relative;
+    width: 1270px;
+    height: 760px;
+    flex: none;
+    overflow: hidden;
+    background: var(--sealed-slate);
+    font-family: var(--font);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+
+    /* Two rows: the message, then the product. The product row takes
+       everything left over, so the headline can grow without squashing it. */
+    display: grid;
+    grid-template-rows: auto 1fr;
+    row-gap: 30px;
+    padding: 50px 56px 52px;
+  }
+
+  /* Texture, not decoration: the same dot grid the app's canvas sits on.
+     Kept under 4% opacity so it reads as material, never as pattern. */
+  .slide::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle at 1px 1px,
+                      rgb(51 65 85 / 0.55) 1px, transparent 0);
+    background-size: 26px 26px;
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  /* A single soft light behind the product. This is what makes the app
+     "pop" — the surface is lit, rather than the background being styled. */
+  .slide::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 58%;
+    width: 1150px;
+    height: 620px;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(ellipse at center,
+                rgb(52 211 153 / 0.13) 0%,
+                rgb(52 211 153 / 0.05) 38%,
+                transparent 68%);
+    pointer-events: none;
+  }
+
+  .slide > * { position: relative; z-index: 1; }
+
+  /* ---------- header ---------- */
+
+  .header {
+    display: grid;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .lockup {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .lockup svg { height: 22px; width: auto; display: block; }
+
+  .lockup span {
+    font-size: 19px;
+    font-weight: 650;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+  }
+
+  .lockup span em {
+    font-style: normal;
+    color: var(--containment-green);
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 50px;
+    line-height: 1.06;
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    /* Two balanced lines, deliberately: a single 1400px line would have to
+       drop to ~48px to fit, and the hook is the one thing that must read
+       from across a Product Hunt grid. */
+    text-wrap: balance;
+    max-width: 19ch;
+  }
+
+  .sub {
+    margin: 14px 0 0;
+    font-size: 17px;
+    line-height: 1.5;
+    font-weight: 400;
+    color: var(--text-muted);
+    letter-spacing: -0.005em;
+    /* Wide enough to hold the line in one run. At 60ch it broke after
+       "still" and left "works." orphaned on a line of its own. */
+    max-width: 740px;
+  }
+
+  /* ---------- the product slot ---------- */
+
+  .stage {
+    display: grid;
+    place-items: center;
+    min-height: 0;             /* lets the frame shrink inside the 1fr row */
+  }
+
+  .frame {
+    width: 980px;
+    height: 100%;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    overflow: hidden;
+    border: 1px solid rgb(51 65 85 / 0.7);
+    border-radius: 14px;
+    background: var(--chamber);
+    /* Depth comes from one deep drop plus a hairline of light on the rim —
+       the same two-shadow budget the product itself keeps to. */
+    box-shadow:
+      0 2px 0 0 rgb(255 255 255 / 0.04) inset,
+      0 40px 80px -20px rgb(0 0 0 / 0.75),
+      0 0 0 1px rgb(52 211 153 / 0.08);
+  }
+
+  /* A restrained browser bar. It costs 34px and buys the viewer the
+     single most important fact: this is a website, not a desktop app. */
+  .chrome {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 34px;
+    padding: 0 13px;
+    border-bottom: 1px solid rgb(51 65 85 / 0.6);
+    background: rgb(2 6 23 / 0.6);
+  }
+
+  .dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--edge);
+    opacity: 0.55;
+    flex: none;
+  }
+
+  .url {
+    margin-left: 8px;
+    padding: 3px 12px;
+    border-radius: 999px;
+    background: rgb(15 23 42 / 0.9);
+    border: 1px solid rgb(51 65 85 / 0.5);
+    font-size: 11.5px;
+    letter-spacing: 0.01em;
+    color: var(--text-muted);
+  }
+
+  .shot {
+    position: relative;
+    overflow: hidden;
+    background: var(--chamber);
+  }
+
+  .shot img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    /* Cropped from the top: toolbars and the first fold are what matter,
+       and the bottom of a long screenshot is the expendable part. */
+    object-fit: cover;
+    object-position: top center;
+  }
+
+  /* Shown only when app-shot.png is missing, so the layout can be
+     judged before the real screenshot exists. */
+  .placeholder {
+    display: none;
+    place-items: center;
+    height: 100%;
+    text-align: center;
+    color: var(--edge);
+    font-size: 14px;
+    letter-spacing: 0.04em;
+  }
+
+  .shot.is-empty img { display: none; }
+  .shot.is-empty .placeholder { display: grid; }
+
+  /* ---------- 2x export ----------
+     Screenshot tools capture CSS pixels. To get a 2540x1520 asset without
+     changing the layout, uncomment this block and capture the .slide.
+     Everything scales together because only the transform changes.
+
+  .slide { transform: scale(2); transform-origin: top left; }
+  html, body { place-items: start; }
+  ------------------------------------------------------------------ */
+</style>
+</head>
+<body>
+
+<div class="slide">
+
+  <header class="header">
+    <div class="lockup">
+      <!-- The shipped mark, cropped to its artwork exactly as in the app. -->
+      <svg viewBox="7 11.5 34 26.6" aria-hidden="true">
+        <rect x="7" y="11.5" width="26" height="4.6" rx="2.3" fill="#475569"/>
+        <rect x="7" y="20.2" width="34" height="9.2" rx="2.6" fill="#34d399"/>
+        <rect x="7" y="33.5" width="19" height="4.6" rx="2.3" fill="#475569"/>
+      </svg>
+      <span>Redact<em>Local</em></span>
+    </div>
+
+    <h1>Your files never leave your screen.</h1>
+
+    <!-- Delete this line if you want the hook to carry the slide alone. -->
+    <p class="sub">
+      Redact PDFs in the browser. No upload, no account &mdash; turn off your Wi-Fi and it still works.
+    </p>
+  </header>
+
+  <div class="stage">
+    <div class="frame">
+      <div class="chrome">
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="url">redactlocal.org</span>
+      </div>
+
+      <!-- ================= DROP YOUR SCREENSHOT HERE ================= -->
+      <div class="shot" id="shot">
+        <iframe src="/" style="width:1440px;height:900px;border:0;transform:scale(0.6806);transform-origin:top left;"></iframe>
+      </div>
+      </div>
+      <!-- ============================================================= -->
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
