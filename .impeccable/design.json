@@ -1,0 +1,351 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-15T22:37:41.847159Z",
+  "title": "Design System: RedactLocal",
+  "extensions": {
+    "colorMeta": {
+      "containment-green": {
+        "role": "primary",
+        "displayName": "Containment Green",
+        "canonical": "#34d399",
+        "tonalRamp": [
+          "#022c22",
+          "#064e3b",
+          "#065f46",
+          "#047857",
+          "#059669",
+          "#10b981",
+          "#34d399",
+          "#6ee7b7"
+        ]
+      },
+      "containment-green-solid": {
+        "role": "primary",
+        "displayName": "Containment Green Solid",
+        "canonical": "#10b981",
+        "tonalRamp": [
+          "#022c22",
+          "#064e3b",
+          "#065f46",
+          "#047857",
+          "#059669",
+          "#10b981",
+          "#34d399",
+          "#6ee7b7"
+        ]
+      },
+      "sealed-slate": {
+        "role": "neutral",
+        "displayName": "Sealed Slate",
+        "canonical": "#020617",
+        "tonalRamp": [
+          "#020617",
+          "#0f172a",
+          "#1e293b",
+          "#334155",
+          "#475569",
+          "#64748b",
+          "#94a3b8",
+          "#cbd5e1"
+        ]
+      },
+      "chamber": {
+        "role": "neutral",
+        "displayName": "Chamber",
+        "canonical": "#0f172a",
+        "tonalRamp": [
+          "#020617",
+          "#0f172a",
+          "#1e293b",
+          "#334155",
+          "#475569",
+          "#64748b",
+          "#94a3b8",
+          "#cbd5e1"
+        ]
+      },
+      "partition": {
+        "role": "neutral",
+        "displayName": "Partition",
+        "canonical": "#1e293b",
+        "tonalRamp": [
+          "#020617",
+          "#0f172a",
+          "#1e293b",
+          "#334155",
+          "#475569",
+          "#64748b",
+          "#94a3b8",
+          "#cbd5e1"
+        ]
+      },
+      "seam": {
+        "role": "neutral",
+        "displayName": "Seam",
+        "canonical": "#334155",
+        "tonalRamp": [
+          "#020617",
+          "#0f172a",
+          "#1e293b",
+          "#334155",
+          "#475569",
+          "#64748b",
+          "#94a3b8",
+          "#cbd5e1"
+        ]
+      },
+      "warning-amber": {
+        "role": "tertiary",
+        "displayName": "Warning Amber",
+        "canonical": "#fcd34d",
+        "tonalRamp": [
+          "#451a03",
+          "#78350f",
+          "#92400e",
+          "#b45309",
+          "#d97706",
+          "#f59e0b",
+          "#fbbf24",
+          "#fcd34d"
+        ]
+      },
+      "danger-red": {
+        "role": "tertiary",
+        "displayName": "Danger Red",
+        "canonical": "#fca5a5",
+        "tonalRamp": [
+          "#450a0a",
+          "#7f1d1d",
+          "#991b1b",
+          "#b91c1c",
+          "#dc2626",
+          "#ef4444",
+          "#f87171",
+          "#fca5a5"
+        ]
+      },
+      "redaction-black": {
+        "role": "neutral",
+        "displayName": "Redaction Black",
+        "canonical": "#000000",
+        "tonalRamp": [
+          "#000000",
+          "#000000",
+          "#000000",
+          "#000000",
+          "#000000",
+          "#000000",
+          "#000000",
+          "#000000"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The single page headline above the drop zone. One per route."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Landing-page section headings."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Panel titles and the wordmark."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "The working size: control labels, copy, match text. Caps at ~65ch."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Metadata, row status, counts. The densest legible step at 11px."
+      },
+      "data": {
+        "displayName": "Data",
+        "purpose": "Matched strings and numeric readouts, where character differences matter."
+      }
+    },
+    "shadows": [
+      {
+        "name": "document",
+        "value": "0 25px 50px -12px rgb(0 0 0 / 0.5)",
+        "purpose": "The page canvas only. It is a physical page in the room and must read as the one real object on screen."
+      },
+      {
+        "name": "commitment-glow",
+        "value": "0 10px 15px -3px rgb(16 185 129 / 0.25)",
+        "purpose": "The single primary action per surface; brightens to 30% on hover. The system owns no third shadow."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state",
+        "value": "200ms",
+        "purpose": "Default duration for hover, press and toggle transitions."
+      },
+      {
+        "name": "tint",
+        "value": "150ms",
+        "purpose": "Colour-only shifts such as input focus borders and tab hovers."
+      },
+      {
+        "name": "reveal",
+        "value": "300ms ease-out",
+        "purpose": "Progress bars and collapsible panels animating on a grid row."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Action",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The single commitment action on a surface. One per screen; carries the only coloured shadow in the system.",
+      "html": "<button class=\"ds-btn-primary\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z\"/><path d=\"m9 12 2 2 4-4\"/></svg>Export Redacted PDF</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 2.75rem; padding: 0.5rem 1rem; border: none; border-radius: 0.75rem; background: #10b981; color: #020617; font: 600 0.875rem/1.5 Inter, ui-sans-serif, system-ui, sans-serif; cursor: pointer; box-shadow: 0 10px 15px -3px rgb(16 185 129 / 0.25); transition: background 0.2s, box-shadow 0.2s, transform 0.2s; } .ds-btn-primary svg { width: 1rem; height: 1rem; flex: none; } .ds-btn-primary:hover { background: #34d399; box-shadow: 0 10px 15px -3px rgb(52 211 153 / 0.3); } .ds-btn-primary:active { transform: scale(0.98); } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 2px #020617, 0 0 0 4px rgb(52 211 153 / 0.6); }"
+    },
+    {
+      "name": "Toggle Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "A mode switch such as Manual Mode. Quiet when off; takes a Containment Green tint and border when on.",
+      "html": "<button class=\"ds-btn-toggle is-on\" aria-pressed=\"true\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 3a2 2 0 0 0-2 2\"/><path d=\"M19 3a2 2 0 0 1 2 2\"/><path d=\"M5 21a2 2 0 0 1-2-2\"/><path d=\"M9 3h1\"/><path d=\"M9 21h2\"/><path d=\"M14 3h1\"/><path d=\"M3 9v1\"/><path d=\"M21 9v2\"/><path d=\"M3 14v1\"/><path d=\"m21 15-6 6-3-3 6-6z\"/></svg>Manual Mode</button> <button class=\"ds-btn-toggle\" aria-pressed=\"false\">Find &amp; Redact</button>",
+      "css": ".ds-btn-toggle { display: inline-flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; padding: 0.5rem 0.875rem; border: 1px solid rgb(51 65 85 / 0.6); border-radius: 0.75rem; background: rgb(30 41 59 / 0.4); color: #94a3b8; font: 500 0.875rem/1.5 Inter, ui-sans-serif, system-ui, sans-serif; cursor: pointer; transition: background 0.2s, border-color 0.2s, color 0.2s; } .ds-btn-toggle svg { width: 1rem; height: 1rem; flex: none; } .ds-btn-toggle:hover { border-color: #475569; background: #1e293b; color: #cbd5e1; } .ds-btn-toggle.is-on { border-color: rgb(16 185 129 / 0.5); background: rgb(16 185 129 / 0.15); color: #6ee7b7; } .ds-btn-toggle:focus-visible { outline: none; box-shadow: 0 0 0 2px rgb(16 185 129 / 0.5); }"
+    },
+    {
+      "name": "Ghost Action",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Corrective actions only (undo, clear). Icon-only and near-invisible at rest, because they undo work rather than create it.",
+      "html": "<button class=\"ds-btn-ghost\" aria-label=\"Undo last box\" title=\"Undo last box\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M9 14 4 9l5-5\"/><path d=\"M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v0a5.5 5.5 0 0 1-5.5 5.5H11\"/></svg></button> <button class=\"ds-btn-ghost\" disabled aria-label=\"Clear page\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m7 21-4.3-4.3a1 1 0 0 1 0-1.4l9.6-9.6a1 1 0 0 1 1.4 0l5.6 5.6a1 1 0 0 1 0 1.4L13 21\"/><path d=\"M22 21H7\"/></svg></button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; justify-content: center; min-width: 2.75rem; min-height: 2.75rem; padding: 0.5rem; border: 1px solid transparent; border-radius: 0.75rem; background: transparent; color: #94a3b8; cursor: pointer; transition: background 0.2s, color 0.2s; } .ds-btn-ghost svg { width: 1rem; height: 1rem; } .ds-btn-ghost:hover:not(:disabled) { background: #1e293b; color: #cbd5e1; } .ds-btn-ghost:disabled { opacity: 0.35; cursor: not-allowed; } .ds-btn-ghost:focus-visible { outline: none; box-shadow: 0 0 0 2px rgb(100 116 139 / 0.5); }"
+    },
+    {
+      "name": "Panel Surface",
+      "kind": "card",
+      "refersTo": "surface-panel",
+      "description": "The enclosure. Translucent Chamber over the ground, hairline Seam border, no shadow. Header pinned, body scrolls.",
+      "html": "<section class=\"ds-panel\"><header class=\"ds-panel-head\"><h3>Find &amp; Redact</h3><p>invoice-q1.pdf</p></header><div class=\"ds-panel-body\">Matching runs on this device against the text already in memory.</div></section>",
+      "css": ".ds-panel { display: flex; flex-direction: column; overflow: hidden; border: 1px solid rgb(51 65 85 / 0.5); border-radius: 1rem; background: rgb(15 23 42 / 0.4); font-family: Inter, ui-sans-serif, system-ui, sans-serif; } .ds-panel-head { flex: none; padding: 0.75rem 1rem; border-bottom: 1px solid rgb(51 65 85 / 0.5); } .ds-panel-head h3 { margin: 0; font-size: 0.875rem; font-weight: 600; color: #f1f5f9; } .ds-panel-head p { margin: 0; font-size: 0.6875rem; color: #64748b; } .ds-panel-body { padding: 0.75rem 1rem; font-size: 0.6875rem; line-height: 1.5; color: #94a3b8; }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "A recessed well in the ground colour. Focus shifts the border to green; no ring, because the field is already enclosed.",
+      "html": "<input class=\"ds-input\" type=\"text\" value=\"EXEMPTION 6\" aria-label=\"Custom stamp text\">",
+      "css": ".ds-input { min-height: 2.75rem; padding: 0.5rem 0.75rem; border: 1px solid rgb(51 65 85 / 0.6); border-radius: 0.75rem; background: rgb(2 6 23 / 0.6); color: #f1f5f9; font: 400 0.875rem/1.5 Inter, ui-sans-serif, system-ui, sans-serif; transition: border-color 0.15s; } .ds-input::placeholder { color: #475569; } .ds-input:focus { outline: none; border-color: rgb(16 185 129 / 0.6); }"
+    },
+    {
+      "name": "Sidebar Tabs",
+      "kind": "nav",
+      "refersTo": "tab-active",
+      "description": "Two jobs that are never done at once take turns in the column. Each tab carries a count badge.",
+      "html": "<div class=\"ds-tabs\" role=\"tablist\"><button class=\"ds-tab is-active\" role=\"tab\" aria-selected=\"true\">Queue<span class=\"ds-tab-badge\">3</span></button><button class=\"ds-tab\" role=\"tab\" aria-selected=\"false\">Find &amp; Redact<span class=\"ds-tab-badge\">48</span></button></div>",
+      "css": ".ds-tabs { display: flex; align-items: center; gap: 0.25rem; padding: 0.5rem; font-family: Inter, ui-sans-serif, system-ui, sans-serif; } .ds-tab { display: inline-flex; flex: 1; align-items: center; justify-content: center; gap: 0.375rem; min-height: 2.75rem; padding: 0.375rem 0.5rem; border: none; border-radius: 0.5rem; background: transparent; color: #94a3b8; font-size: 0.75rem; font-weight: 500; cursor: pointer; transition: background 0.2s, color 0.2s; } .ds-tab:hover { background: rgb(30 41 59 / 0.6); color: #cbd5e1; } .ds-tab.is-active { background: rgb(16 185 129 / 0.15); color: #a7f3d0; box-shadow: inset 0 0 0 1px rgb(16 185 129 / 0.4); } .ds-tab-badge { border-radius: 9999px; padding: 0 0.375rem; background: #1e293b; color: #94a3b8; font-size: 0.625rem; font-variant-numeric: tabular-nums; } .ds-tab.is-active .ds-tab-badge { background: rgb(16 185 129 / 0.25); color: #d1fae5; } .ds-tab:focus-visible { outline: none; box-shadow: 0 0 0 2px rgb(16 185 129 / 0.6); }"
+    },
+    {
+      "name": "Queue Row",
+      "kind": "custom",
+      "description": "One document in the batch. Two lines: name, then size and status sharing a row so the switcher stays scannable in a short column.",
+      "html": "<ul class=\"ds-queue\"><li><button class=\"ds-queue-row is-active\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z\"/><path d=\"M14 2v4a2 2 0 0 0 2 2h4\"/></svg><span class=\"ds-queue-text\"><span class=\"ds-queue-name\">bank-statement-q1.pdf</span><span class=\"ds-queue-meta\">184 KB &middot; 12 pp<em class=\"ds-queue-status\">18 to review</em></span></span></button></li><li><button class=\"ds-queue-row\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z\"/><path d=\"M14 2v4a2 2 0 0 0 2 2h4\"/></svg><span class=\"ds-queue-text\"><span class=\"ds-queue-name\">passport-scan.pdf</span><span class=\"ds-queue-meta\">96 KB &middot; 2 pp</span></span></button></li></ul>",
+      "css": ".ds-queue { list-style: none; margin: 0; padding: 0.5rem; font-family: Inter, ui-sans-serif, system-ui, sans-serif; } .ds-queue-row { display: flex; align-items: flex-start; gap: 0.625rem; width: 100%; min-height: 2.75rem; padding: 0.5rem 0.625rem; border: 1px solid transparent; border-radius: 0.75rem; background: transparent; text-align: left; cursor: pointer; transition: background 0.2s, border-color 0.2s; } .ds-queue-row:hover { border-color: #334155; background: rgb(30 41 59 / 0.5); } .ds-queue-row.is-active { border-color: rgb(16 185 129 / 0.5); background: rgb(16 185 129 / 0.1); } .ds-queue-row svg { width: 1rem; height: 1rem; flex: none; margin-top: 0.125rem; color: #64748b; } .ds-queue-row.is-active svg { color: #34d399; } .ds-queue-text { min-width: 0; flex: 1; } .ds-queue-name { display: block; font-size: 0.75rem; font-weight: 500; color: #e2e8f0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .ds-queue-row.is-active .ds-queue-name { color: #d1fae5; } .ds-queue-meta { display: flex; align-items: center; gap: 0.375rem; margin-top: 0.125rem; font-size: 0.6875rem; color: #64748b; font-variant-numeric: tabular-nums; } .ds-queue-status { font-style: normal; color: #fcd34d; } .ds-queue-row:focus-visible { outline: none; box-shadow: 0 0 0 2px rgb(16 185 129 / 0.6); }"
+    },
+    {
+      "name": "Redaction Bar",
+      "kind": "custom",
+      "description": "The signature element and the only pure black in the system. Shown here over document text, with an optional compliance stamp burned into it.",
+      "html": "<div class=\"ds-doc\"><p class=\"ds-doc-line\">Account holder: <span class=\"ds-redaction\">CONFIDENTIAL</span></p><p class=\"ds-doc-line\">Sort code: <span class=\"ds-redaction ds-redaction-plain\"></span></p></div>",
+      "css": ".ds-doc { padding: 1rem 1.25rem; border-radius: 0.125rem; background: #ffffff; box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.5); font: 400 0.8125rem/2 Inter, ui-sans-serif, system-ui, sans-serif; color: #0f172a; } .ds-doc-line { margin: 0 0 0.5rem; } .ds-doc-line:last-child { margin-bottom: 0; } .ds-redaction { display: inline-flex; align-items: center; justify-content: center; min-width: 9rem; padding: 0.125rem 0.5rem; border-radius: 0.0625rem; background: #000000; color: #e8edf5; font-size: 0.625rem; font-weight: 700; letter-spacing: 0.02em; vertical-align: middle; } .ds-redaction-plain { min-width: 6rem; }"
+    },
+    {
+      "name": "Status Pill",
+      "kind": "chip",
+      "description": "Ambient state markers. Green confirms, amber means a human still has to look, and both sit on a tinted ground rather than a solid fill.",
+      "html": "<span class=\"ds-pill ds-pill-ok\">Exports as a flattened image (no hidden text)</span> <span class=\"ds-pill ds-pill-warn\">18 to review</span>",
+      "css": ".ds-pill { display: inline-flex; align-items: center; border-radius: 9999px; padding: 0.25rem 0.75rem; font: 500 0.6875rem/1.45 Inter, ui-sans-serif, system-ui, sans-serif; letter-spacing: 0.01em; } .ds-pill-ok { border: 1px solid rgb(16 185 129 / 0.3); background: rgb(16 185 129 / 0.1); color: #6ee7b7; } .ds-pill-warn { border: 1px solid rgb(245 158 11 / 0.3); background: rgb(245 158 11 / 0.1); color: #fcd34d; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Sealed Room",
+    "overview": "The interface is the container. RedactLocal's entire claim is that the document never leaves the tab, and the visual system exists to make that claim legible without ever saying it out loud. Surfaces are bounded — hairline-bordered panels sitting on a near-black ground, each one holding its contents rather than floating above them. Nothing bleeds off an edge, nothing implies a somewhere-else. When a panel needs to grow it scrolls inside itself; the room does not get bigger.\n\nThe palette is one accent against a deep neutral, and the accent is rationed. Containment Green appears where something has been sealed, confirmed, or is about to be: the redaction bar itself, a verified export, the one action per surface that finalises. Everywhere else the interface recedes into slate. The result is a workspace that reads as instrument rather than product — the person using it is handling a bank statement or a passport scan, and the design's job is to stay out of the way while making the state of the work unmistakable.\n\nDensity is high but not punishing. This is an Operate surface: the document occupies as much of the viewport as the chrome can spare, and every toolbar decision is a negotiation against the canvas. The one place expression is allowed is the moment of confirmation — the emerald glow under the export button, the verification panel that reports zero extractable characters. Those are the payoffs the rest of the restraint buys.",
+    "keyCharacteristics": [
+      "Bounded surfaces: every panel is enclosed by a hairline border and scrolls internally rather than pushing the page",
+      "One rationed accent against a near-black ground",
+      "Canvas-first: chrome is compressed so the document can breathe",
+      "State is always legible — counts, progress, and verification are shown, never implied",
+      "Evidence over assertion: the interface shows proof rather than claiming trust"
+    ],
+    "rules": [
+      {
+        "name": "The One Seal Rule",
+        "body": "Exactly one Containment Green fill per surface. Multiple green-text elements are fine — they report state — but two solid green buttons competing in one panel means the primary action has not been decided.",
+        "section": "colors"
+      },
+      {
+        "name": "The Black Is Not A Colour Rule",
+        "body": "Pure #000000 belongs to redaction rectangles only. UI never reaches for it; Sealed Slate is the darkest chrome value. This keeps the one thing that means 'destroyed' visually unique.",
+        "section": "colors"
+      },
+      {
+        "name": "The Amber Means Unfinished Rule",
+        "body": "Amber is never decorative and never a brand colour. It marks exactly one condition: something a human still has to look at. A screen with no amber is a screen with nothing outstanding.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tabular Digits Rule",
+        "body": "Every number that updates in place uses tabular-nums. Digits changing width causes the control beside them to twitch, which reads as instability in a tool whose job is to look exact.",
+        "section": "typography"
+      },
+      {
+        "name": "The 11px Floor Rule",
+        "body": "0.6875rem is the smallest type in the system, and it carries metadata only. Nothing a decision depends on may live below Body size.",
+        "section": "typography"
+      },
+      {
+        "name": "The 44px Until Large Rule",
+        "body": "Every interactive target is at least 44x44px below lg, relaxing to 36px only at lg and above. The breakpoint is lg, not sm, because tablets are touch devices at 768px.",
+        "section": "layout"
+      },
+      {
+        "name": "The Nothing Scrolls The Page Rule",
+        "body": "In the editor, scrolling belongs to the canvas stage and the sidebar panels, never to the document body. A page that scrolls while a redaction is being drawn moves the target out from under the pointer.",
+        "section": "layout"
+      },
+      {
+        "name": "The Two Shadows Rule",
+        "body": "The system owns two shadows: one for the document, one for the primary action. A third means something is being emphasised that should have been solved with tone or border.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep exactly one Containment Green fill per surface (The One Seal Rule); use green text freely for state.",
+      "Do separate surfaces with hairline Seam borders at 50-60% opacity rather than reaching for a shadow.",
+      "Do give every number that updates in place tabular-nums.",
+      "Do hold interactive targets at 44x44px below lg, relaxing to 36px only at lg and above.",
+      "Do make panels scroll internally — min-h-0 on the flex child, shrink-0 on its header and footer.",
+      "Do show the proof. Counts, progress and verification results are stated as numbers, not as reassurance.",
+      "Do reach for a horizontal bar when a new element could plausibly be one."
+    ],
+    "donts": [
+      "Don't drift toward cloud-SaaS visual language — gradient heroes, floating 3D mockups, blue-violet palettes, 'trusted by' logo walls. The product's whole claim is that it is not a cloud service.",
+      "Don't use security-theatre iconography: padlocks, shields, fingerprints, hex-grid backgrounds, matrix green. The shield was deliberately retired in favour of the redaction bar.",
+      "Don't add consumer-app playfulness — mascots, blobs, bouncy spring motion, emoji as section markers. People arrive here with passport scans and bank statements.",
+      "Don't use pure #000000 for any UI surface; it belongs to redaction rectangles alone.",
+      "Don't introduce a third shadow, an md/xl breakpoint, or a second accent hue without retiring something first.",
+      "Don't let the page body scroll in the editor; scrolling belongs to the canvas stage and the panels.",
+      "Don't put type below 0.6875rem, and never put a decision-carrying value there."
+    ]
+  }
+}
