@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>RedactLocal — Product Hunt gallery slides 2–4</title>
+<style>
+  /* ============================================================
+     RedactLocal — Product Hunt gallery, slides 2 to 4 (1270 x 760)
+
+     HOW TO USE
+     1. Open this file in a browser.
+     2. Press E. All three slides download as 2x PNGs
+        (ph-slide-2.png, ph-slide-3.png, ph-slide-4.png).
+        Press 2, 3 or 4 to export just that one.
+
+     These are statement slides, not screenshots. Every number and
+     every quoted string is copied from what the app actually prints
+     — see VerificationPanel and DocumentQueuePanel.
+     ============================================================ */
+
+  :root {
+    --sealed-slate: #020617;
+    --chamber: #0f172a;
+    --partition: #1e293b;
+    --seam: #334155;
+    --edge: #475569;
+    --containment-green: #34d399;
+    --green-solid: #10b981;
+    --amber: #fcd34d;
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
+    --text-faint: #64748b;
+
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto,
+            Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 40px 0;
+    background: #05070d;
+    display: grid;
+    place-items: center;
+    gap: 40px;
+  }
+
+  /* ---------- shared slide shell ---------- */
+
+  .slide {
+    position: relative;
+    width: 1270px;
+    height: 760px;
+    flex: none;
+    overflow: hidden;
+    background: var(--sealed-slate);
+    font-family: var(--font);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    row-gap: 34px;
+    padding: 54px 64px 60px;
+  }
+
+  .slide::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle at 1px 1px,
+                      rgb(51 65 85 / 0.55) 1px, transparent 0);
+    background-size: 26px 26px;
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .slide::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 60%;
+    width: 1120px;
+    height: 600px;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(ellipse at center,
+                rgb(52 211 153 / 0.10) 0%,
+                rgb(52 211 153 / 0.04) 40%,
+                transparent 70%);
+    pointer-events: none;
+  }
+
+  .slide > * { position: relative; z-index: 1; }
+
+  /* ---------- header ---------- */
+
+  .header { display: grid; justify-items: center; text-align: center; }
+
+  .eyebrow {
+    margin: 0 0 16px;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--containment-green);
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 50px;
+    line-height: 1.06;
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+    max-width: 21ch;
+  }
+
+  .sub {
+    margin: 14px 0 0;
+    font-size: 17px;
+    line-height: 1.5;
+    color: var(--text-muted);
+    max-width: 760px;
+  }
+
+  .body { display: grid; place-items: center; min-height: 0; }
+
+  /* ---------- slide 2: the comparison ---------- */
+
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    width: 100%;
+    max-width: 1000px;
+  }
+
+  .card {
+    border: 1px solid rgb(51 65 85 / 0.7);
+    border-radius: 14px;
+    background: rgb(15 23 42 / 0.55);
+    padding: 24px 26px 26px;
+    display: grid;
+    align-content: start;
+    gap: 16px;
+  }
+
+  .card.win { border-color: rgb(52 211 153 / 0.4); }
+
+  .card-label {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+
+  .card.win .card-label { color: var(--containment-green); }
+
+  /* A line of document text with a redaction over it. */
+  .doc-line {
+    background: #ffffff;
+    border-radius: 3px;
+    padding: 14px 16px;
+    font-size: 14px;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .bar {
+    display: inline-block;
+    height: 19px;
+    width: 172px;
+    border-radius: 2px;
+    background: #000000;
+    flex: none;
+  }
+
+  .result {
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.6;
+    padding: 12px 14px;
+    border-radius: 8px;
+    background: rgb(2 6 23 / 0.7);
+    border: 1px solid rgb(51 65 85 / 0.5);
+  }
+
+  .result .cmd { color: var(--text-faint); display: block; margin-bottom: 6px; }
+  .leak { color: #fca5a5; }
+  .clean { color: var(--containment-green); }
+
+  /* ---------- slide 3: the workflow ---------- */
+
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    width: 100%;
+    max-width: 1060px;
+  }
+
+  .step {
+    border: 1px solid rgb(51 65 85 / 0.6);
+    border-radius: 14px;
+    background: rgb(15 23 42 / 0.5);
+    padding: 24px 22px;
+    display: grid;
+    align-content: start;
+    gap: 10px;
+  }
+
+  .step-n {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    color: var(--containment-green);
+  }
+
+  .step h3 {
+    margin: 0;
+    font-size: 19px;
+    font-weight: 650;
+    letter-spacing: -0.02em;
+  }
+
+  .step p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--text-muted);
+  }
+
+  /* ---------- slide 4: the receipt ---------- */
+
+  .receipt {
+    width: 100%;
+    max-width: 900px;
+    border: 1px solid rgb(52 211 153 / 0.35);
+    border-radius: 16px;
+    background: rgb(16 185 129 / 0.08);
+    padding: 34px 38px;
+    display: grid;
+    gap: 18px;
+  }
+
+  .receipt-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 19px;
+    font-weight: 650;
+    color: var(--containment-green);
+    letter-spacing: -0.015em;
+  }
+
+  .receipt-head svg { width: 22px; height: 22px; flex: none; }
+
+  .receipt-body {
+    font-size: 20px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    letter-spacing: -0.01em;
+  }
+
+  .receipt-body b {
+    color: var(--text-primary);
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .receipt-note {
+    font-size: 14px;
+    color: var(--text-faint);
+    line-height: 1.55;
+    border-top: 1px solid rgb(52 211 153 / 0.2);
+    padding-top: 16px;
+  }
+</style>
+</head>
+<body>
+
+<!-- =================== SLIDE 2 — the mechanism =================== -->
+<div class="slide" id="slide-2">
+  <header class="header">
+    <p class="eyebrow">How it works</p>
+    <h1>The text isn&rsquo;t hidden. It stops existing.</h1>
+    <p class="sub">
+      Every page is rendered to a canvas, the boxes are burned into the pixels,
+      and the PDF is rebuilt from images alone.
+    </p>
+  </header>
+
+  <div class="body">
+    <div class="compare">
+      <div class="card">
+        <span class="card-label">Every other redaction tool</span>
+        <div class="doc-line">Account&nbsp;<span class="bar"></span></div>
+        <div class="result">
+          <span class="cmd">$ pdftotext redacted.pdf -</span>
+          <span class="leak">Account 4539 8821 0074 6612</span>
+        </div>
+      </div>
+
+      <div class="card win">
+        <span class="card-label">RedactLocal</span>
+        <div class="doc-line">Account&nbsp;<span class="bar"></span></div>
+        <div class="result">
+          <span class="cmd">$ pdftotext redacted.pdf -</span>
+          <span class="clean">(empty &mdash; there is no text layer)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =================== SLIDE 3 — the workflow =================== -->
+<div class="slide" id="slide-3">
+  <header class="header">
+    <p class="eyebrow">Built for volume</p>
+    <h1>Forty files. One pass.</h1>
+    <p class="sub">
+      Drop a whole disclosure bundle in at once. Nothing is redacted without you
+      confirming it first.
+    </p>
+  </header>
+
+  <div class="body">
+    <div class="steps">
+      <div class="step">
+        <span class="step-n">01</span>
+        <h3>Drop</h3>
+        <p>Every file stays a handle in memory until you open it. Nothing uploads.</p>
+      </div>
+      <div class="step">
+        <span class="step-n">02</span>
+        <h3>Scan all</h3>
+        <p>The queue is swept in parallel for SSNs, IBANs, cards, gov IDs and emails.</p>
+      </div>
+      <div class="step">
+        <span class="step-n">03</span>
+        <h3>Review</h3>
+        <p>Each hit shows its surrounding line. You tick what actually goes.</p>
+      </div>
+      <div class="step">
+        <span class="step-n">04</span>
+        <h3>Export</h3>
+        <p>Stamp each box FOIA EXEMPTION or your own code. Download as one .zip.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =================== SLIDE 4 — the receipt =================== -->
+<div class="slide" id="slide-4">
+  <header class="header">
+    <p class="eyebrow">Verification</p>
+    <h1>Then it checks its own work.</h1>
+    <p class="sub">
+      The file you are about to send is re-opened and inspected before you ever
+      see the download.
+    </p>
+  </header>
+
+  <div class="body">
+    <div class="receipt">
+      <div class="receipt-head">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>
+        </svg>
+        Download complete &mdash; redacted_settlement-agreement.pdf
+      </div>
+
+      <p class="receipt-body">
+        Re-opened and checked: <b>12</b> flattened pages,
+        <b>0</b> selectable characters, <b>0</b> text operators,
+        <b>0</b> font objects, <b>0</b> annotations.
+      </p>
+
+      <p class="receipt-note">
+        This is the app&rsquo;s own output, not a marketing claim. If any check cannot run
+        in your browser, it says so by name rather than reporting a zero.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+/**
+ * Press E to export every slide at 2x. Press 2, 3 or 4 for a single one.
+ *
+ * Same pipeline as the gallery slide: serialise to an SVG <foreignObject>,
+ * rasterise through an Image, draw to a canvas at the target size. The SVG must
+ * be a data: URL — a blob: URL taints the canvas and toBlob() throws.
+ */
+async function exportSlide(el, name, scale = 2) {
+  const W = 1270, H = 760;
+
+  const clone = el.cloneNode(true);
+  for (const img of clone.querySelectorAll('img')) {
+    const src = img.getAttribute('src');
+    if (src && !src.startsWith('data:')) {
+      const blob = await (await fetch(src)).blob();
+      img.setAttribute('src', await new Promise((res) => {
+        const fr = new FileReader();
+        fr.onload = () => res(fr.result);
+        fr.readAsDataURL(blob);
+      }));
+    }
+  }
+  clone.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+
+  const css = document.querySelector('style').textContent;
+  const markup = new XMLSerializer().serializeToString(clone);
+  const svg =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="' + W * scale + '" height="' + H * scale +
+    '" viewBox="0 0 ' + W + ' ' + H + '">' +
+    '<foreignObject x="0" y="0" width="' + W + '" height="' + H + '">' +
+    '<style xmlns="http://www.w3.org/1999/xhtml">' + css + '</style>' + markup +
+    '</foreignObject></svg>';
+
+  const image = await new Promise((res, rej) => {
+    const i = new Image();
+    i.onload = () => res(i);
+    i.onerror = () => rej(new Error('render failed'));
+    i.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+  });
+
+  const canvas = document.createElement('canvas');
+  canvas.width = W * scale;
+  canvas.height = H * scale;
+  canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
+
+  return new Promise((resolve) => {
+    canvas.toBlob((blob) => {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = name;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+      resolve(blob);
+    }, 'image/png');
+  });
+}
+
+addEventListener('keydown', async (e) => {
+  if (e.key === 'e' || e.key === 'E') {
+    for (const n of [2, 3, 4]) {
+      await exportSlide(document.getElementById('slide-' + n), 'ph-slide-' + n + '.png');
+      // Browsers throttle a burst of downloads; space them out.
+      await new Promise((r) => setTimeout(r, 600));
+    }
+  }
+  if (['2', '3', '4'].includes(e.key)) {
+    exportSlide(document.getElementById('slide-' + e.key), 'ph-slide-' + e.key + '.png');
+  }
+});
+</script>
+
+</body>
+</html>
