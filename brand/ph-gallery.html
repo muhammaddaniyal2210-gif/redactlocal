@@ -11,8 +11,10 @@
      1. Drop your UI screenshot next to this file as `app-shot.png`
         (anything wide works; it is cropped from the top edge).
      2. Open this file in a browser.
-     3. Screenshot the .slide element. For a 2x/retina capture, see
-        the note at the bottom of this stylesheet.
+     3. Press E. A 2540x1520 PNG (1270x760 at 2x) downloads.
+
+     No screenshot tool, no cropping, no terminal. The export renders
+     the slide itself, so what downloads is exactly what you see.
      ============================================================ */
 
   :root {
@@ -235,14 +237,8 @@
   .shot.is-empty img { display: none; }
   .shot.is-empty .placeholder { display: grid; }
 
-  /* ---------- 2x export ----------
-     Screenshot tools capture CSS pixels. To get a 2540x1520 asset without
-     changing the layout, uncomment this block and capture the .slide.
-     Everything scales together because only the transform changes.
-
-  .slide { transform: scale(2); transform-origin: top left; }
-  html, body { place-items: start; }
-  ------------------------------------------------------------------ */
+  /* The 2x export is handled by the script at the end of this file, which
+     rasterises the slide at any scale. Nothing here needs to change. */
 </style>
 </head>
 <body>
@@ -289,5 +285,71 @@
 
 </div>
 
+<script>
+/**
+ * Press E to export the slide as a PNG at 2x (2540 x 1520).
+ *
+ * The slide is serialised into an SVG <foreignObject>, rasterised through an
+ * Image, and drawn to a canvas at the target size — so the export is the real
+ * layout at native resolution rather than an upscale of a 1x capture.
+ *
+ * Two things that will silently break it if changed: the screenshot must be
+ * inlined as a data URI (an SVG rasterised through <img> cannot fetch anything),
+ * and the SVG must be handed over as a data: URL — a blob: URL taints the
+ * canvas and toBlob() then throws a SecurityError.
+ */
+async function exportSlide(scale = 2) {
+  const W = 1270, H = 760;
+  const slide = document.querySelector('.slide');
+
+  const img = slide.querySelector('.shot img');
+  let inlined = null;
+  if (img && img.getAttribute('src') && !img.getAttribute('src').startsWith('data:')) {
+    const blob = await (await fetch(img.getAttribute('src'))).blob();
+    inlined = await new Promise((res) => {
+      const fr = new FileReader();
+      fr.onload = () => res(fr.result);
+      fr.readAsDataURL(blob);
+    });
+  }
+
+  const clone = slide.cloneNode(true);
+  if (inlined) clone.querySelector('.shot img').setAttribute('src', inlined);
+  clone.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+
+  const css = document.querySelector('style').textContent;
+  const markup = new XMLSerializer().serializeToString(clone);
+  const svg =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="' + W * scale + '" height="' + H * scale +
+    '" viewBox="0 0 ' + W + ' ' + H + '">' +
+    '<foreignObject x="0" y="0" width="' + W + '" height="' + H + '">' +
+    '<style xmlns="http://www.w3.org/1999/xhtml">' + css + '</style>' + markup +
+    '</foreignObject></svg>';
+
+  const image = await new Promise((res, rej) => {
+    const i = new Image();
+    i.onload = () => res(i);
+    i.onerror = () => rej(new Error('render failed'));
+    i.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+  });
+
+  const canvas = document.createElement('canvas');
+  canvas.width = W * scale;
+  canvas.height = H * scale;
+  canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
+
+  canvas.toBlob((blob) => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'ph-gallery.png';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  }, 'image/png');
+}
+
+addEventListener('keydown', (e) => {
+  if (e.key === 'e' || e.key === 'E') exportSlide(2);
+});
+</script>
 </body>
 </html>
