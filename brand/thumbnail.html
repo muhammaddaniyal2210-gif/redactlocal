@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>RedactLocal — Product Hunt thumbnail</title>
+<style>
+  /* ============================================================
+     RedactLocal — Product Hunt thumbnail (240 x 240)
+
+     HOW TO USE
+     1. Open this file in a browser.
+     2. Press E. A 240x240 PNG downloads.
+        Press Shift+E for a 480x480 (2x) version instead.
+
+     The mark is vector, so both exports are pixel-exact — the 2x is
+     only worth using if a surface renders the thumbnail above 240px.
+     ============================================================ */
+
+  :root {
+    /* From DESIGN.md, matching the app, the favicon and the avatars. */
+    --sealed-slate: #020617;
+    --edge: #475569;
+    --containment-green: #34d399;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background: #05070d;        /* Only the page around the tile. */
+    display: grid;
+    place-items: center;
+  }
+
+  /* ---------- the tile: a strict, non-negotiable 240 x 240 ---------- */
+
+  .thumb {
+    width: 240px;
+    height: 240px;
+    flex: none;
+    display: grid;
+    place-items: center;        /* Optical centring is unnecessary: the mark's
+                                   viewBox is cropped to its artwork, so its
+                                   geometric centre is its visual centre. */
+    background: var(--sealed-slate);
+    overflow: hidden;
+  }
+
+  /* 60% of the tile width. Larger than the social avatars, which had to
+     clear a circular crop; a Product Hunt thumbnail is a rounded square,
+     so the mark can sit closer to the edge and read better when the tile
+     is shown at 48px in a feed. */
+  .mark {
+    width: 144px;
+    height: auto;
+    display: block;
+  }
+</style>
+</head>
+<body>
+
+<div class="thumb">
+  <!-- The shipped mark. Same three rects and same cropped viewBox as
+       src/components/BrandMark.tsx, so this cannot drift from the app. -->
+  <svg class="mark" viewBox="7 11.5 34 26.6" aria-hidden="true">
+    <rect x="7" y="11.5" width="26" height="4.6" rx="2.3" fill="#475569"/>
+    <rect x="7" y="20.2" width="34" height="9.2" rx="2.6" fill="#34d399"/>
+    <rect x="7" y="33.5" width="19" height="4.6" rx="2.3" fill="#475569"/>
+  </svg>
+</div>
+
+<script>
+/**
+ * Press E to export the tile as a 240x240 PNG. Shift+E gives 480x480.
+ *
+ * Same pipeline as the gallery slide: the element is serialised into an SVG
+ * <foreignObject>, rasterised through an Image, and drawn to a canvas at the
+ * target size, so the export is the real layout rather than a screen capture.
+ *
+ * The SVG must be handed over as a data: URL. A blob: URL taints the canvas
+ * and toBlob() then throws a SecurityError.
+ */
+async function exportTile(scale = 1) {
+  const SIZE = 240;
+  const tile = document.querySelector('.thumb');
+
+  // Any raster added later has to be inlined: an SVG rasterised through
+  // <img> cannot fetch anything, and a relative src renders as a blank.
+  const clone = tile.cloneNode(true);
+  for (const img of clone.querySelectorAll('img')) {
+    const src = img.getAttribute('src');
+    if (src && !src.startsWith('data:')) {
+      const blob = await (await fetch(src)).blob();
+      img.setAttribute('src', await new Promise((res) => {
+        const fr = new FileReader();
+        fr.onload = () => res(fr.result);
+        fr.readAsDataURL(blob);
+      }));
+    }
+  }
+  clone.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+
+  const css = document.querySelector('style').textContent;
+  const markup = new XMLSerializer().serializeToString(clone);
+  const svg =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="' + SIZE * scale + '" height="' + SIZE * scale +
+    '" viewBox="0 0 ' + SIZE + ' ' + SIZE + '">' +
+    '<foreignObject x="0" y="0" width="' + SIZE + '" height="' + SIZE + '">' +
+    '<style xmlns="http://www.w3.org/1999/xhtml">' + css + '</style>' + markup +
+    '</foreignObject></svg>';
+
+  const image = await new Promise((res, rej) => {
+    const i = new Image();
+    i.onload = () => res(i);
+    i.onerror = () => rej(new Error('render failed'));
+    i.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+  });
+
+  const canvas = document.createElement('canvas');
+  canvas.width = SIZE * scale;
+  canvas.height = SIZE * scale;
+  canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
+
+  canvas.toBlob((blob) => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = scale === 1 ? 'thumbnail.png' : 'thumbnail@' + scale + 'x.png';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  }, 'image/png');
+}
+
+addEventListener('keydown', (e) => {
+  if (e.key === 'e' || e.key === 'E') exportTile(e.shiftKey ? 2 : 1);
+});
+</script>
+
+</body>
+</html>
