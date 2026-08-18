@@ -30,14 +30,14 @@ export function Header({ onTestOffline }: HeaderProps) {
         <nav className="ml-auto flex items-center gap-1 sm:gap-2">
           {/* A plain anchor, not a router Link: the blog is a static file in
               public/, so the router has no route for it and would render the
-              app shell instead of the post.
+              app shell instead of the hub.
 
               It opens in a new tab on purpose. This header sits above a
               workspace holding an unsaved document in memory — navigating away
               in the same tab silently discards every redaction the user has
               made, with nothing to recover it from. */}
           <a
-            href="/blog/black-box-flaw"
+            href="/blog"
             target="_blank"
             rel="noopener"
             className="inline-flex min-h-11 items-center rounded-xl px-3 text-sm font-medium text-slate-300 transition-all duration-200 hover:bg-slate-800/70 hover:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/60 lg:min-h-9"
