@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Primary Meta Tags -->
+    <title>DSAR Redaction: How to Redact a Subject Access Request</title>
+    <meta name="description" content="A subject access request means disclosing a file full of other people's data too. What to redact, what GDPR requires, and how to do it without uploading.">
+    <link rel="canonical" href="https://redactlocal.org/blog/subject-access-request-redaction">
+
+    <!-- Open Graph / LinkedIn / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://redactlocal.org/blog/subject-access-request-redaction">
+    <meta property="og:title" content="DSAR Redaction: What to Remove Before You Release the File">
+    <meta property="og:description" content="A subject access request means handing over a file that contains other people's data too. What to redact, what the law requires, and how to do it without uploading the bundle.">
+    <meta property="og:image" content="https://redactlocal.org/blog/subject-access-request-redaction/cover.jpg">
+    <meta property="og:image:width" content="1600">
+    <meta property="og:image:height" content="957">
+    <meta property="og:image:alt" content="RedactLocal's in-browser PDF editor redacting third-party names from a personnel file">
+    <meta property="og:site_name" content="RedactLocal">
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://redactlocal.org/blog/subject-access-request-redaction">
+    <meta name="twitter:title" content="DSAR Redaction: What to Remove Before You Release the File">
+    <meta name="twitter:description" content="A subject access request means handing over a file that contains other people's data too. What to redact, what the law requires, and how to do it without uploading the bundle.">
+    <meta name="twitter:image" content="https://redactlocal.org/blog/subject-access-request-redaction/cover.jpg">
+
+    <!-- JSON-LD Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Article",
+          "@id": "https://redactlocal.org/blog/subject-access-request-redaction#article",
+          "isPartOf": { "@id": "https://redactlocal.org/blog/subject-access-request-redaction" },
+          "mainEntityOfPage": { "@id": "https://redactlocal.org/blog/subject-access-request-redaction" },
+          "headline": "DSAR Redaction: What to Remove Before You Release the File",
+          "alternativeHeadline": "A practical guide to redacting third-party data from subject access requests",
+          "description": "A subject access request means handing over a file that contains other people's data too. What to redact, what the law requires, and how to do it without uploading the bundle.",
+          "inLanguage": "en",
+          "datePublished": "2026-08-18T09:00:00+00:00",
+          "dateModified": "2026-08-18T09:00:00+00:00",
+          "author": {
+            "@type": "Person",
+            "@id": "https://redactlocal.org/#founder",
+            "name": "Muhammad Daniyal",
+            "jobTitle": "Founder",
+            "url": "https://redactlocal.org/about"
+          },
+          "publisher": { "@id": "https://redactlocal.org/#organization" },
+          "image": {
+            "@type": "ImageObject",
+            "url": "https://redactlocal.org/blog/subject-access-request-redaction/cover.jpg",
+            "width": 1600,
+            "height": 957
+          },
+          "articleSection": "Data Protection",
+          "keywords": [
+            "DSAR redaction",
+            "subject access request redaction",
+            "GDPR redaction",
+            "redact third party data",
+            "data subject access request",
+            "client-side PDF redaction"
+          ],
+          "about": [
+            { "@type": "Thing", "name": "General Data Protection Regulation" },
+            { "@type": "Thing", "name": "Data subject access request" },
+            { "@type": "Thing", "name": "PDF redaction" }
+          ],
+          "mentions": { "@id": "https://redactlocal.org/#software" }
+        },
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://redactlocal.org/#software",
+          "name": "RedactLocal",
+          "url": "https://redactlocal.org",
+          "description": "A browser-native PDF redactor that runs entirely on your device. Documents are never uploaded. Pages are permanently rasterized so redacted text is destroyed rather than hidden, and every export is re-inspected to confirm zero selectable characters and zero embedded fonts.",
+          "applicationCategory": ["SecurityApplication", "BusinessApplication"],
+          "applicationSubCategory": "PDF Redaction",
+          "operatingSystem": "Any (runs in a modern web browser)",
+          "browserRequirements": "Requires JavaScript. Chrome, Firefox, Safari or Edge.",
+          "isAccessibleForFree": true,
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock"
+          },
+          "featureList": [
+            "Client-side PDF redaction with no file upload",
+            "Works offline after the page loads",
+            "Permanent rasterization destroys the underlying text layer",
+            "Automatic post-export verification of zero selectable text and zero fonts",
+            "Pattern scanning for SSNs, EINs, IBANs, card numbers, government IDs and emails",
+            "Manual review of every match before redaction is applied",
+            "Batch processing of multiple documents",
+            "Compliance stamps including FOIA EXEMPTION and PRIVACY ACT",
+            "No account or installation required"
+          ],
+          "publisher": { "@id": "https://redactlocal.org/#organization" },
+          "author": { "@id": "https://redactlocal.org/#founder" }
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://redactlocal.org/#organization",
+          "name": "RedactLocal",
+          "url": "https://redactlocal.org",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://redactlocal.org/favicon.svg",
+            "width": 48,
+            "height": 48
+          }
+        }
+      ]
+    }
+    </script>
+
+    <style>
+        /* Base Flexbox Layout & Typography */
+        :root {
+            --text-main: #1a1a1a;
+            --text-muted: #4a5568;
+            --bg-color: #ffffff;
+            --accent: #2b6cb0;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text-main);
+            background-color: var(--bg-color);
+            line-height: 1.7;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        nav {
+            width: 100%;
+            max-width: 768px;
+            padding: 2rem 1.5rem;
+            box-sizing: border-box;
+        }
+
+        nav a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        article {
+            width: 100%;
+            max-width: 768px;
+            padding: 0 1.5rem 4rem 1.5rem;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            line-height: 1.2;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+            font-weight: 400;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            margin-top: 3rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 2rem;
+            margin-bottom: 0.75rem;
+        }
+
+        p, ul, ol {
+            margin-bottom: 1.5rem;
+            font-size: 1.125rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* In-text links. The base stylesheet only styled nav links and the CTA
+           button, which left contextual links rendering as default browser blue. */
+        article p a,
+        article li a,
+        article td a {
+            color: var(--accent);
+            font-weight: 500;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+            text-decoration-thickness: 1px;
+            transition: color 0.15s ease;
+        }
+
+        article p a:hover,
+        article li a:hover,
+        article td a:hover {
+            color: var(--text-main);
+        }
+
+        code {
+            background-color: #f1f5f9;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+
+        .callout {
+            border-left: 3px solid var(--accent);
+            background-color: #f8fafc;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .callout p:last-child {
+            margin-bottom: 0;
+        }
+
+        .disclaimer {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            padding-top: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .cta-box {
+            background-color: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-top: 3rem;
+            text-align: center;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background-color: var(--text-main);
+            color: #ffffff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 1rem;
+            transition: background-color 0.2s ease;
+        }
+
+        .cta-button:hover {
+            background-color: var(--accent);
+        }
+
+        /* A mid-article conversion point, styled to read as an action rather
+           than as another paragraph. */
+        .inline-cta {
+            text-align: center;
+            margin: 2.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8fafc;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            h2 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="/">&larr; Back to RedactLocal</a>
+    </nav>
+
+    <article>
+        <h1>DSAR Redaction: What to Remove Before You Release the File</h1>
+        <p class="subtitle">A subject access request obliges you to hand over someone's data. It does not oblige you to hand over everyone else's.</p>
+
+        <img
+            src="/blog/subject-access-request-redaction/cover.jpg"
+            alt="RedactLocal's in-browser PDF editor redacting third-party names from a personnel file"
+            width="1600"
+            height="957"
+            fetchpriority="high"
+            decoding="async"
+            onerror="this.style.display='none'"
+            style="display: block; box-sizing: border-box; width: 100%; max-width: 800px; height: auto; aspect-ratio: 1600 / 957; margin: 0 auto 3rem; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 24px rgba(15, 23, 42, 0.10), 0 1px 3px rgba(15, 23, 42, 0.06);">
+
+        <p>An employee submits a subject access request. You have one month. You pull their personnel file, their manager's notes, eighteen months of email, and a grievance investigation report.</p>
+
+        <p>Then you actually read it. The grievance report names the colleague who complained. The manager's notes quote a second employee's appraisal. Three emails contain a customer's home address. One attachment is another employee's sick note.</p>
+
+        <p>You are legally required to disclose the requester's personal data. You are simultaneously required not to disclose everyone else's. Those two obligations meet in the same PDF, and resolving them is what DSAR redaction actually is.</p>
+
+        <p>Most teams get this wrong in one of two ways: they redact in a manner that can be trivially undone, or they upload the entire bundle — every name in it — to a free online PDF tool in order to redact it. The second mistake is a personal data breach committed during the process of complying with data protection law.</p>
+
+        <h2>Why a DSAR Requires Redaction at All</h2>
+
+        <p>Article 15 of the GDPR gives a data subject the right to obtain a copy of the personal data an organisation holds about them. That right is not unlimited.</p>
+
+        <p>Article 15(4) states that the right to obtain a copy "shall not adversely affect the rights and freedoms of others." Recital 63 expands on this, noting that the right of access should not adversely affect the rights or freedoms of others, including trade secrets and intellectual property.</p>
+
+        <p>In practice this means a DSAR response usually contains three categories of content:</p>
+
+        <table>
+            <tr>
+                <th>Category</th>
+                <th>Treatment</th>
+            </tr>
+            <tr>
+                <td><strong>The requester's personal data</strong></td>
+                <td>Disclose. This is the substance of the request.</td>
+            </tr>
+            <tr>
+                <td><strong>Third-party personal data</strong></td>
+                <td>Redact, unless the third party consents or it is reasonable to disclose without consent.</td>
+            </tr>
+            <tr>
+                <td><strong>Exempt material</strong></td>
+                <td>Withhold under the applicable exemption — legal privilege being the most commonly relied upon.</td>
+            </tr>
+        </table>
+
+        <p>The deadline is the pressure. Article 12(3) requires a response without undue delay and within one month, extendable by two further months where requests are complex or numerous. Teams routinely spend most of that window locating documents and leave the redaction to the final days — which is exactly when mistakes are made.</p>
+
+        <div class="callout">
+            <p><strong>The asymmetry worth internalising:</strong> failing to disclose enough invites a complaint. Disclosing too much is a personal data breach affecting people who never made a request and cannot un-see the result. The second failure is materially worse, and it is the one caused by rushing.</p>
+        </div>
+
+        <h2>What Actually Has to Come Out</h2>
+
+        <p>Third-party personal data is broader than most people assume. It is not only names. Anything that identifies a living individual, directly or in combination with other information you are disclosing, is in scope.</p>
+
+        <h3>Direct identifiers</h3>
+        <ul>
+            <li>Names of colleagues, complainants, witnesses, customers and family members</li>
+            <li>Personal email addresses and direct telephone numbers</li>
+            <li>Home addresses and postcodes</li>
+            <li>National insurance, social security and other government reference numbers</li>
+            <li>Employee and payroll ID numbers belonging to other staff</li>
+            <li>Bank account, IBAN and card details</li>
+        </ul>
+
+        <h3>The ones that get missed</h3>
+        <ul>
+            <li><strong>Email headers.</strong> A redacted email body means nothing if the To, From and CC lines are untouched.</li>
+            <li><strong>Signature blocks and footers</strong> carrying a third party's direct line and mobile.</li>
+            <li><strong>Document metadata</strong> — author fields, tracked changes and comment attributions naming reviewers.</li>
+            <li><strong>Handwriting and initials</strong> on scanned forms.</li>
+            <li><strong>Job titles in small teams.</strong> "The Regional Finance Manager raised a concern" identifies one person as surely as a name does.</li>
+        </ul>
+
+        <p>That last category is the judgement-heavy one, and it is why fully automated redaction is a bad idea for DSARs. A pattern matcher can find every email address in a bundle in seconds. It cannot know that "the only part-time analyst on the team" is an identifier in your organisation. A human has to make that call — the tool's job is to make sure the human is looking at every candidate.</p>
+
+        <h2>The Two Ways DSAR Redaction Fails</h2>
+
+        <h3>Failure one: the redaction can be undone</h3>
+
+        <p>Drawing a black rectangle in a standard PDF editor does not remove text. It adds a drawing instruction that paints over text which remains fully intact in the file — recoverable by selecting and copying it, or by running <code>pdftotext</code> against the document.</p>
+
+        <p>A DSAR response is sent to someone who, by definition, is already interested enough in your records to have made a formal request. Handing them a file whose redactions can be lifted with a copy-paste is the worst possible audience for that mistake.</p>
+
+        <p>We covered the mechanism of this failure in detail in <a href="/blog/black-box-flaw">The Black Box Flaw</a>. The short version: only rasterization — flattening each page to an image and rebuilding the PDF from those images — actually destroys the underlying text.</p>
+
+        <h3>Failure two: you upload the bundle to redact it</h3>
+
+        <p>This one is specific to data protection work, and it is uncomfortable.</p>
+
+        <p>To redact a DSAR bundle with a typical free online PDF tool, you must first upload it. That bundle contains the personal data of the requester <em>and</em> every third party whose data you were about to remove. You have transmitted all of it to a processor you have not assessed, under terms you have not negotiated, possibly outside your jurisdiction.</p>
+
+        <p>The questions that follow are not comfortable ones for a compliance function:</p>
+
+        <ul>
+            <li>Is that vendor a processor under Article 28, and where is the data processing agreement?</li>
+            <li>Was this an international transfer, and on what safeguard?</li>
+            <li>Does your Record of Processing Activities list this tool?</li>
+            <li>If that vendor is breached, are you notifying every third party in the bundle?</li>
+        </ul>
+
+        <p>Under Article 83(5), infringements of data subject rights and of the basic principles of processing sit in the higher penalty tier — up to €20 million or 4% of total worldwide annual turnover, whichever is higher. Creating a transfer you cannot document, in the course of servicing an access request, is a genuinely poor place to end up.</p>
+
+        <div class="inline-cta">
+            <a href="https://redactlocal.org" class="cta-button">Redact a DSAR bundle in your browser &rarr;</a>
+        </div>
+
+        <h2>A Defensible DSAR Redaction Workflow</h2>
+
+        <p>"Defensible" here means: if the ICO or a supervisory authority asks how you produced the response, you can describe every step and none of them involves a system you cannot account for.</p>
+
+        <ol>
+            <li><strong>Assemble the bundle and freeze it.</strong> Work from a fixed copy so what you disclose matches what you logged.</li>
+            <li><strong>Keep the unredacted original.</strong> You may need to justify a specific redaction later. Store it under your normal retention controls; never send it.</li>
+            <li><strong>Redact on a machine you control.</strong> If the tool requires an upload, the tool is part of your processing chain. <a href="https://redactlocal.org">RedactLocal</a> runs entirely inside your browser tab, so the bundle never reaches a server.</li>
+            <li><strong>Scan for structured identifiers first.</strong> Email addresses, phone numbers, national ID and account numbers follow predictable formats and should be caught mechanically rather than by eye.</li>
+            <li><strong>Review every match by hand.</strong> Confirm each one in context. Some third-party data is disclosable; some innocuous-looking text is identifying. Only you know which.</li>
+            <li><strong>Read the bundle for contextual identifiers.</strong> The pass that no tool can do for you: job titles, team sizes, distinctive incidents.</li>
+            <li><strong>Flatten the output.</strong> Export so the redacted text is destroyed, not covered.</li>
+            <li><strong>Verify before sending.</strong> Run <code>pdftotext</code> over the finished file, or search it for a name you know you removed. If it appears, do not send it.</li>
+            <li><strong>Log your reasoning.</strong> Record which exemptions you relied on and why. This is the artefact that makes the response defensible months later.</li>
+        </ol>
+
+        <h2>Where RedactLocal Fits</h2>
+
+        <p><a href="https://redactlocal.org">RedactLocal</a> was built for steps three through eight. It is a PDF redactor that runs entirely in the browser — there is no upload endpoint, because there is no backend that accepts files.</p>
+
+        <h3>Nothing leaves the tab</h3>
+        <p>Your bundle is read into memory by the browser's own file API, parsed and rendered locally, and exported by your browser's download mechanism. You can verify this in about ten seconds: open the tool, disconnect from the internet, and redact a document. It keeps working, because there is nowhere for the file to go.</p>
+
+        <h3>Structured identifiers found, never auto-removed</h3>
+        <p>The scanner sweeps the bundle for email addresses, phone numbers, national ID formats, tax IDs, IBANs, card numbers and account references. Every hit is presented with the line of text surrounding it, and nothing is blacked out until you confirm it. That review step is deliberate — a tool that silently over-redacts produces a response that is unusable, and one that silently under-redacts produces a breach.</p>
+
+        <h3>Redactions are destroyed, then verified</h3>
+        <p>On export, every page is rasterized and the redaction boxes are burned into the pixels. The new PDF is assembled from images alone, so there is no text layer left to recover. The file is then re-opened and inspected before the download appears, reporting the flattened page count alongside the number of selectable characters, text operators, font objects and annotations it found. On a correct export those counts are zero.</p>
+
+        <h3>Whole bundles at once</h3>
+        <p>DSAR responses are rarely one document. You can queue the bundle, scan every file in one pass, work through them individually, and export the set as a single archive. Each redaction can carry a stamp — <code>PRIVACY ACT</code>, <code>PII REDACTED</code>, or your own reference code — burned into the black box so the reader knows the basis on which material was withheld.</p>
+
+        <h2>What This Does Not Do</h2>
+
+        <p>Two limits you should know before relying on any of the above.</p>
+
+        <p><strong>Scanned documents are not scanned for patterns.</strong> The identifier search reads a PDF's text layer. If a document is an image-only scan — a photographed sick note, a faxed form — there is no text to match against. RedactLocal reports those pages by number and tells you to review them by eye rather than reporting them as clean. Manual redaction and flattened export work normally on them.</p>
+
+        <p><strong>The site loads page analytics.</strong> Loading redactlocal.org records a page view, as most websites do. It has no access to your documents, which never leave your tab's memory. We state this plainly because a tool asking you to trust its handling of data you cannot see should be candid about the data you can.</p>
+
+        <div class="disclaimer">
+            <p><strong>This article is not legal advice.</strong> It describes the mechanics of redacting documents and summarises widely-applicable data protection principles. Obligations vary by jurisdiction, and exemptions under instruments such as the UK Data Protection Act 2018 are fact-specific. Where a request is contentious or a disclosure decision is finely balanced, take advice from your DPO or counsel.</p>
+        </div>
+
+        <div class="cta-box">
+            <h2>Redact the Bundle Without Sending It Anywhere</h2>
+            <p>No account, no installation, and no server that receives your file. Open the tool, disconnect your Wi-Fi if you want proof, and redact your DSAR response with the bundle never leaving your machine.</p>
+            <a href="https://redactlocal.org" class="cta-button">Open RedactLocal &mdash; free, no sign-up</a>
+        </div>
+    </article>
+
+</body>
+</html>
