@@ -68,6 +68,7 @@ export function PdfViewer({ doc, onClose, queue }: PdfViewerProps) {
   const stageRef = useRef<HTMLDivElement>(null)
   const renderTask = useRef<RenderTask | null>(null)
   const addFilesRef = useRef<HTMLInputElement>(null)
+  const sidebarRef = useRef<HTMLElement>(null)
 
   const [pageNumber, setPageNumber] = useState(1)
   const [scale, setScale] = useState(1)
@@ -105,6 +106,27 @@ export function PdfViewer({ doc, onClose, queue }: PdfViewerProps) {
     setReport(null)
     setExportError(null)
   }, [doc])
+
+  // When the sidebar opens on a narrow screen it stacks *below* the editor,
+  // off the bottom of the viewport, so a tap that opened it looks like it did
+  // nothing. Bring it into view. Only below `lg`: at wider widths the sidebar
+  // sits beside the canvas and is already visible, and scrolling it to the top
+  // there would yank the page for no reason. Honour reduced-motion.
+  useEffect(() => {
+    if (!sidebar) return
+    if (typeof window === 'undefined' || !window.matchMedia) return
+    if (window.matchMedia('(min-width: 1024px)').matches) return
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    // Next frame: the panel has to be laid out before it can be scrolled to.
+    const id = requestAnimationFrame(() => {
+      sidebarRef.current?.scrollIntoView({
+        behavior: reduce ? 'auto' : 'smooth',
+        block: 'start',
+      })
+    })
+    return () => cancelAnimationFrame(id)
+  }, [sidebar])
 
   useEffect(() => setPageInput(String(pageNumber)), [pageNumber])
 
@@ -396,7 +418,7 @@ export function PdfViewer({ doc, onClose, queue }: PdfViewerProps) {
                 sidebar === 'find' ? 'text-emerald-300' : 'text-emerald-400 group-hover:text-emerald-300'
               }`}
             />
-            Find &amp; Redact
+            Auto-Detect
           </button>
 
           {/* The only way into a batch from here. Without it, opening a single
@@ -537,7 +559,7 @@ export function PdfViewer({ doc, onClose, queue }: PdfViewerProps) {
       </div>
 
       {sidebar && (
-        <aside className="min-h-0 shrink-0 lg:h-full lg:w-80">
+        <aside ref={sidebarRef} className="min-h-0 shrink-0 lg:h-full lg:w-80">
           {/* Capped against the viewport so the panel can never drive the row's
               height. Uncapped, its content grew to 1146px inside a 764px area,
               pushing the primary action off screen and making the page scroll
@@ -625,7 +647,7 @@ function SidebarTabs({
     { id: 'queue' as const, label: 'Queue', badge: String(queueCount) },
     {
       id: 'find' as const,
-      label: 'Find & Redact',
+      label: 'Auto-Detect',
       badge: matchCount === null ? null : String(matchCount),
     },
   ]

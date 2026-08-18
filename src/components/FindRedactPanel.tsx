@@ -103,7 +103,7 @@ export function FindRedactPanel({
         <div className="flex shrink-0 items-center gap-2 border-b border-slate-700/50 px-4 py-3">
           <Search className="size-4 shrink-0 text-emerald-400/80" />
           <div className="min-w-0 flex-1">
-            <h2 className="truncate text-sm font-semibold text-slate-100">Find &amp; Redact</h2>
+            <h2 className="truncate text-sm font-semibold text-slate-100">Auto-Detect</h2>
             {documentName && (
               <p className="truncate text-[11px] text-slate-500" title={documentName}>
                 {documentName}
@@ -113,7 +113,7 @@ export function FindRedactPanel({
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close Find and Redact"
+            aria-label="Close Auto-Detect"
             className="grid size-11 shrink-0 place-items-center rounded-lg text-slate-400 transition-all duration-200 hover:bg-slate-800 hover:text-slate-200 lg:size-8"
           >
             <X className="size-4" />
