@@ -64,32 +64,37 @@
            and mirror --sealed-slate, --chamber, --seam, --containment-green.
 
            TO ADD AN ARTICLE: copy the commented template card near the
-           bottom of <main>, paste it above the others, and fill in the
-           four fields marked TODO. Newest post goes first.
+           bottom of the grid, paste it as the FIRST card, remove the
+           comment markers, and fill the four TODO fields. Newest first.
            ============================================================ */
 
         :root {
             --sealed-slate: #020617;   /* page ground */
             --chamber: #0f172a;        /* card body */
-            --partition: #1e293b;      /* hover / raised */
-            --seam: #334155;           /* hairline borders */
+            --partition: #1e293b;      /* raised / hover */
+            --slate-800: #1e293b;      /* card border at rest */
+            --seam: #334155;           /* hairline dividers */
             --edge: #475569;
-            --green: #34d399;          /* accent text + rules */
+            --green: #34d399;          /* accent */
             --green-solid: #10b981;
             --text-primary: #f1f5f9;
             --text-secondary: #cbd5e1;
             --text-muted: #94a3b8;
             --text-faint: #64748b;
             --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+            --ease: cubic-bezier(0.22, 1, 0.36, 1);
         }
 
         * { box-sizing: border-box; }
+
+        html { -webkit-text-size-adjust: 100%; }
 
         body {
             margin: 0;
             background-color: var(--sealed-slate);
             /* The same faint dot grid the app's canvas sits on. */
-            background-image: radial-gradient(circle at 1px 1px, rgba(51, 65, 85, 0.4) 1px, transparent 0);
+            background-image: radial-gradient(circle at 1px 1px, rgba(51, 65, 85, 0.35) 1px, transparent 0);
             background-size: 24px 24px;
             color: var(--text-primary);
             font-family: var(--font);
@@ -99,11 +104,14 @@
 
         a { color: inherit; text-decoration: none; }
 
+        img { display: block; max-width: 100%; }
+
+        /* max-w-7xl (80rem / 1280px), centred, with fluid side padding. */
         .container {
             width: 100%;
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 0 1.5rem;
+            max-width: 80rem;
+            margin-inline: auto;
+            padding-inline: clamp(1.25rem, 4vw, 2.5rem);
         }
 
         /* ---------- top bar ---------- */
@@ -112,10 +120,10 @@
             position: sticky;
             top: 0;
             z-index: 10;
-            border-bottom: 1px solid rgba(51, 65, 85, 0.6);
-            background-color: rgba(2, 6, 23, 0.85);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(51, 65, 85, 0.55);
+            background-color: rgba(2, 6, 23, 0.82);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
 
         .topbar-inner {
@@ -130,7 +138,7 @@
             gap: 10px;
         }
 
-        .brand svg { height: 26px; width: auto; display: block; }
+        .brand svg { height: 26px; width: auto; }
 
         .brand-word {
             font-size: 1.15rem;
@@ -144,15 +152,15 @@
             margin-left: auto;
             display: inline-flex;
             align-items: center;
-            min-height: 40px;
-            padding: 0 1rem;
-            border-radius: 10px;
+            min-height: 44px;
+            padding-inline: 1.1rem;
+            border-radius: 12px;
             border: 1px solid var(--seam);
             background-color: var(--chamber);
             color: var(--text-secondary);
             font-size: 0.9rem;
             font-weight: 500;
-            transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+            transition: border-color 0.2s var(--ease), color 0.2s var(--ease), background-color 0.2s var(--ease);
         }
 
         .topbar-cta:hover {
@@ -169,11 +177,11 @@
         /* ---------- masthead ---------- */
 
         .masthead {
-            padding: 4rem 0 2.5rem;
+            padding-block: clamp(3rem, 8vw, 5rem) clamp(2rem, 5vw, 3rem);
         }
 
         .eyebrow {
-            margin: 0 0 0.75rem;
+            margin: 0 0 0.85rem;
             font-size: 0.75rem;
             font-weight: 600;
             letter-spacing: 0.16em;
@@ -183,47 +191,63 @@
 
         .masthead h1 {
             margin: 0;
-            font-size: clamp(2.25rem, 6vw, 3.25rem);
-            line-height: 1.05;
+            font-size: clamp(2.25rem, 6vw, 3.5rem);
+            line-height: 1.04;
             font-weight: 700;
             letter-spacing: -0.03em;
             max-width: 16ch;
+            text-wrap: balance;
         }
 
         .masthead p {
-            margin: 1rem 0 0;
-            font-size: 1.15rem;
+            margin: 1.15rem 0 0;
+            font-size: clamp(1.05rem, 2.5vw, 1.2rem);
             color: var(--text-muted);
             max-width: 60ch;
         }
 
         /* ---------- article grid ---------- */
 
-        main { padding-bottom: 5rem; }
+        main { padding-bottom: clamp(4rem, 8vw, 6rem); }
 
+        /* Mobile-first: 1 column. Tablet: 2. Desktop: 3. */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 1.75rem;
-            margin-top: 1rem;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
         }
 
-        /* The whole card is one link — a big, accessible target. The
+        @media (min-width: 640px) {
+            .grid { grid-template-columns: repeat(2, 1fr); gap: 1.75rem; }
+        }
+
+        @media (min-width: 1024px) {
+            .grid { grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+        }
+
+        /* The whole card is one link — a large, accessible target. The
            "Read more" line is a styled span, not a nested anchor. */
         .card {
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            border: 1px solid rgba(51, 65, 85, 0.55);
-            border-radius: 16px;
-            background-color: rgba(15, 23, 42, 0.55);
-            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid var(--slate-800);
+            border-radius: 20px;
+            background-color: rgba(15, 23, 42, 0.6);
+            transition:
+                transform 0.28s var(--ease),
+                border-color 0.28s var(--ease),
+                box-shadow 0.28s var(--ease);
         }
 
         .card:hover {
             transform: translateY(-4px);
-            border-color: rgba(52, 211, 153, 0.4);
-            box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.7);
+            border-color: rgba(52, 211, 153, 0.45);
+            /* Soft emerald glow plus real depth. */
+            box-shadow:
+                0 1px 0 0 rgba(52, 211, 153, 0.08) inset,
+                0 20px 45px -18px rgba(16, 185, 129, 0.22),
+                0 12px 30px -14px rgba(0, 0, 0, 0.6);
         }
 
         .card:focus-visible {
@@ -231,33 +255,41 @@
             outline-offset: 3px;
         }
 
+        /* CRITICAL FIX: a fixed height with object-fit means the cover is
+           strictly contained no matter its intrinsic size. No aspect-ratio,
+           which Safari was ignoring here and letting the 957px-tall source
+           blow the card out. */
         .card-cover {
-            display: block;
             width: 100%;
-            aspect-ratio: 16 / 10;
+            height: 13rem;              /* ~h-52; 208px */
             object-fit: cover;
+            object-position: center 28%; /* favours the cover's headline band */
             background-color: var(--chamber);
-            border-bottom: 1px solid rgba(51, 65, 85, 0.55);
+            border-bottom: 1px solid var(--slate-800);
+        }
+
+        @media (min-width: 1024px) {
+            .card-cover { height: 14rem; } /* ~h-56 on desktop */
         }
 
         .card-body {
             display: flex;
             flex-direction: column;
             flex: 1;
-            padding: 1.35rem 1.5rem 1.5rem;
+            padding: 1.65rem 1.65rem 1.75rem;
         }
 
         .card-tag {
             font-size: 0.7rem;
             font-weight: 600;
-            letter-spacing: 0.12em;
+            letter-spacing: 0.13em;
             text-transform: uppercase;
             color: var(--text-faint);
-            margin-bottom: 0.7rem;
+            margin-bottom: 0.8rem;
         }
 
         .card-title {
-            margin: 0 0 0.6rem;
+            margin: 0 0 0.7rem;
             font-size: 1.3rem;
             line-height: 1.25;
             font-weight: 650;
@@ -266,10 +298,10 @@
         }
 
         .card-excerpt {
-            margin: 0 0 1.35rem;
+            margin: 0 0 1.5rem;
             font-size: 0.95rem;
             color: var(--text-muted);
-            flex: 1;
+            flex: 1;                    /* pushes "Read more" to a shared baseline */
         }
 
         .card-more {
@@ -281,19 +313,14 @@
             color: var(--green);
         }
 
-        .card-more span {
-            transition: transform 0.2s ease;
-        }
-
-        .card:hover .card-more span {
-            transform: translateX(3px);
-        }
+        .card-more .arrow { transition: transform 0.28s var(--ease); }
+        .card:hover .card-more .arrow { transform: translateX(4px); }
 
         /* ---------- footer ---------- */
 
         footer {
-            border-top: 1px solid rgba(51, 65, 85, 0.6);
-            padding: 2rem 0;
+            border-top: 1px solid rgba(51, 65, 85, 0.55);
+            padding-block: 2.25rem;
             text-align: center;
             font-size: 0.85rem;
             color: var(--text-faint);
@@ -349,7 +376,7 @@
                         <div class="card-tag">Document Security</div>
                         <h2 class="card-title">The Black Box Flaw: Why Your Redacted PDFs Are Still Leaking</h2>
                         <p class="card-excerpt">A black box doesn&rsquo;t remove text &mdash; it covers it, one copy-paste from recovery. Why only rasterization actually destroys redacted content, and how to do it without uploading a thing.</p>
-                        <span class="card-more">Read more <span aria-hidden="true">&rarr;</span></span>
+                        <span class="card-more">Read more <span class="arrow" aria-hidden="true">&rarr;</span></span>
                     </div>
                 </a>
 
@@ -363,7 +390,7 @@
                         <div class="card-tag">Data Protection</div>
                         <h2 class="card-title">DSAR Redaction: What to Remove Before You Release the File</h2>
                         <p class="card-excerpt">A subject access request means disclosing a file full of other people&rsquo;s data too. What to redact, what GDPR requires, and how to do it without uploading the bundle.</p>
-                        <span class="card-more">Read more <span aria-hidden="true">&rarr;</span></span>
+                        <span class="card-more">Read more <span class="arrow" aria-hidden="true">&rarr;</span></span>
                     </div>
                 </a>
 
@@ -386,7 +413,7 @@
                         <div class="card-tag">TODO: Category</div>
                         <h2 class="card-title">TODO: Article Title</h2>
                         <p class="card-excerpt">TODO: One or two sentences that make a busy professional want to click.</p>
-                        <span class="card-more">Read more <span aria-hidden="true">&rarr;</span></span>
+                        <span class="card-more">Read more <span class="arrow" aria-hidden="true">&rarr;</span></span>
                     </div>
                 </a>
 
