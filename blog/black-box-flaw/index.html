@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Primary Meta Tags -->
+    <title>Client-Side PDF Redaction: Why Redacted PDFs Still Leak</title>
+    <meta name="description" content="Black boxes don't remove text — they cover it. Learn how client-side PDF redaction rasterizes pages so redacted text is destroyed, not hidden. No uploads.">
+    
+    <!-- Open Graph / LinkedIn / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://redactlocal.org/blog/black-box-flaw">
+    <meta property="og:title" content="The Black Box Flaw: Why Your Redacted PDFs Are Still Leaking">
+    <meta property="og:description" content="Black boxes don't remove text — they cover it. Learn how client-side PDF redaction rasterizes pages so redacted text is destroyed, not hidden. No uploads.">
+    <meta property="og:image" content="https://redactlocal.org/blog/black-box-flaw-cover.png">
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://redactlocal.org/blog/black-box-flaw">
+    <meta name="twitter:title" content="The Black Box Flaw: Why Your Redacted PDFs Are Still Leaking">
+    <meta name="twitter:description" content="Black boxes don't remove text — they cover it. Learn how client-side PDF redaction rasterizes pages so redacted text is destroyed, not hidden. No uploads.">
+    <meta name="twitter:image" content="https://redactlocal.org/blog/black-box-flaw-cover.png">
+
+    <!-- JSON-LD Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Article",
+          "@id": "https://redactlocal.org/blog/black-box-flaw#article",
+          "isPartOf": { "@id": "https://redactlocal.org/blog/black-box-flaw" },
+          "mainEntityOfPage": { "@id": "https://redactlocal.org/blog/black-box-flaw" },
+          "headline": "The Black Box Flaw: Why Your Redacted PDFs Are Still Leaking",
+          "alternativeHeadline": "How client-side PDF redaction closes the hole for good",
+          "description": "Black boxes don't remove text — they cover it. How client-side PDF redaction rasterizes pages so redacted text is destroyed, not hidden.",
+          "inLanguage": "en",
+          "datePublished": "2026-08-18T09:00:00+00:00",
+          "dateModified": "2026-08-18T09:00:00+00:00",
+          "author": {
+            "@type": "Person",
+            "@id": "https://redactlocal.org/#founder",
+            "name": "Muhammad Daniyal",
+            "jobTitle": "Founder",
+            "url": "https://redactlocal.org/about",
+            "sameAs": [
+              "https://www.linkedin.com/in/YOUR-HANDLE",
+              "https://x.com/YOUR-HANDLE"
+            ]
+          },
+          "publisher": { "@id": "https://redactlocal.org/#organization" },
+          "image": {
+            "@type": "ImageObject",
+            "url": "https://redactlocal.org/blog/black-box-flaw-cover.png",
+            "width": 2540,
+            "height": 1520
+          },
+          "articleSection": "Document Security",
+          "keywords": [
+            "client-side PDF redaction",
+            "offline PDF redactor",
+            "browser-native PDF redaction",
+            "legal document redaction software",
+            "PDF rasterization",
+            "redaction failure"
+          ],
+          "about": [
+            { "@type": "Thing", "name": "PDF redaction" },
+            { "@type": "Thing", "name": "Data privacy" },
+            { "@type": "Thing", "name": "Attorney-client privilege" }
+          ],
+          "mentions": { "@id": "https://redactlocal.org/#software" }
+        },
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://redactlocal.org/#software",
+          "name": "RedactLocal",
+          "url": "https://redactlocal.org",
+          "description": "A browser-native PDF redactor that runs entirely on your device. Documents are never uploaded. Pages are permanently rasterized so redacted text is destroyed rather than hidden, and every export is re-inspected to confirm zero selectable characters and zero embedded fonts.",
+          "applicationCategory": ["SecurityApplication", "BusinessApplication"],
+          "applicationSubCategory": "PDF Redaction",
+          "operatingSystem": "Any (runs in a modern web browser)",
+          "browserRequirements": "Requires JavaScript. Chrome, Firefox, Safari or Edge.",
+          "isAccessibleForFree": true,
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock"
+          },
+          "featureList": [
+            "Client-side PDF redaction with no file upload",
+            "Works offline after the page loads",
+            "Permanent rasterization destroys the underlying text layer",
+            "Automatic post-export verification of zero selectable text and zero fonts",
+            "Pattern scanning for SSNs, EINs, IBANs, card numbers, government IDs and emails",
+            "Manual review of every match before redaction is applied",
+            "Batch processing of multiple documents",
+            "Compliance stamps including FOIA EXEMPTION and PRIVACY ACT",
+            "No account or installation required"
+          ],
+          "screenshot": "https://redactlocal.org/blog/black-box-flaw-cover.png",
+          "publisher": { "@id": "https://redactlocal.org/#organization" },
+          "author": { "@id": "https://redactlocal.org/#founder" }
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://redactlocal.org/#organization",
+          "name": "RedactLocal",
+          "url": "https://redactlocal.org",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://redactlocal.org/favicon.svg",
+            "width": 48,
+            "height": 48
+          }
+        }
+      ]
+    }
+    </script>
+
+    <style>
+        /* Base Flexbox Layout & Typography */
+        :root {
+            --text-main: #1a1a1a;
+            --text-muted: #4a5568;
+            --bg-color: #ffffff;
+            --accent: #2b6cb0;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text-main);
+            background-color: var(--bg-color);
+            line-height: 1.7;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        nav {
+            width: 100%;
+            max-width: 768px;
+            padding: 2rem 1.5rem;
+            box-sizing: border-box;
+        }
+
+        nav a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        article {
+            width: 100%;
+            max-width: 768px;
+            padding: 0 1.5rem 4rem 1.5rem;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            line-height: 1.2;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+            font-weight: 400;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            margin-top: 3rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 2rem;
+            margin-bottom: 0.75rem;
+        }
+
+        p, ul, ol {
+            margin-bottom: 1.5rem;
+            font-size: 1.125rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background-color: #f1f5f9;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+
+        .cta-box {
+            background-color: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-top: 3rem;
+            text-align: center;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background-color: var(--text-main);
+            color: #ffffff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 1rem;
+            transition: background-color 0.2s ease;
+        }
+
+        .cta-button:hover {
+            background-color: var(--accent);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8fafc;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            h2 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="/">&larr; Back to RedactLocal</a>
+    </nav>
+
+    <article>
+        <h1>The Black Box Flaw: Why Your Redacted PDFs Are Still Leaking</h1>
+        <p class="subtitle">And how client-side PDF redaction closes the hole for good.</p>
+
+        <p>A partner asks you to redact a settlement agreement before it goes to opposing counsel. You open a PDF editor, drag black rectangles over the account numbers and the claimant's address, save, and send.</p>
+        
+        <p>The document looks redacted. It is not redacted.</p>
+
+        <p>Anyone who receives that file can select the text underneath your black rectangle, copy it, and paste it into a text editor. The account number is still there. So is the address. The black box you drew is a graphic sitting on top of a text layer that was never touched.</p>
+
+        <p>This is not a hypothetical. It is the single most common way privileged material leaks, and it has happened in court filings, government document releases, and merger disclosures — repeatedly, publicly, and always by the same mechanism.</p>
+
+        <p>There are two separate failures at work in most redaction workflows. Both are fixable. Neither is fixed by the tool you are probably using right now.</p>
+
+        <h2>Failure One: A Black Box Is Not a Redaction</h2>
+        
+        <h3>What "drawing a box" actually does to a PDF</h3>
+        <p>A PDF is not a picture of a page. It is a set of instructions for drawing a page — a content stream that says, in effect, "set this font, move to these coordinates, show this string of characters."</p>
+        <p>When you draw a black rectangle in a standard PDF editor, you add one more instruction to that stream: fill this area with black. The instruction is appended, so it paints over the earlier ones.</p>
+        <p>But the text-showing operator is still in the file. The font used to render it is still embedded. The character codes are still sitting in the content stream, in reading order, at known coordinates.</p>
+        <p>You did not remove anything. You drew a curtain in front of it.</p>
+
+        <h3>How the text comes back</h3>
+        <p>Recovering it requires no expertise and no special software:</p>
+        <ul>
+            <li><strong>Select and copy.</strong> Drag across the black box in any PDF reader. The text highlights beneath it. Paste it anywhere.</li>
+            <li><strong>Command-line extraction.</strong> <code>pdftotext redacted.pdf -</code> dumps every character in the document to your terminal, black boxes irrelevant.</li>
+            <li><strong>Metadata and object inspection.</strong> Document properties, annotation objects, and revision history routinely retain earlier states of the file.</li>
+            <li><strong>Converting the file.</strong> Send that PDF through almost any converter and the "hidden" text reappears as ordinary body copy.</li>
+        </ul>
+        
+        <p>The person who receives your document does not need to be an adversary or a technician. A paralegal running a routine text search can surface material that was supposed to be withheld.</p>
+        
+        <p><strong>The test that matters:</strong> run <code>pdftotext</code> on any PDF you have redacted in the last year. If the redacted content appears in the output, that document leaked the moment you sent it.</p>
+
+        <h2>Failure Two: You Uploaded Privileged Material to Someone Else's Server</h2>
+        <p>Search for a redaction tool and you will find dozens of free web apps. Nearly all of them begin the same way: "Upload your file."</p>
+        <p>Consider what that sentence actually asks of you. You are transmitting attorney-client privileged material, PHI, or personally identifiable financial data to infrastructure you cannot inspect, in a jurisdiction you may not know, under a retention policy you did not read.</p>
+
+        <h3>What "processed securely" usually means</h3>
+        <p>The marketing copy on these services tends to say "files are deleted after one hour" or "processed securely." Read that carefully. It is a promise about behaviour, not a property of the architecture. It concedes the file was stored in the first place.</p>
+        <p>Between upload and deletion, your document has plausibly touched:</p>
+        <ul>
+            <li>Web server request logs</li>
+            <li>A temporary processing directory on disk</li>
+            <li>Automated infrastructure backups and snapshots</li>
+            <li>A CDN or load balancer cache</li>
+            <li>Whatever observability tooling the vendor runs</li>
+        </ul>
+        <p>None of that is malicious. It is what ordinary server architecture does. The problem is that you now have a disclosure event you cannot describe, on systems you cannot audit.</p>
+
+        <h3>The compliance problem this creates</h3>
+        <p>For regulated professionals, the exposure is not merely technical:</p>
+        <table>
+            <tr>
+                <th>Concern</th>
+                <th>The question you cannot answer</th>
+            </tr>
+            <tr>
+                <td><strong>Attorney-client privilege</strong></td>
+                <td>Did transmitting this to a third-party processor waive it?</td>
+            </tr>
+            <tr>
+                <td><strong>GDPR / data protection</strong></td>
+                <td>Who is the processor? Where is the DPA? Was this a cross-border transfer?</td>
+            </tr>
+            <tr>
+                <td><strong>Client engagement terms</strong></td>
+                <td>Does your retainer permit sending client material to unvetted vendors?</td>
+            </tr>
+            <tr>
+                <td><strong>Incident response</strong></td>
+                <td>If that vendor is breached next year, is your document in the blast radius?</td>
+            </tr>
+        </table>
+        <p>The cleanest way to answer every one of those questions is to make the upload never happen.</p>
+
+        <h2>The Only Redaction That Works: Rasterization</h2>
+        <p>If masking fails because the text survives underneath, the fix is straightforward in principle: destroy the text rather than cover it.</p>
+        <p>That is what rasterization does.</p>
+
+        <h3>Masking vs. rasterization</h3>
+        <p><strong>Masking</strong> adds a drawing instruction on top of the existing content stream. Text objects, fonts, and coordinates all survive intact. The information is hidden but present.</p>
+        <p><strong>Rasterization</strong> converts each page into a flat image — a grid of pixels — then builds a new PDF from those images alone. The black rectangle is burned into the pixel data before the new file is written.</p>
+        <p>There is no text layer in the output because there is no text. There are no fonts to reconstruct characters from. There is nothing beneath the black area except black pixels, because the black area <em>is</em> pixels.</p>
+        <p>Copy-paste returns nothing. <code>pdftotext</code> returns an empty file. Not because the text is protected — because it does not exist.</p>
+
+        <h3>What you give up, and why it is correct</h3>
+        <p>Rasterization is not free. A flattened PDF is no longer searchable, its file size is usually larger, and the text cannot be reflowed.</p>
+        <p>For a document being produced under a protective order, filed publicly, or handed to opposing counsel, <strong>that is exactly the right trade.</strong> You are not optimising for convenience. You are producing a document whose withheld content is unrecoverable by anyone, forever, using any tool.</p>
+        <p>Keep your searchable original. Produce the flattened copy.</p>
+
+        <h2>Server-Side vs. Client-Side: Where the Work Happens</h2>
+        <p>Rasterization solves the recovery problem. It does nothing about the upload problem — a cloud tool can rasterize your file perfectly well after receiving it.</p>
+        <p>This is where client-side PDF redaction matters.</p>
+        <p>Modern browsers are capable computing environments. They can parse a PDF, render pages to a canvas, manipulate pixels, and assemble a new file — all in local memory, using JavaScript and WebAssembly your machine already downloaded.</p>
+        <p>Nothing about redaction inherently requires a server. When a web-based redaction tool uploads your file, that is an architectural choice made for the vendor's convenience, not a technical necessity.</p>
+        <p>Browser-native PDF redaction inverts the trust model. Instead of asking you to trust a privacy policy, it removes the party you would have had to trust.</p>
+
+        <h2>How RedactLocal Works</h2>
+        <p>RedactLocal is an offline PDF redactor web app built on exactly this principle. Here is the mechanism, without marketing language.</p>
+
+        <h3>Your document never reaches a server</h3>
+        <p>When you open a PDF in RedactLocal, the browser's own <code>FileReader</code> API reads it into the tab's memory. It is parsed by pdf.js in a Web Worker. It is rendered to a canvas element. It is exported by your browser's download mechanism.</p>
+        <p>At no point in that chain is there an endpoint the document is sent to. There is no upload API, because there is no backend that accepts files.</p>
+        <p><strong>The test:</strong> open RedactLocal, disconnect your Wi-Fi, and redact a document. It works. Export the file — it still works. A cloud tool cannot survive that test, and that is the entire difference.</p>
+
+        <h3>Permanent rasterization, burned into pixels</h3>
+        <p>On export, every page is rendered to a canvas at 2× the PDF's native resolution — roughly 144 DPI, which stays legible in print without producing an unmanageable file. Your redaction rectangles are filled onto those pixels. The resulting images become the new PDF.</p>
+        <p>The source document's text objects, embedded fonts, vector paths, and metadata have no path into the output. They are not carried over and suppressed. They are simply never written.</p>
+        <p>The rendering density adapts to your hardware — from roughly 16.7 megapixels of canvas on a desktop down to 3 megapixels on a low-memory phone — so a 200-page production does not crash the tab on a laptop.</p>
+
+        <h3>Every export inspects its own work</h3>
+        <p>This is the part most redaction tools do not do at all.</p>
+        <p>Before the download button appears, RedactLocal re-opens the PDF it just generated and inspects it as an adversary would:</p>
+        <ul>
+            <li>Extractable characters via text extraction</li>
+            <li>Text-showing operators in the page content streams</li>
+            <li>Font objects in the document</li>
+            <li>Annotation objects</li>
+        </ul>
+        <p>It then reports what it found:</p>
+        <p><em>Re-opened and checked: 12 flattened pages, 0 selectable characters, 0 text operators, 0 font objects, 0 annotations.</em></p>
+        <p>You are not asked to trust that the redaction worked. You are shown the result of the check. And if a particular inspection cannot run in your browser, it says so by name rather than quietly reporting a zero — because "verified clean" and "could not verify" are different claims, and collapsing them would be the exact dishonesty this tool exists to eliminate.</p>
+
+        <h3>What we are transparent about</h3>
+        <p>Two things you should know before trusting any claim in this article:</p>
+        <p><strong>The site loads privacy-friendly page analytics.</strong> Loading redactlocal.org fires a page-view beacon, the same as most websites. It records that a page was viewed. It has no access to your document, which never leaves your tab's memory. We tell you this because you will find it in your Network tab in ten seconds, and a security tool that hides a detail like that has told you something about how it handles the details you cannot see.</p>
+        <p><strong>Pattern scanning does not read scanned documents.</strong> The scanner works on a PDF's text layer. If your file is an image-only scan, there is no text to match against — RedactLocal reports those pages by number and tells you to check them by eye rather than passing them as clean. Manual redaction and rasterized export work normally on scanned pages.</p>
+
+        <h2>How to Redact a PDF Without Uploading It</h2>
+        <ol>
+            <li><strong>Open redactlocal.org.</strong> No account, no installation, no extension.</li>
+            <li><strong>Disconnect from the internet.</strong> Optional, but do it once — it is the only proof that matters.</li>
+            <li><strong>Drop in your PDF.</strong> It is read into your browser's memory by your browser.</li>
+            <li><strong>Mark what has to go.</strong> Drag boxes manually, or scan for structured identifiers and confirm each match.</li>
+            <li><strong>Export.</strong> Pages are rasterized, redactions burned into pixels, and a new PDF assembled from images.</li>
+            <li><strong>Read the verification report</strong> before you download.</li>
+            <li><strong>Verify independently.</strong> Run <code>pdftotext</code> on the file you just saved. It should return nothing.</li>
+        </ol>
+
+        <div class="cta-box">
+            <h2>Try It Before You Trust It</h2>
+            <p>Every other redaction tool asks for your trust first and your file second. RedactLocal asks for neither. There is no account to create, nothing to install, and no server that receives your document.</p>
+            <p>Open the tool, turn off your Wi-Fi, and redact something. That is the whole pitch, and you can falsify it in ten seconds.</p>
+            <a href="/" class="cta-button">Open RedactLocal Workspace</a>
+        </div>
+    </article>
+
+</body>
+</html> 
