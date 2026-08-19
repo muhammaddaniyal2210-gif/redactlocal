@@ -93,6 +93,8 @@
           "featureList": [
             "Client-side PDF redaction with no file upload",
             "Works offline after the page loads",
+            "Regulatory compliance presets for UIDAI/RBI, FRCP 5.2 and GDPR",
+            "Partial masking that covers the first 8 digits of an Aadhaar number and keeps the last 4",
             "Precise manual masking for partial identifiers",
             "Permanent rasterization destroys the underlying text layer",
             "Automatic post-export verification of zero selectable text and zero fonts",
@@ -410,7 +412,7 @@
         <ol>
             <li><strong>Decide whether you need the document at all.</strong> If a masked Aadhaar from myAadhaar or an alternative OVD will do, start there.</li>
             <li><strong>Work on a machine you control.</strong> If the tool requires an upload, it has joined your processing chain. <a href="/">RedactLocal</a> runs entirely inside your browser tab.</li>
-            <li><strong>Cover the first eight digits only.</strong> Leave the final four visible. Include any separators inside the masked area.</li>
+            <li><strong>Cover the first eight digits only.</strong> Leave the final four visible, and include any separators inside the masked area. In RedactLocal this is the <strong>🇮🇳 UIDAI / RBI Aadhaar</strong> preset; elsewhere it is a rectangle you draw yourself.</li>
             <li><strong>Check the back and the QR code.</strong> An Aadhaar PDF often repeats the number elsewhere, and the QR code encodes demographic data. Mask every instance, not just the one on the front.</li>
             <li><strong>Flatten the output</strong> so the digits are destroyed rather than covered.</li>
             <li><strong>Verify before filing.</strong> Run <code>pdftotext</code> over the finished file, or open it and search for the first eight digits. If they appear, do not store it.</li>
@@ -424,10 +426,20 @@
         <h3>Nothing leaves the tab</h3>
         <p>The card is read into memory by the browser's own file API, rendered locally, and exported by your browser's download mechanism. You can confirm it in ten seconds, and we would rather you did: <strong>open the tool, turn off your Wi-Fi, load the Aadhaar card and mask it.</strong> It keeps working, because there is nowhere for the file to go. No cloud tool survives that test.</p>
 
-        <h3>Precision masking is the right tool for this job</h3>
-        <p>Aadhaar masking is a partial redaction &mdash; eight digits out of twelve &mdash; and that makes it a job for a drawn box rather than an automatic sweep. You drag a rectangle over the first eight digits, leave the last four clear, and the mask lands exactly where you put it.</p>
+        <h3>The India preset masks the first eight for you</h3>
+        <p>Aadhaar masking is a <em>partial</em> redaction &mdash; eight digits out of twelve &mdash; which is precisely why most automatic redaction tools are useless for it. A scanner that finds an identifier and blacks out the whole thing produces a fully masked number, and a fully masked number fails the KYC check it was prepared for.</p>
 
-        <p>To be straightforward about the limits of the automatic scanner: <strong>RedactLocal's Auto-Redact does not currently include an Aadhaar pattern</strong>, and it blacks out whole matches rather than parts of them. Even with such a pattern it would mask all twelve digits, which is not what the rule asks for. Manual masking is the correct method here, not a workaround.</p>
+        <p>RedactLocal now does the partial redaction directly. Choose <strong>🇮🇳 UIDAI / RBI Aadhaar (Mask First 8 Digits, Keep Last 4)</strong> from the compliance preset selector in the toolbar, run Auto-Detect, and the scanner finds twelve-digit Aadhaar numbers on the page and places the box over the first eight digits only. The final four stay readable. A forty-card onboarding batch is a scan and a confirmation rather than forty hand-drawn rectangles.</p>
+
+        <p>Three details are worth stating precisely, because they are what separate this from a find-and-replace:</p>
+
+        <ul>
+            <li><strong>Format does not matter.</strong> <code>2345 6789 0123</code>, <code>2345-6789-0123</code> and <code>234567890123</code> are all matched, and in each case the same eight digits go under the box. The mask is positioned by measuring where the characters actually sit on the page, not by counting them.</li>
+            <li><strong>The pattern uses a real UIDAI rule.</strong> An Aadhaar number never begins with 0 or 1, so numbers that do are rejected outright. The scanner also refuses to take a twelve-digit bite out of a longer run of digits, which is how a sixteen-digit card number gets misread as an Aadhaar by naive tooling.</li>
+            <li><strong>Every hit is still reviewed before anything is drawn.</strong> The panel lists what was found, showing the covered digits as a bar and the retained four beside them, so you approve the outcome rather than the intention. Any twelve-digit number beginning 2&ndash;9 is structurally indistinguishable from an Aadhaar &mdash; an account number of the same shape will be offered as a match, and you decline it.</li>
+        </ul>
+
+        <p>All of it executes in the tab. The preset changes which patterns run against text already held in your browser's memory; it contacts nothing, and it works with the network off. Manual masking remains available and remains the right method for anything the text layer cannot reach &mdash; which, for Aadhaar work specifically, is a larger category than it sounds. See below.</p>
 
         <h3>The mask is destroyed, then verified</h3>
         <p>On export, every page is rasterized and the mask is burned into the pixels. The new PDF is assembled from images alone, so there is no text layer left to recover. The file is then re-opened and inspected before the download appears, reporting the flattened page count alongside the number of selectable characters, text operators, font objects and annotations found. On a correct export those counts are zero.</p>
@@ -439,7 +451,7 @@
 
         <p>One limit matters more than usual for Aadhaar work.</p>
 
-        <p><strong>Most Aadhaar cards are scans or photographs.</strong> If the PDF is an image with no text layer, there is nothing for any pattern scanner to read &mdash; in RedactLocal or anywhere else. Manual masking and flattened export work normally on such files, and for a photographed card that is the only method available regardless of which tool you use. Where the file <em>has</em> been OCR'd by your document system, it does contain recoverable text, which is exactly the case people wrongly assume is safe because "it is only a picture."</p>
+        <p><strong>Most Aadhaar cards are scans or photographs.</strong> If the PDF is an image with no text layer, there is nothing for any pattern scanner to read &mdash; in RedactLocal or anywhere else. <strong>The India preset will find nothing on such a file, and finding nothing is not the same as there being nothing.</strong> Draw the box by hand and export as normal; for a photographed card that is the only method available regardless of which tool you use. Where the file <em>has</em> been OCR'd by your document system, it does contain recoverable text, and the preset will find it &mdash; which is exactly the case people wrongly assume is safe because "it is only a picture."</p>
 
         <p><strong>The site loads page analytics.</strong> Loading redactlocal.org records a page view, as most websites do. It has no access to your documents, which never leave your tab's memory. We state that plainly, because a tool asking you to trust its handling of data you cannot see should be candid about the data you can.</p>
 
