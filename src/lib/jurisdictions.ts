@@ -78,6 +78,24 @@ export const JURISDICTION_PRESETS: readonly JurisdictionPreset[] = [
     categories: ['emails', 'phones'],
     banner: { flag: '🌐', region: 'Global', rule: 'GDPR & general PII' },
   },
+  {
+    id: 'us-hipaa',
+    label: '🏥 US Healthcare: HIPAA (NPIs & Provider IDs)',
+    hint: 'Finds checksum-valid NPIs and labelled medical record numbers.',
+    caveat:
+      'Identifiers only. HIPAA also treats names, dates, addresses and other PHI as protected, and those are not pattern-detectable — read the record by eye. Medical record numbers are matched by their label, so an unlabelled one will be missed.',
+    categories: ['npi', 'mrn'],
+    banner: { flag: '🏥', region: 'US', rule: 'HIPAA identifiers' },
+  },
+  {
+    id: 'pci-dss',
+    label: '💳 Global Finance: PCI-DSS (Credit Card PANs)',
+    hint: 'Finds 16-digit card numbers that pass the Luhn checksum.',
+    caveat:
+      'Sixteen-digit PANs only. Amex (15 digits) and Diners are not matched, and PCI-DSS also governs the CVV, expiry and cardholder name, which are not detected — check the page before filing.',
+    categories: ['pan'],
+    banner: { flag: '💳', region: 'Global', rule: 'PCI-DSS card PANs' },
+  },
 ]
 
 /**
@@ -93,6 +111,8 @@ const SLUG_TO_ID: Readonly<Record<string, string>> = {
   'india-aadhaar': 'in-uidai',
   'us-frcp52': 'us-frcp',
   'global-pii': 'eu-gdpr',
+  'us-hipaa': 'us-hipaa',
+  'pci-dss': 'pci-dss',
 }
 
 const ID_TO_SLUG = new Map(Object.entries(SLUG_TO_ID).map(([slug, id]) => [id, slug]))

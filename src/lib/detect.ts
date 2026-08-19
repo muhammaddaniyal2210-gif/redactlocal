@@ -32,6 +32,9 @@ export type SweepCategoryId =
   | 'ein'
   | 'govIds'
   | 'aadhaar'
+  | 'npi'
+  | 'mrn'
+  | 'pan'
   | 'cards'
   | 'iban'
   | 'accounts'
@@ -74,6 +77,65 @@ export interface SweepCategory {
    * found rather than only the part being covered.
    */
   maskSpan?: (text: string) => { start: number; end: number } | null
+  /**
+   * Rejects a match the pattern alone cannot rule out.
+   *
+   * Some identifiers carry a check digit, which turns "ten digits in a row"
+   * into something that can actually be verified. Where that is true the
+   * arithmetic belongs here rather than in the regex, and a failing value is
+   * dropped before it ever reaches the review list — a scanner that reports
+   * every ten-digit number as a provider ID is one people stop reading.
+   */
+  validate?: (text: string) => boolean
+}
+
+const onlyDigits = (value: string) => value.replace(/\D/g, '')
+
+/**
+ * The Luhn checksum, used by card PANs and — via a fixed prefix — by NPIs.
+ *
+ * Digits are weighted alternately from the right, doubled values above nine
+ * have nine subtracted, and a valid number sums to a multiple of ten.
+ */
+function passesLuhn(digits: string): boolean {
+  if (digits.length === 0) return false
+  let sum = 0
+  let double = false
+  for (let i = digits.length - 1; i >= 0; i--) {
+    let n = digits.charCodeAt(i) - 48
+    if (n < 0 || n > 9) return false
+    if (double) {
+      n *= 2
+      if (n > 9) n -= 9
+    }
+    sum += n
+    double = !double
+  }
+  return sum % 10 === 0
+}
+
+/**
+ * A National Provider Identifier: ten digits whose last one is a Luhn check
+ * digit computed over `80840` plus the other nine.
+ *
+ * The prefix is not decoration — it is the NPPES rule, standing in for the
+ * ISO issuer identifier assigned to health applications. Together with the
+ * leading 1 or 2 that NPPES actually issues, this rejects the overwhelming
+ * majority of ten-digit numbers that are not NPIs, which is the difference
+ * between a usable healthcare sweep and one that flags every phone number.
+ */
+function isNpi(text: string): boolean {
+  const digits = onlyDigits(text)
+  if (digits.length !== 10) return false
+  if (digits[0] !== '1' && digits[0] !== '2') return false
+  return passesLuhn(`80840${digits}`)
+}
+
+/** A 16-digit card PAN, verified by its own Luhn check digit. */
+function isPan(text: string): boolean {
+  const digits = onlyDigits(text)
+  if (digits.length !== 16) return false
+  return passesLuhn(digits)
 }
 
 /**
@@ -156,6 +218,42 @@ export const SWEEP_CATEGORIES: readonly SweepCategory[] = [
     pattern: () => /(^|[^\d-])([2-9]\d{3}[ -]?\d{4}[ -]?\d{4})(?![\d-])/g,
     capture: 2,
     maskSpan: maskAllButLastDigits(4),
+  },
+  {
+    id: 'npi',
+    group: 'identifiers',
+    label: 'Provider IDs (NPI)',
+    hint: '1234567893 — checksum verified',
+    // Ten digits, guarded so a longer run of digits cannot yield a ten-digit
+    // window. NPPES issues only 1- and 2-prefixed numbers today; the checksum
+    // in `validate` does the rest of the work.
+    pattern: () => /(^|[^\d-])([12]\d{9})(?![\d-])/g,
+    capture: 2,
+    validate: isNpi,
+  },
+  {
+    id: 'mrn',
+    group: 'identifiers',
+    label: 'Medical record numbers',
+    hint: 'MRN: 00847321',
+    // Anchored on the label, because there is no such thing as an MRN format:
+    // every hospital assigns its own, so the surrounding words are the only
+    // reliable signal. The capture group keeps the box off the label itself.
+    pattern: () =>
+      /(?:mrn|medical record(?:\s*(?:no\.?|number|#))?|patient\s*(?:id|no\.?|number|#))\s*[:#-]?\s*([A-Za-z0-9][A-Za-z0-9-]{3,19})/gi,
+    capture: 1,
+  },
+  {
+    id: 'pan',
+    group: 'financial',
+    label: 'Card PANs (PCI-DSS)',
+    hint: '4111 1111 1111 1111 — checksum verified',
+    // Four groups of four, separators optional and allowed to be a space or a
+    // hyphen. Sits above the looser `cards` category so that when both are on
+    // the finding is reported under the name that actually verified it.
+    pattern: () => /(^|[^\d-])((?:\d{4}[ -]?){3}\d{4})(?![\d-])/g,
+    capture: 2,
+    validate: isPan,
   },
   {
     id: 'cards',
@@ -493,6 +591,18 @@ export async function scanPage(
 
         const { index, length } = spanFor(match, category.capture)
         const value = str.slice(index, index + length)
+
+        // A check digit is the cheapest way to tell a real identifier from an
+        // arbitrary run of digits, so a value that fails it is not a finding.
+        if (category.validate) {
+          let ok = false
+          try {
+            ok = category.validate(value)
+          } catch (err) {
+            console.error('Find & Redact could not validate a match:', err)
+          }
+          if (!ok) continue
+        }
 
         // A partial rule moves the box onto a sub-range of the value while the
         // finding keeps reporting the value in full.
