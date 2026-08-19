@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Primary Meta Tags -->
+    <title>Offline Aadhaar Masking Tool: Mask the First 8 Digits</title>
+    <meta name="description" content="UIDAI and RBI KYC rules require the first 8 digits of an Aadhaar number to be masked. How to mask Aadhaar cards offline, without uploading them anywhere.">
+    <link rel="canonical" href="https://redactlocal.org/blog/aadhaar-card-masking-offline">
+
+    <!-- Open Graph / LinkedIn / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://redactlocal.org/blog/aadhaar-card-masking-offline">
+    <meta property="og:title" content="Offline Aadhaar Masking: Mask the First 8 Digits Without Uploading">
+    <meta property="og:description" content="UIDAI and RBI KYC rules require the first 8 digits of an Aadhaar number to be masked. How to mask Aadhaar cards offline, without uploading them anywhere.">
+    <meta property="og:image" content="https://redactlocal.org/blog/aadhaar-card-masking-offline/cover.jpg">
+    <meta property="og:image:width" content="1600">
+    <meta property="og:image:height" content="957">
+    <meta property="og:image:alt" content="RedactLocal's in-browser PDF editor masking the first eight digits of an Aadhaar number">
+    <meta property="og:site_name" content="RedactLocal">
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://redactlocal.org/blog/aadhaar-card-masking-offline">
+    <meta name="twitter:title" content="Offline Aadhaar Masking: Mask the First 8 Digits Without Uploading">
+    <meta name="twitter:description" content="UIDAI and RBI KYC rules require the first 8 digits of an Aadhaar number to be masked. How to mask Aadhaar cards offline, without uploading them anywhere.">
+    <meta name="twitter:image" content="https://redactlocal.org/blog/aadhaar-card-masking-offline/cover.jpg">
+
+    <!-- JSON-LD Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "BlogPosting",
+          "@id": "https://redactlocal.org/blog/aadhaar-card-masking-offline#article",
+          "isPartOf": { "@id": "https://redactlocal.org/blog/aadhaar-card-masking-offline" },
+          "mainEntityOfPage": { "@id": "https://redactlocal.org/blog/aadhaar-card-masking-offline" },
+          "headline": "Offline Aadhaar Masking: Mask the First 8 Digits Without Uploading",
+          "alternativeHeadline": "What UIDAI and RBI KYC rules require, and how to comply without a cloud tool",
+          "description": "UIDAI and RBI KYC rules require the first 8 digits of an Aadhaar number to be masked. How to mask Aadhaar cards offline, without uploading them anywhere.",
+          "inLanguage": "en",
+          "datePublished": "2026-08-19T09:00:00+00:00",
+          "dateModified": "2026-08-19T09:00:00+00:00",
+          "author": {
+            "@type": "Person",
+            "@id": "https://redactlocal.org/#founder",
+            "name": "Muhammad Daniyal",
+            "jobTitle": "Founder",
+            "url": "https://redactlocal.org/about"
+          },
+          "publisher": { "@id": "https://redactlocal.org/#organization" },
+          "image": {
+            "@type": "ImageObject",
+            "url": "https://redactlocal.org/blog/aadhaar-card-masking-offline/cover.jpg",
+            "width": 1600,
+            "height": 957
+          },
+          "articleSection": "Data Protection",
+          "keywords": [
+            "offline Aadhaar masking tool",
+            "mask first 8 digits of Aadhaar",
+            "RBI KYC compliance",
+            "Aadhaar masking",
+            "DPDP Act",
+            "client-side PDF redaction"
+          ],
+          "about": [
+            { "@type": "Thing", "name": "Aadhaar" },
+            { "@type": "Thing", "name": "Digital Personal Data Protection Act" },
+            { "@type": "Thing", "name": "Know Your Customer" }
+          ],
+          "mentions": { "@id": "https://redactlocal.org/#software" }
+        },
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://redactlocal.org/#software",
+          "name": "RedactLocal",
+          "url": "https://redactlocal.org",
+          "description": "A browser-native PDF redactor that runs entirely on your device. Documents are never uploaded. Pages are permanently rasterized so redacted text is destroyed rather than hidden, and every export is re-inspected to confirm zero selectable characters and zero embedded fonts.",
+          "applicationCategory": ["SecurityApplication", "BusinessApplication"],
+          "applicationSubCategory": "PDF Redaction",
+          "operatingSystem": "Any (runs in a modern web browser)",
+          "browserRequirements": "Requires JavaScript. Chrome, Firefox, Safari or Edge.",
+          "isAccessibleForFree": true,
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock"
+          },
+          "featureList": [
+            "Client-side PDF redaction with no file upload",
+            "Works offline after the page loads",
+            "Precise manual masking for partial identifiers",
+            "Permanent rasterization destroys the underlying text layer",
+            "Automatic post-export verification of zero selectable text and zero fonts",
+            "Batch processing of multiple documents",
+            "Custom redaction stamps",
+            "No account or installation required"
+          ],
+          "publisher": { "@id": "https://redactlocal.org/#organization" },
+          "author": { "@id": "https://redactlocal.org/#founder" }
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://redactlocal.org/#organization",
+          "name": "RedactLocal",
+          "url": "https://redactlocal.org",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://redactlocal.org/favicon.svg",
+            "width": 48,
+            "height": 48
+          }
+        }
+      ]
+    }
+    </script>
+
+    <style>
+        /* Base Flexbox Layout & Typography */
+        :root {
+            --text-main: #1a1a1a;
+            --text-muted: #4a5568;
+            --bg-color: #ffffff;
+            --accent: #2b6cb0;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text-main);
+            background-color: var(--bg-color);
+            line-height: 1.7;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        nav {
+            width: 100%;
+            max-width: 768px;
+            padding: 2rem 1.5rem;
+            box-sizing: border-box;
+        }
+
+        nav a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        article {
+            width: 100%;
+            max-width: 768px;
+            padding: 0 1.5rem 4rem 1.5rem;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            line-height: 1.2;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+            font-weight: 400;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            margin-top: 3rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 2rem;
+            margin-bottom: 0.75rem;
+        }
+
+        p, ul, ol {
+            margin-bottom: 1.5rem;
+            font-size: 1.125rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* In-text links. The base stylesheet only styled nav links and the CTA
+           button, which left contextual links rendering as default browser blue. */
+        article p a,
+        article li a,
+        article td a {
+            color: var(--accent);
+            font-weight: 500;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+            text-decoration-thickness: 1px;
+            transition: color 0.15s ease;
+        }
+
+        article p a:hover,
+        article li a:hover,
+        article td a:hover {
+            color: var(--text-main);
+        }
+
+        code {
+            background-color: #f1f5f9;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+
+        .callout {
+            border-left: 3px solid var(--accent);
+            background-color: #f8fafc;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .callout p:last-child {
+            margin-bottom: 0;
+        }
+
+        .disclaimer {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            padding-top: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .cta-box {
+            background-color: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-top: 3rem;
+            text-align: center;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background-color: var(--text-main);
+            color: #ffffff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 1rem;
+            transition: background-color 0.2s ease;
+        }
+
+        .cta-button:hover {
+            background-color: var(--accent);
+        }
+
+        /* A mid-article conversion point, styled to read as an action rather
+           than as another paragraph. */
+        .inline-cta {
+            text-align: center;
+            margin: 2.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8fafc;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            h2 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="/">&larr; Back to RedactLocal</a>
+    </nav>
+
+    <article>
+        <h1>Offline Aadhaar Masking: Mask the First 8 Digits Without Uploading</h1>
+        <p class="subtitle">Masking an Aadhaar number is a two-minute job. Doing it through a cloud tool is a reportable data breach.</p>
+
+        <img
+            src="/blog/aadhaar-card-masking-offline/cover.jpg"
+            alt="RedactLocal's in-browser PDF editor masking the first eight digits of an Aadhaar number"
+            width="1600"
+            height="957"
+            fetchpriority="high"
+            decoding="async"
+            onerror="this.style.display='none'"
+            style="display: block; box-sizing: border-box; width: 100%; max-width: 800px; height: auto; aspect-ratio: 1600 / 957; margin: 0 auto 3rem; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 24px rgba(15, 23, 42, 0.10), 0 1px 3px rgba(15, 23, 42, 0.06);">
+
+        <p>An HR executive is onboarding forty people. Each one has sent an Aadhaar card as a PDF. Policy says the first eight digits must be masked before anything goes into the HRMS.</p>
+
+        <p>So they search for a masking tool, find a free online PDF editor, and upload forty unmasked Aadhaar cards to a server they know nothing about.</p>
+
+        <p>That single action is the thing the policy existed to prevent. Forty complete Aadhaar numbers, each attached to a name, a photograph and a date of birth, have just been transmitted to a third party with no contract, no security assessment, and quite possibly no presence in India. The masked copies that come back do not undo it.</p>
+
+        <p>This is the most common way Aadhaar data leaves an Indian organisation, and it happens during the compliance step.</p>
+
+        <h2>What the Rule Actually Says</h2>
+
+        <p>Two separate requirements are usually collapsed into one, and it is worth keeping them apart.</p>
+
+        <h3>Masked Aadhaar (UIDAI)</h3>
+
+        <p>UIDAI provides a masked Aadhaar format in which the first eight digits are replaced and only the final four remain visible &mdash; rendered as <code>XXXX XXXX 1234</code>. It is downloadable directly from the myAadhaar portal and the mAadhaar app, and it is a valid form of the document for most verification purposes.</p>
+
+        <p>Separately, the Aadhaar Act and the Aadhaar (Sharing of Information) Regulations restrict what an entity may do with an Aadhaar number. Publishing, displaying or posting an Aadhaar number publicly is prohibited, and entities are directed not to retain full Aadhaar numbers where they have no authority to do so.</p>
+
+        <h3>KYC records (RBI)</h3>
+
+        <p>For entities regulated by the Reserve Bank of India, the KYC Master Direction addresses the situation where a customer submits Aadhaar as an officially valid document. Where the copy is retained, the Aadhaar number is to be redacted or blacked out so that it is not stored in full.</p>
+
+        <table>
+            <tr>
+                <th>Element</th>
+                <th>Treatment</th>
+            </tr>
+            <tr>
+                <td>First 8 digits of the Aadhaar number</td>
+                <td>Masked or blacked out</td>
+            </tr>
+            <tr>
+                <td>Last 4 digits</td>
+                <td>Left visible, as the reference</td>
+            </tr>
+            <tr>
+                <td>Name, photograph, address</td>
+                <td>Retained, subject to your own retention policy</td>
+            </tr>
+        </table>
+
+        <div class="callout">
+            <p><strong>This is partial masking, and that detail matters.</strong> The requirement is not "remove the Aadhaar number." It is to leave the last four digits readable so the record remains identifiable, while the other eight stop existing. A tool that blacks out the whole number has not complied better &mdash; it has destroyed the reference the rule deliberately preserves.</p>
+        </div>
+
+        <h3>The prior question</h3>
+
+        <p>Before masking anything, ask whether you should be holding the document at all. Many organisations collect Aadhaar as a matter of habit rather than because a law requires it, and alternatives &mdash; offline e-KYC, the Aadhaar Virtual ID, or simply a different officially valid document &mdash; often serve the same purpose without putting a full Aadhaar number in your systems. The safest Aadhaar copy is the one you never collected.</p>
+
+        <h2>Why Uploading It Is the Expensive Mistake</h2>
+
+        <p>India's <strong>Digital Personal Data Protection Act, 2023</strong> changed the arithmetic here. Sending an unmasked Aadhaar card to an unassessed third-party tool is no longer just poor practice.</p>
+
+        <p>Under the Act, an organisation deciding the purpose and means of processing personal data is a Data Fiduciary, and it remains responsible for personal data processed on its behalf. Section 8(5) requires a Data Fiduciary to take reasonable security safeguards to prevent a personal data breach. The Schedule sets the penalty for failing to do so at <strong>up to ₹250 crore</strong>.</p>
+
+        <p>Alongside that sit obligations to notify the Data Protection Board and affected individuals of a breach, with its own penalty of up to ₹200 crore.</p>
+
+        <div class="callout">
+            <p><strong>On the ₹500 crore figure:</strong> you will see it quoted widely. It came from an earlier withdrawn draft. The Act as enacted in 2023 caps penalties at ₹250 crore for the security-safeguards breach, which is the head most likely to apply here. Quoting the wrong number in an internal policy is an easy way to lose the room.</p>
+        </div>
+
+        <p>The practical questions a cloud upload creates are the ones nobody wants to answer after the fact:</p>
+
+        <ul>
+            <li>Which entity processed the document, and under what contract?</li>
+            <li>Was the data transferred outside India, and does that comply with your obligations?</li>
+            <li>Did the individual consent to this processor, or only to your organisation?</li>
+            <li>If that vendor is breached, are you notifying forty employees and the Board?</li>
+        </ul>
+
+        <p>All of those disappear if the file never leaves the machine it was opened on.</p>
+
+        <div class="inline-cta">
+            <a href="/" class="cta-button">Mask an Aadhaar card in your browser &rarr;</a>
+        </div>
+
+        <h2>A Black Box Is Not Masking</h2>
+
+        <p>The second failure is quieter and worse, because the document looks correct.</p>
+
+        <p>Drawing a black rectangle over the first eight digits in a standard PDF editor does not remove them. It appends a drawing instruction that paints over text which remains fully intact underneath &mdash; recoverable by selecting and copying, by running <code>pdftotext</code>, or by pushing the file through a converter.</p>
+
+        <p>An Aadhaar card that has been "masked" this way and filed into an HRMS is a full Aadhaar number sitting in your systems, wearing a mask. If that database is ever exposed, the masking bought you nothing at all.</p>
+
+        <p>We covered the mechanism in detail in <a href="/blog/black-box-flaw">The Black Box Flaw</a>. The short version: only <strong>rasterization</strong> &mdash; flattening the page to an image and burning the mask into the pixels &mdash; actually destroys what is underneath.</p>
+
+        <h2>How to Mask an Aadhaar Card Properly</h2>
+
+        <ol>
+            <li><strong>Decide whether you need the document at all.</strong> If a masked Aadhaar from myAadhaar or an alternative OVD will do, start there.</li>
+            <li><strong>Work on a machine you control.</strong> If the tool requires an upload, it has joined your processing chain. <a href="/">RedactLocal</a> runs entirely inside your browser tab.</li>
+            <li><strong>Cover the first eight digits only.</strong> Leave the final four visible. Include any separators inside the masked area.</li>
+            <li><strong>Check the back and the QR code.</strong> An Aadhaar PDF often repeats the number elsewhere, and the QR code encodes demographic data. Mask every instance, not just the one on the front.</li>
+            <li><strong>Flatten the output</strong> so the digits are destroyed rather than covered.</li>
+            <li><strong>Verify before filing.</strong> Run <code>pdftotext</code> over the finished file, or open it and search for the first eight digits. If they appear, do not store it.</li>
+            <li><strong>Delete the unmasked original</strong> once the masked copy is filed, unless you have a specific reason and lawful basis to keep it.</li>
+        </ol>
+
+        <h2>How RedactLocal Fits</h2>
+
+        <p><a href="/">RedactLocal</a> is a PDF redactor that runs entirely in the browser. There is no upload endpoint, because there is no backend that accepts files.</p>
+
+        <h3>Nothing leaves the tab</h3>
+        <p>The card is read into memory by the browser's own file API, rendered locally, and exported by your browser's download mechanism. You can confirm it in ten seconds, and we would rather you did: <strong>open the tool, turn off your Wi-Fi, load the Aadhaar card and mask it.</strong> It keeps working, because there is nowhere for the file to go. No cloud tool survives that test.</p>
+
+        <h3>Precision masking is the right tool for this job</h3>
+        <p>Aadhaar masking is a partial redaction &mdash; eight digits out of twelve &mdash; and that makes it a job for a drawn box rather than an automatic sweep. You drag a rectangle over the first eight digits, leave the last four clear, and the mask lands exactly where you put it.</p>
+
+        <p>To be straightforward about the limits of the automatic scanner: <strong>RedactLocal's Auto-Redact does not currently include an Aadhaar pattern</strong>, and it blacks out whole matches rather than parts of them. Even with such a pattern it would mask all twelve digits, which is not what the rule asks for. Manual masking is the correct method here, not a workaround.</p>
+
+        <h3>The mask is destroyed, then verified</h3>
+        <p>On export, every page is rasterized and the mask is burned into the pixels. The new PDF is assembled from images alone, so there is no text layer left to recover. The file is then re-opened and inspected before the download appears, reporting the flattened page count alongside the number of selectable characters, text operators, font objects and annotations found. On a correct export those counts are zero.</p>
+
+        <h3>Forty cards at a time</h3>
+        <p>Onboarding is rarely one document. You can queue the whole set, work through them in turn, and export as a single archive &mdash; without any of them leaving the machine. Each mask can carry a stamp such as <code>PII REDACTED</code> or your own reference, burned into the black.</p>
+
+        <h2>What This Does Not Do</h2>
+
+        <p>One limit matters more than usual for Aadhaar work.</p>
+
+        <p><strong>Most Aadhaar cards are scans or photographs.</strong> If the PDF is an image with no text layer, there is nothing for any pattern scanner to read &mdash; in RedactLocal or anywhere else. Manual masking and flattened export work normally on such files, and for a photographed card that is the only method available regardless of which tool you use. Where the file <em>has</em> been OCR'd by your document system, it does contain recoverable text, which is exactly the case people wrongly assume is safe because "it is only a picture."</p>
+
+        <p><strong>The site loads page analytics.</strong> Loading redactlocal.org records a page view, as most websites do. It has no access to your documents, which never leave your tab's memory. We state that plainly, because a tool asking you to trust its handling of data you cannot see should be candid about the data you can.</p>
+
+        <div class="disclaimer">
+            <p><strong>This guide is for informational purposes and does not constitute legal advice.</strong> It summarises publicly stated UIDAI guidance, RBI KYC requirements and the Digital Personal Data Protection Act, 2023 as of publication. Rules, circulars and the DPDP Rules continue to evolve, and obligations differ by sector and by entity type. Always check the current text of the applicable regulation and take advice from your compliance function or counsel before setting policy.</p>
+        </div>
+
+        <div class="cta-box">
+            <h2>Mask the Card Without Sending It Anywhere</h2>
+            <p>No account, no installation, and no server that receives your document. Open the tool, turn off your Wi-Fi if you want proof, and mask the first eight digits with the card never leaving your machine.</p>
+            <a href="/" class="cta-button">Start Masking Aadhaar Locally</a>
+        </div>
+    </article>
+
+</body>
+</html>
