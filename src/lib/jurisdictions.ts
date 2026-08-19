@@ -30,10 +30,11 @@ export interface JurisdictionPreset {
    */
   categories: readonly SweepCategoryId[] | null
   /**
-   * Copy for the landing-page badge. Omitted for presets that should not be
-   * advertised before a file exists — Custom has nothing to announce.
+   * Copy for the armed-preset banner, shown only when this preset arrived in
+   * the URL. Omitted where there is nothing to announce — Custom is the
+   * default state, not a rule someone chose.
    */
-  badge?: { flag: string; region: string; detail: string }
+  banner?: { flag: string; region: string; rule: string }
 }
 
 export const CUSTOM_PRESET_ID = 'custom'
@@ -57,10 +58,7 @@ export const JURISDICTION_PRESETS: readonly JurisdictionPreset[] = [
     // it end to end, which would quietly undo the partial mask this preset
     // exists to produce.
     categories: ['aadhaar'],
-    // Kept to roughly the width of the FRCP line: a third of a max-w-2xl row
-    // is about 156px of text, and the full sentence is in the title and in
-    // the drop-zone notice anyway.
-    badge: { flag: '🇮🇳', region: 'India', detail: 'UIDAI Aadhaar (first 8)' },
+    banner: { flag: '🇮🇳', region: 'India', rule: 'UIDAI Aadhaar masking' },
   },
   {
     id: 'us-frcp',
@@ -69,7 +67,7 @@ export const JURISDICTION_PRESETS: readonly JurisdictionPreset[] = [
     caveat:
       'Rule 5.2(a) lists five categories. Birth dates, minors’ names, and financial account numbers are not covered by this preset and need a manual pass. The rule also asks for partial redaction — last four digits of an SSN, birth year — which this preset does not attempt.',
     categories: ['ssns', 'ein'],
-    badge: { flag: '🇺🇸', region: 'US', detail: 'Federal courts — FRCP 5.2' },
+    banner: { flag: '🇺🇸', region: 'US', rule: 'FRCP 5.2 redaction' },
   },
   {
     id: 'eu-gdpr',
@@ -78,7 +76,7 @@ export const JURISDICTION_PRESETS: readonly JurisdictionPreset[] = [
     caveat:
       'Direct contact details only. Names, addresses, and anything identifying someone in combination are not pattern-detectable and remain your judgement.',
     categories: ['emails', 'phones'],
-    badge: { flag: '🌐', region: 'Global', detail: 'GDPR & general PII' },
+    banner: { flag: '🌐', region: 'Global', rule: 'GDPR & general PII' },
   },
 ]
 

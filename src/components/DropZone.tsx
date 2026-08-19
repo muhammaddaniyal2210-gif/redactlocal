@@ -6,13 +6,6 @@ interface DropZoneProps {
   onFiles: (files: File[]) => void
   loading: boolean
   error: string | null
-  /** The drop target itself, so a compliance badge can hand it focus. */
-  targetRef?: React.Ref<HTMLDivElement>
-  /**
-   * Shown inside the zone when a preset is armed, so the rule is confirmed
-   * before the file is chosen rather than after it is open.
-   */
-  notice?: React.ReactNode
 }
 
 const ASSURANCES = [
@@ -29,7 +22,7 @@ function isPdf(file: File) {
   return file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')
 }
 
-export function DropZone({ onFiles, loading, error, targetRef, notice }: DropZoneProps) {
+export function DropZone({ onFiles, loading, error }: DropZoneProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [dragging, setDragging] = useState(false)
   const [rejected, setRejected] = useState<string | null>(null)
@@ -72,7 +65,6 @@ export function DropZone({ onFiles, loading, error, targetRef, notice }: DropZon
   return (
     <div className="mx-auto w-full max-w-2xl">
       <div
-        ref={targetRef}
         onDragEnter={(e) => {
           e.preventDefault()
           dragDepth.current += 1
@@ -145,18 +137,6 @@ export function DropZone({ onFiles, loading, error, targetRef, notice }: DropZon
             ? 'No upload is happening.'
             : 'or click to browse. One .pdf, or many for a batch.'}
         </p>
-
-        {/* The zone is a `place-items-center` grid, so its column track is
-            auto-sized: an unconstrained pill widens the track and pushes every
-            other child past the viewport edge. The wrapper pins the width to
-            the parent and the pill shrinks inside it. */}
-        {notice && !loading && (
-          <span className="mt-5 flex w-full min-w-0 justify-center">
-            <span className="flex min-w-0 items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-xs text-emerald-200">
-              {notice}
-            </span>
-          </span>
-        )}
       </div>
 
       {(rejected || error) && (

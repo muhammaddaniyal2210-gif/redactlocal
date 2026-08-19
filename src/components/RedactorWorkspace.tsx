@@ -1,11 +1,9 @@
-import { useCallback, useRef } from 'react'
 import { PrivacyProofBanner } from './PrivacyProofBanner'
 import { DropZone } from './DropZone'
-import { ComplianceBadges } from './ComplianceBadges'
+import { ArmedPresetNotice } from './ArmedPresetNotice'
 import { PdfViewer } from './PdfViewer'
 import { SecurityGuarantee } from './SecurityGuarantee'
 import { useDocumentQueue } from '../hooks/useDocumentQueue'
-import { CUSTOM_PRESET_ID, presetById } from '../lib/jurisdictions'
 
 interface RedactorWorkspaceProps {
   /** Headline above the tool. The landing routes pass their own H1. */
@@ -33,25 +31,6 @@ export function RedactorWorkspace({
   const queue = useDocumentQueue()
   const { status, error, doc, addFiles, closeAll } = queue
   const Heading = headingLevel
-
-  const dropTargetRef = useRef<HTMLDivElement>(null)
-  const armed = queue.preset === CUSTOM_PRESET_ID ? undefined : presetById(queue.preset)
-
-  /**
-   * Arm a preset from a badge, then put the caret on the drop zone.
-   *
-   * `focus()` scrolls the element into view on its own, so there is no second
-   * scroll call to fight it. `preventScroll` is not used: on a phone the zone
-   * can genuinely be below the fold after the badges, and the whole point of
-   * the click is to move the user to the next step.
-   */
-  const selectPreset = useCallback(
-    (id: string) => {
-      queue.applyPreset(id === queue.preset ? CUSTOM_PRESET_ID : id)
-      dropTargetRef.current?.focus()
-    },
-    [queue],
-  )
 
   return (
     <>
@@ -87,31 +66,14 @@ export function RedactorWorkspace({
                   {subheading}
                 </p>
               </div>
-              {/* Above the zone, not below it: the question these answer —
-                  "does this tool know my regulation?" — is one the visitor has
-                  before they commit a file, not after. */}
-              <div className="mb-5">
-                <ComplianceBadges value={queue.preset} onSelect={selectPreset} />
-              </div>
-
-              <DropZone
-                onFiles={addFiles}
-                loading={status === 'loading'}
-                error={error}
-                targetRef={dropTargetRef}
-                notice={
-                  armed && (
-                    <>
-                      <span aria-hidden="true" className="shrink-0">
-                        {armed.badge?.flag}
-                      </span>
-                      {/* min-w-0 is what actually lets truncate fire inside a
-                          flex row; without it the span keeps its content width. */}
-                      <span className="min-w-0 truncate">{armed.hint}</span>
-                    </>
-                  )
-                }
+              {/* Renders nothing for organic traffic, so the default page is
+                  a drop zone and nothing else. */}
+              <ArmedPresetNotice
+                preset={queue.preset}
+                enteredWithPreset={queue.enteredWithPreset}
               />
+
+              <DropZone onFiles={addFiles} loading={status === 'loading'} error={error} />
 
               {/* Directly under the drop zone, in the same column width, so it
                   reads as part of the tool rather than as page furniture. */}

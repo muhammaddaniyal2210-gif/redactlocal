@@ -78,19 +78,22 @@ export function useDocumentQueue() {
 
   // A `?preset=` on the entry URL arms the tool before a file exists, so a
   // reader arriving from the Aadhaar article is already set to mask the first
-  // eight digits. Read once at mount: later navigation goes through
-  // applyPreset, and re-reading the URL would fight the user's own choice.
-  const [preset, setPreset] = useState<string>(
-    () => presetFromQuery(typeof window === 'undefined' ? '' : window.location.search)
-      ?? CUSTOM_PRESET_ID,
+  // eight digits. Read once at mount: later changes go through applyPreset,
+  // and re-reading the URL would fight the user's own choice.
+  //
+  // Held as state rather than recomputed, because it is also what tells the
+  // landing page whether this visit came from a campaign link. Organic
+  // traffic must see no preset furniture at all, and "a preset happens to be
+  // selected" is not the same question as "this visit arrived carrying one".
+  const [entryPreset] = useState<string | null>(() =>
+    presetFromQuery(typeof window === 'undefined' ? '' : window.location.search),
   )
-  const [enabled, setEnabled] = useState<Set<SweepCategoryId>>(() => {
-    const fromUrl = presetFromQuery(typeof window === 'undefined' ? '' : window.location.search)
-    return (
-      (fromUrl ? categoriesForPreset(fromUrl) : null) ??
-      new Set(SWEEP_CATEGORIES.map((c) => c.id))
-    )
-  })
+  const [preset, setPreset] = useState<string>(entryPreset ?? CUSTOM_PRESET_ID)
+  const [enabled, setEnabled] = useState<Set<SweepCategoryId>>(
+    () =>
+      (entryPreset ? categoriesForPreset(entryPreset) : null) ??
+      new Set(SWEEP_CATEGORIES.map((c) => c.id)),
+  )
   // The stamp is a tool setting, not a document's property: it is shared across
   // the queue so a batch comes out marked consistently, and it is read only at
   // the moment a box is created.
@@ -619,6 +622,9 @@ export function useDocumentQueue() {
     toggleCategory,
     preset,
     applyPreset,
+    /** True when this visit arrived with a valid `?preset=` — a campaign or
+     *  blog CTA rather than organic traffic. */
+    enteredWithPreset: entryPreset !== null,
     scanActive,
     scanAll,
     scanningAll,
