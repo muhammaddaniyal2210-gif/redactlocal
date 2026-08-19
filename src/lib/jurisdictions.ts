@@ -29,6 +29,11 @@ export interface JurisdictionPreset {
    * "leave the ticks alone", which is what Custom is.
    */
   categories: readonly SweepCategoryId[] | null
+  /**
+   * Copy for the landing-page badge. Omitted for presets that should not be
+   * advertised before a file exists — Custom has nothing to announce.
+   */
+  badge?: { flag: string; region: string; detail: string }
 }
 
 export const CUSTOM_PRESET_ID = 'custom'
@@ -52,6 +57,10 @@ export const JURISDICTION_PRESETS: readonly JurisdictionPreset[] = [
     // it end to end, which would quietly undo the partial mask this preset
     // exists to produce.
     categories: ['aadhaar'],
+    // Kept to roughly the width of the FRCP line: a third of a max-w-2xl row
+    // is about 156px of text, and the full sentence is in the title and in
+    // the drop-zone notice anyway.
+    badge: { flag: '🇮🇳', region: 'India', detail: 'UIDAI Aadhaar (first 8)' },
   },
   {
     id: 'us-frcp',
@@ -60,6 +69,7 @@ export const JURISDICTION_PRESETS: readonly JurisdictionPreset[] = [
     caveat:
       'Rule 5.2(a) lists five categories. Birth dates, minors’ names, and financial account numbers are not covered by this preset and need a manual pass. The rule also asks for partial redaction — last four digits of an SSN, birth year — which this preset does not attempt.',
     categories: ['ssns', 'ein'],
+    badge: { flag: '🇺🇸', region: 'US', detail: 'Federal courts — FRCP 5.2' },
   },
   {
     id: 'eu-gdpr',
@@ -68,10 +78,58 @@ export const JURISDICTION_PRESETS: readonly JurisdictionPreset[] = [
     caveat:
       'Direct contact details only. Names, addresses, and anything identifying someone in combination are not pattern-detectable and remain your judgement.',
     categories: ['emails', 'phones'],
+    badge: { flag: '🌐', region: 'Global', detail: 'GDPR & general PII' },
   },
 ]
 
+/**
+ * Public URL slugs for `?preset=`, kept deliberately separate from the internal
+ * ids above.
+ *
+ * These appear in blog CTAs and in links other people may share, which makes
+ * them a published contract: renaming an internal id must never turn somebody's
+ * saved link into a silent no-op. Adding an alias here is cheap; changing one
+ * is not.
+ */
+const SLUG_TO_ID: Readonly<Record<string, string>> = {
+  'india-aadhaar': 'in-uidai',
+  'us-frcp52': 'us-frcp',
+  'global-pii': 'eu-gdpr',
+}
+
+const ID_TO_SLUG = new Map(Object.entries(SLUG_TO_ID).map(([slug, id]) => [id, slug]))
+
 const BY_ID = new Map(JURISDICTION_PRESETS.map((p) => [p.id, p]))
+
+/** The `?preset=` slug for a preset, for building links. */
+export function slugForPreset(id: string): string | undefined {
+  return ID_TO_SLUG.get(id)
+}
+
+/**
+ * Read a preset id out of a query string, or null if there isn't a usable one.
+ *
+ * Accepts the public slug and, for convenience, the internal id. Anything
+ * unrecognised returns null rather than throwing: a mistyped link should open
+ * the ordinary tool, never an error page. Takes the search string rather than
+ * reading `location` itself so it stays callable where there is no DOM.
+ */
+export function presetFromQuery(search: string): string | null {
+  let raw: string | null = null
+  try {
+    raw = new URLSearchParams(search).get('preset')
+  } catch {
+    return null
+  }
+  if (!raw) return null
+
+  const key = raw.trim().toLowerCase()
+  const id = SLUG_TO_ID[key] ?? key
+  // Custom is the default and selects nothing, so treating it as "no preset"
+  // keeps `?preset=custom` from looking like it did something.
+  if (!BY_ID.has(id) || id === CUSTOM_PRESET_ID) return null
+  return id
+}
 
 export function presetById(id: string): JurisdictionPreset | undefined {
   return BY_ID.get(id)

@@ -14,7 +14,7 @@ import {
   type QueueItem,
 } from '../lib/batch'
 import { SWEEP_CATEGORIES, scanDocument, type ScanMatch, type SweepCategoryId } from '../lib/detect'
-import { CUSTOM_PRESET_ID, categoriesForPreset } from '../lib/jurisdictions'
+import { CUSTOM_PRESET_ID, categoriesForPreset, presetFromQuery } from '../lib/jurisdictions'
 import { downloadBlob, exportRedactedPdf, ExportFailure, type ExportProgress } from '../lib/export'
 import { createZip, sanitizeFileName, uniqueName } from '../lib/zip'
 import type { RedactionBox, RedactionMap } from '../lib/redactions'
@@ -76,13 +76,21 @@ export function useDocumentQueue() {
   const [status, setStatus] = useState<DocStatus>('empty')
   const [error, setError] = useState<string | null>(null)
 
-  const [enabled, setEnabled] = useState<Set<SweepCategoryId>>(
-    () => new Set(SWEEP_CATEGORIES.map((c) => c.id)),
+  // A `?preset=` on the entry URL arms the tool before a file exists, so a
+  // reader arriving from the Aadhaar article is already set to mask the first
+  // eight digits. Read once at mount: later navigation goes through
+  // applyPreset, and re-reading the URL would fight the user's own choice.
+  const [preset, setPreset] = useState<string>(
+    () => presetFromQuery(typeof window === 'undefined' ? '' : window.location.search)
+      ?? CUSTOM_PRESET_ID,
   )
-  // Which regulatory preset the current selection came from. A label for the
-  // state rather than a second source of truth: `enabled` is what scanning
-  // reads, and this only records how it got that way.
-  const [preset, setPreset] = useState<string>(CUSTOM_PRESET_ID)
+  const [enabled, setEnabled] = useState<Set<SweepCategoryId>>(() => {
+    const fromUrl = presetFromQuery(typeof window === 'undefined' ? '' : window.location.search)
+    return (
+      (fromUrl ? categoriesForPreset(fromUrl) : null) ??
+      new Set(SWEEP_CATEGORIES.map((c) => c.id))
+    )
+  })
   // The stamp is a tool setting, not a document's property: it is shared across
   // the queue so a batch comes out marked consistently, and it is read only at
   // the moment a box is created.
