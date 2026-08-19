@@ -18,7 +18,11 @@ interface DropZoneProps {
 const ASSURANCES = [
   { icon: Lock, label: 'No account, no server' },
   { icon: MonitorSmartphone, label: 'Runs in this tab only' },
-  { icon: FileWarning, label: 'Nothing is stored on close' },
+  // "Nothing stored on close", not "Nothing is stored on close": the longer
+  // form needs 168px in a 168px slot, so it wrapped while its two neighbours
+  // did not. Dropping one word restores a ~17px margin and reads in the same
+  // clipped register as the other two.
+  { icon: FileWarning, label: 'Nothing stored on close' },
 ]
 
 function isPdf(file: File) {
@@ -162,14 +166,29 @@ export function DropZone({ onFiles, loading, error, targetRef, notice }: DropZon
         </p>
       )}
 
-      <ul className="mt-8 grid gap-3 sm:grid-cols-3">
+      {/* Equal heights come from the grid itself — items stretch by default —
+          so the row was never ragged. What made it look unbalanced was one
+          label wrapping while the other two did not, which left two cards
+          with a single line floating in a box sized for two.
+
+          The label had 162px of room and wanted 168. Tightening the padding
+          and the icon gap buys that back, and `text-balance` means that if a
+          narrower breakpoint ever does force a wrap it splits across the two
+          lines evenly instead of orphaning a word. `items-center` keeps the
+          icon on the optical centre in either case. */}
+      {/* Three across from md, not sm. The container is capped at max-w-2xl,
+          so a card is 216px wide at every size above ~704px and no wider —
+          but between 640 and 704 it is squeezed to ~189px, which is too
+          narrow for the longest label. Below md the cards go full width,
+          where nothing can wrap at all. */}
+      <ul className="mt-8 grid items-stretch gap-3 md:grid-cols-3">
         {ASSURANCES.map(({ icon: Icon, label }) => (
           <li
             key={label}
-            className="flex items-center gap-2.5 rounded-xl border border-slate-800 bg-slate-900/40 px-3.5 py-3 text-sm text-slate-400"
+            className="flex min-h-12 items-center gap-2 rounded-xl border border-slate-800 bg-slate-900/40 px-3 py-3 text-sm leading-snug text-slate-400"
           >
             <Icon className="size-4 shrink-0 text-emerald-400/80" />
-            {label}
+            <span className="min-w-0 text-balance">{label}</span>
           </li>
         ))}
       </ul>

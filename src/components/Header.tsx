@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import { WifiOff } from 'lucide-react'
 import { BrandMark } from './BrandMark'
 
@@ -10,14 +9,23 @@ export function Header({ onTestOffline }: HeaderProps) {
   return (
     <header className="sticky top-0 z-20 border-b border-slate-800/80 bg-slate-950/85 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6">
-        {/* Router link, not an anchor: a full reload here would throw away the
-            document the user is in the middle of redacting. */}
-        <Link to="/" className="flex items-center gap-2.5">
+        {/* Points at the blog, by request, rather than at the site root.
+            A plain anchor is required: /blog is a static file in public/, so
+            the router has no route for it and would fall through to the
+            catch-all and redirect straight back to "/".
+
+            New tab, matching the Blog link in the nav below and for the same
+            reason — this header sits above a workspace holding an unsaved
+            document in memory, there is no beforeunload guard anywhere in the
+            app, and a same-tab navigation would silently discard every
+            redaction the user has made. The logo is the control people click
+            most reflexively, which makes it the worst place to put that. */}
+        <a href="/blog" target="_blank" rel="noopener" className="flex items-center gap-2.5">
           <BrandMark className="h-7 w-auto shrink-0" />
           <span className="text-lg font-semibold tracking-tight">
             Redact<span className="text-emerald-400">Local</span>
           </span>
-        </Link>
+        </a>
 
         <span className="hidden items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-300 ring-1 ring-emerald-500/30 sm:inline-flex">
           <span className="relative flex size-1.5">
