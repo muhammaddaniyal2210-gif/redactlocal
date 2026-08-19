@@ -31,6 +31,7 @@ export type SweepCategoryId =
   | 'ssns'
   | 'ein'
   | 'govIds'
+  | 'aadhaar'
   | 'cards'
   | 'iban'
   | 'accounts'
@@ -62,6 +63,39 @@ export interface SweepCategory {
    * that found it.
    */
   capture?: number
+  /**
+   * Narrows the box to part of the matched value, for rules that require a
+   * value to stay *partly* readable — UIDAI's "mask the first eight digits,
+   * keep the last four" being the case this exists for.
+   *
+   * Receives the matched text (after `capture` has been applied) and returns
+   * the character range to cover, or `null` when there is nothing to mask.
+   * The finding still reports the whole value, so the reviewer sees what was
+   * found rather than only the part being covered.
+   */
+  maskSpan?: (text: string) => { start: number; end: number } | null
+}
+
+/**
+ * Cover every digit except the last `keep`, along with any separators in
+ * between, and leave the tail readable.
+ *
+ * Written against digit positions rather than character count so it behaves
+ * identically for `234567890123`, `2345 6789 0123` and `2345-6789-0123`: in
+ * all three the same eight digits go under the box.
+ */
+export function maskAllButLastDigits(keep: number) {
+  return (text: string): { start: number; end: number } | null => {
+    const digits: number[] = []
+    for (let i = 0; i < text.length; i++) {
+      const code = text.charCodeAt(i)
+      if (code >= 48 && code <= 57) digits.push(i)
+    }
+    // Nothing to mask: covering the whole thing here would be the opposite of
+    // what a partial rule asks for, so this is not reported as a finding.
+    if (digits.length <= keep) return null
+    return { start: digits[0], end: digits[digits.length - keep - 1] + 1 }
+  }
 }
 
 /**
@@ -104,6 +138,24 @@ export const SWEEP_CATEGORIES: readonly SweepCategory[] = [
     label: 'Passport & national IDs',
     hint: 'AB1234567, 35202-8847193-7',
     pattern: () => /\b(?:\d{5}-\d{7}-\d|[A-Z]{1,2}\d{6,8})\b/g,
+  },
+  {
+    id: 'aadhaar',
+    group: 'identifiers',
+    label: 'Aadhaar numbers (mask first 8)',
+    hint: '2345 6789 0123 — last 4 stay readable',
+    // Twelve digits, optionally grouped in fours by a space or hyphen.
+    //
+    // The leading `[2-9]` is a real UIDAI rule, not a guess: an Aadhaar number
+    // never begins with 0 or 1, which cheaply rejects a great many ordinary
+    // twelve-digit numbers. The surrounding guards stop the pattern biting a
+    // twelve-digit window out of the middle of a longer run of digits, which
+    // is how a sixteen-digit card number would otherwise come back as an
+    // Aadhaar. A capture group is used rather than a lookbehind because
+    // lookbehind still throws at parse time in older WebKit.
+    pattern: () => /(^|[^\d-])([2-9]\d{3}[ -]?\d{4}[ -]?\d{4})(?![\d-])/g,
+    capture: 2,
+    maskSpan: maskAllButLastDigits(4),
   },
   {
     id: 'cards',
@@ -212,7 +264,15 @@ function boxForMatch(
   matchIndex: number,
   matchLength: number,
   fontFamily: string,
-): DetectedBox | null {
+  /**
+   * Set for a partial mask, where widening the box to the whole text item
+   * would cover the very characters the rule requires to stay readable. It
+   * suppresses the whole-item shortcut but cannot conjure measurements: when
+   * the slice genuinely cannot be computed the result still falls back to the
+   * whole item, and `sliced: false` tells the caller not to claim otherwise.
+   */
+  preferSlice = false,
+): { box: DetectedBox; sliced: boolean } | null {
   if (!Array.isArray(item.transform) || item.transform.length < 6) return null
   const tx = multiplyTransforms(viewportTransform, item.transform)
   const [a, b, c, d, e, f] = tx
@@ -245,10 +305,13 @@ function boxForMatch(
     const xs = corners.map((p) => p[0])
     const ys = corners.map((p) => p[1])
     return {
-      x: Math.min(...xs) - PAD_X,
-      y: Math.min(...ys) - PAD_X,
-      width: Math.max(...xs) - Math.min(...xs) + PAD_X * 2,
-      height: Math.max(...ys) - Math.min(...ys) + PAD_X * 2,
+      box: {
+        x: Math.min(...xs) - PAD_X,
+        y: Math.min(...ys) - PAD_X,
+        width: Math.max(...xs) - Math.min(...xs) + PAD_X * 2,
+        height: Math.max(...ys) - Math.min(...ys) + PAD_X * 2,
+      },
+      sliced: false,
     }
   }
 
@@ -260,29 +323,42 @@ function boxForMatch(
   }
 
   // A match covering most of the item, or one we cannot measure accurately,
-  // takes the whole item. Over-covering is the safe direction to fail in.
+  // takes the whole item. Over-covering is the safe direction to fail in —
+  // except for a partial mask, where the whole item is exactly what must not
+  // be covered, so the shortcut is skipped and the slice attempted properly.
   const coversMost = matchLength / Math.max(item.str.length, 1) >= WHOLE_ITEM_THRESHOLD
   const ctx = getMeasuringContext()
-  if (coversMost || !ctx) return wholeItem
+  if ((coversMost && !preferSlice) || !ctx) return { box: wholeItem, sliced: false }
 
   ctx.font = `${fontHeight}px ${fontFamily}`
   const measuredTotal = ctx.measureText(item.str).width
-  if (!(measuredTotal > 0)) return wholeItem
+  if (!(measuredTotal > 0)) return { box: wholeItem, sliced: false }
 
   // Normalise browser metrics onto pdf.js's reported advance width.
   const normalise = itemWidth / measuredTotal
   const prefix = ctx.measureText(item.str.slice(0, matchIndex)).width * normalise
   const matchWidth =
     ctx.measureText(item.str.slice(matchIndex, matchIndex + matchLength)).width * normalise
-  if (!Number.isFinite(prefix) || !Number.isFinite(matchWidth) || matchWidth <= 0) return wholeItem
+  if (!Number.isFinite(prefix) || !Number.isFinite(matchWidth) || matchWidth <= 0) {
+    return { box: wholeItem, sliced: false }
+  }
 
   // Slack absorbs the residual difference between the substitute font and the
   // real one, so a match is never left with an uncovered character at an edge.
   const margin = fontHeight * SLICE_MARGIN
+  // A partial mask spills into the characters it is required to leave
+  // readable if it uses that same generous slack: at a 12pt font the margin
+  // is 4.2pt against a digit roughly 6.7pt wide, which would put a black box
+  // over most of the first digit the rule says to keep. Half a character of
+  // the matched run is enough to absorb measurement error while still landing
+  // inside the separator that precedes the retained group.
+  const trailMargin = preferSlice
+    ? Math.min(margin, matchWidth / Math.max(matchLength, 1) / 2)
+    : margin
   const left = Math.max(e - PAD_X, e + prefix - margin)
-  const right = Math.min(e + itemWidth + PAD_X, e + prefix + matchWidth + margin)
+  const right = Math.min(e + itemWidth + PAD_X, e + prefix + matchWidth + trailMargin)
 
-  return { x: left, y: top, width: Math.max(right - left, 0), height }
+  return { box: { x: left, y: top, width: Math.max(right - left, 0), height }, sliced: true }
 }
 
 export interface ScanMatch {
@@ -291,11 +367,18 @@ export interface ScanMatch {
   group: SweepGroupId
   /** 1-based page the match was found on. */
   page: number
-  /** The matched text itself. */
+  /** The matched text itself — the whole value, even when only part is covered. */
   text: string
   /** Surrounding line, for judging a false positive at a glance. */
   snippet: string
   box: DetectedBox
+  /**
+   * Set only when the box deliberately covers part of the value, so the panel
+   * can show which characters survive. Absent whenever the whole match is
+   * covered — including when a partial mask was wanted but the slice could
+   * not be measured and the box fell back to covering everything.
+   */
+  partialMask?: { masked: string; kept: string }
 }
 
 export interface PageScan {
@@ -409,15 +492,47 @@ export async function scanPage(
         if (matches.length >= MAX_MATCHES) return { matches }
 
         const { index, length } = spanFor(match, category.capture)
+        const value = str.slice(index, index + length)
 
-        let box: DetectedBox | null = null
+        // A partial rule moves the box onto a sub-range of the value while the
+        // finding keeps reporting the value in full.
+        let boxIndex = index
+        let boxLength = length
+        let wanted: { start: number; end: number } | null = null
+        if (category.maskSpan) {
+          wanted = category.maskSpan(value)
+          // Too few digits to mask anything while honouring the rule. Covering
+          // it wholesale would contradict the rule, so it is not a finding.
+          if (!wanted) continue
+          boxIndex = index + wanted.start
+          boxLength = wanted.end - wanted.start
+        }
+
+        let result: { box: DetectedBox; sliced: boolean } | null = null
         try {
-          box = boxForMatch(rawItem, viewportTransform, index, length, fontFamily)
+          result = boxForMatch(
+            rawItem,
+            viewportTransform,
+            boxIndex,
+            boxLength,
+            fontFamily,
+            wanted !== null,
+          )
         } catch (err) {
           console.error('Find & Redact skipped a text item:', err)
           continue
         }
-        if (!box || box.width <= 0 || box.height <= 0) continue
+        if (!result) continue
+        const { box, sliced } = result
+        if (box.width <= 0 || box.height <= 0) continue
+
+        // Only claim a partial mask when the box really was sliced. If the
+        // slice could not be measured the box covers the whole item, and
+        // saying "last 4 kept" there would be a lie about what is on the page.
+        const partialMask =
+          wanted && sliced
+            ? { masked: value.slice(wanted.start, wanted.end), kept: value.slice(wanted.end) }
+            : undefined
 
         // Two patterns hitting the same characters is one finding, not two.
         const key = [box.x, box.y, box.width, box.height].map((n) => n.toFixed(1)).join(':')
@@ -429,9 +544,10 @@ export async function scanPage(
           category: category.id,
           group: category.group,
           page: pageNumber,
-          text: str.slice(index, index + length),
+          text: value,
           snippet: buildSnippet(str, index, length),
           box,
+          partialMask,
         })
       }
     }
@@ -451,6 +567,11 @@ export async function scanPage(
 function dropContained(matches: ScanMatch[]): ScanMatch[] {
   const T = 0.5
   return matches.filter((candidate) =>
+    // A partial mask is always contained in a full cover of the same value —
+    // that is what makes it partial — so the rule above would delete exactly
+    // the finding the user turned the preset on for. It stays, and the
+    // reviewer chooses between the two.
+    candidate.partialMask !== undefined ||
     !matches.some((other) => {
       if (other === candidate || other.page !== candidate.page) return false
       const widerThan =

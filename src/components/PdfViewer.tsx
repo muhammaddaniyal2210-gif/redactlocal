@@ -34,6 +34,7 @@ import { sanitizeFileName } from '../lib/zip'
 import { stampTextFor } from '../lib/stamps'
 import { FindRedactPanel } from './FindRedactPanel'
 import { StampSelector } from './StampSelector'
+import { JurisdictionSelector } from './JurisdictionSelector'
 import { DocumentQueuePanel } from './DocumentQueuePanel'
 import { RedactionLayer } from './RedactionLayer'
 import type { DocumentQueue, LoadedDoc } from '../hooks/useDocumentQueue'
@@ -421,6 +422,14 @@ export function PdfViewer({ doc, onClose, queue }: PdfViewerProps) {
             Auto-Detect
           </button>
 
+          {/* Next to Auto-Detect because it governs it: the preset decides
+              what that scan looks for and how much of each hit it covers. */}
+          <JurisdictionSelector
+            value={queue.preset}
+            onChange={queue.applyPreset}
+            disabled={busy}
+          />
+
           {/* The only way into a batch from here. Without it, opening a single
               file is a one-way door: the queue's own "add" button does not
               exist until there is a queue to put it in. */}
@@ -597,6 +606,7 @@ export function PdfViewer({ doc, onClose, queue }: PdfViewerProps) {
                 <FindRedactPanel
                   enabled={queue.enabled}
                   onToggleCategory={queue.toggleCategory}
+                  preset={queue.preset}
                   scan={activeItem?.scan ?? null}
                   scanError={activeItem?.scanError ?? null}
                   scanProgress={activeItem?.scanProgress ?? null}

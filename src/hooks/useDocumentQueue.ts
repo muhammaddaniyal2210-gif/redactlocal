@@ -14,6 +14,7 @@ import {
   type QueueItem,
 } from '../lib/batch'
 import { SWEEP_CATEGORIES, scanDocument, type ScanMatch, type SweepCategoryId } from '../lib/detect'
+import { CUSTOM_PRESET_ID, categoriesForPreset } from '../lib/jurisdictions'
 import { downloadBlob, exportRedactedPdf, ExportFailure, type ExportProgress } from '../lib/export'
 import { createZip, sanitizeFileName, uniqueName } from '../lib/zip'
 import type { RedactionBox, RedactionMap } from '../lib/redactions'
@@ -78,6 +79,10 @@ export function useDocumentQueue() {
   const [enabled, setEnabled] = useState<Set<SweepCategoryId>>(
     () => new Set(SWEEP_CATEGORIES.map((c) => c.id)),
   )
+  // Which regulatory preset the current selection came from. A label for the
+  // state rather than a second source of truth: `enabled` is what scanning
+  // reads, and this only records how it got that way.
+  const [preset, setPreset] = useState<string>(CUSTOM_PRESET_ID)
   // The stamp is a tool setting, not a document's property: it is shared across
   // the queue so a batch comes out marked consistently, and it is read only at
   // the moment a box is created.
@@ -352,6 +357,9 @@ export function useDocumentQueue() {
   // -------------------------------------------------------------- scanning
 
   const toggleCategory = useCallback((id: SweepCategoryId) => {
+    // Hand-editing the ticks means the selection is no longer the preset it
+    // started as, and the dropdown should stop claiming otherwise.
+    setPreset(CUSTOM_PRESET_ID)
     setEnabled((current) => {
       const next = new Set(current)
       if (next.has(id)) next.delete(id)
@@ -395,6 +403,35 @@ export function useDocumentQueue() {
     const item = itemsRef.current.find((entry) => entry.id === activeIdRef.current)
     if (item) await scanItem(item)
   }, [scanItem])
+
+  /**
+   * Switch to a regulatory preset, replacing what Auto-Detect looks for.
+   *
+   * A document that has already been scanned is scanned again, because its
+   * findings on screen were produced under the old rules and would otherwise
+   * sit there looking current. A document that has never been scanned is left
+   * alone: the user has not asked for that work yet, and the new selection is
+   * what the Scan button will use when they do. With nothing open at all this
+   * only moves the dropdown — no document, no scan, and nothing to throw.
+   */
+  const applyPreset = useCallback(
+    (id: string) => {
+      setPreset(id)
+
+      const next = categoriesForPreset(id)
+      if (next) {
+        setEnabled(next)
+        // The scan below reads this ref and React has not re-rendered yet, so
+        // without this line it would run against the previous selection.
+        enabledRef.current = next
+      }
+
+      const item = itemsRef.current.find((entry) => entry.id === activeIdRef.current)
+      if (!item || !item.scan) return
+      void scanItem(item)
+    },
+    [scanItem],
+  )
 
   /**
    * Scan every queued document, several at a time.
@@ -572,6 +609,8 @@ export function useDocumentQueue() {
     // find & redact
     enabled,
     toggleCategory,
+    preset,
+    applyPreset,
     scanActive,
     scanAll,
     scanningAll,

@@ -7,11 +7,14 @@ import {
   type ScanMatch,
   type SweepCategoryId,
 } from '../lib/detect'
+import { presetById } from '../lib/jurisdictions'
 
 interface FindRedactPanelProps {
   /** Which patterns to look for. Shared across the queue, so Scan All agrees. */
   enabled: ReadonlySet<SweepCategoryId>
   onToggleCategory: (id: SweepCategoryId) => void
+  /** Active regulatory preset, so its limits are stated where the scan is run. */
+  preset: string
 
   /** Findings for the *active* document. Null until it has been scanned. */
   scan: DocumentScan | null
@@ -62,6 +65,7 @@ const NO_MATCHES: ScanMatch[] = []
 export function FindRedactPanel({
   enabled,
   onToggleCategory,
+  preset,
   scan,
   scanError,
   scanProgress,
@@ -78,6 +82,7 @@ export function FindRedactPanel({
 }: FindRedactPanelProps) {
   const scanning = scanProgress !== null
   const matches = scan?.matches ?? NO_MATCHES
+  const activePreset = presetById(preset)
 
   const pending = useMemo(
     () => matches.filter((m) => selected.has(m.id) && !redacted.has(m.id)),
@@ -122,6 +127,16 @@ export function FindRedactPanel({
       )}
 
       <div className="min-h-0 flex-1 overflow-y-auto">
+        {activePreset?.caveat && (
+          <div className="border-b border-slate-700/50 px-4 py-3">
+            <p className="text-[11px] font-medium text-slate-300">{activePreset.hint}</p>
+            <p className="mt-1 flex items-start gap-1.5 text-[11px] leading-relaxed text-amber-200/90">
+              <TriangleAlert className="mt-px size-3 shrink-0" />
+              {activePreset.caveat}
+            </p>
+          </div>
+        )}
+
         <details className="border-b border-slate-700/50" open={scan === null}>
           <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-3 text-xs font-medium tracking-wide text-slate-400 transition-colors hover:text-slate-200">
             <ChevronDown className="size-3.5 transition-transform duration-200" />
@@ -312,9 +327,24 @@ function MatchList({
                     </label>
 
                     <div className="min-w-0 flex-1">
-                      <p className="truncate font-mono text-xs text-slate-100" title={match.text}>
-                        {match.text}
-                      </p>
+                      {match.partialMask ? (
+                        // Shows the shape of the outcome rather than the input:
+                        // the covered run as a black bar, the retained tail as
+                        // the characters that will still be readable.
+                        <p
+                          className="truncate font-mono text-xs text-slate-100"
+                          title={`${match.text} — first ${match.partialMask.masked.replace(/\D/g, '').length} digits covered, last ${match.partialMask.kept.replace(/\D/g, '').length} kept`}
+                        >
+                          <span className="rounded-[3px] bg-slate-100 px-1 text-transparent select-none">
+                            {match.partialMask.masked}
+                          </span>
+                          <span className="text-emerald-300">{match.partialMask.kept}</span>
+                        </p>
+                      ) : (
+                        <p className="truncate font-mono text-xs text-slate-100" title={match.text}>
+                          {match.text}
+                        </p>
+                      )}
                       <p className="mt-0.5 truncate text-[11px] text-slate-500" title={match.snippet}>
                         {match.snippet}
                       </p>
