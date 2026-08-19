@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Primary Meta Tags -->
+    <title>FRCP 5.2 Redaction: E-Filing Court Documents Safely</title>
+    <meta name="description" content="What Rule 5.2 actually requires, why a black box over text is not redaction, and how to redact a filing for PACER without uploading privileged material.">
+    <link rel="canonical" href="https://redactlocal.org/blog/federal-court-efiling-redaction-frcp-52">
+
+    <!-- Open Graph / LinkedIn / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://redactlocal.org/blog/federal-court-efiling-redaction-frcp-52">
+    <meta property="og:title" content="FRCP 5.2 Redaction: E-Filing Court Documents Safely">
+    <meta property="og:description" content="What Rule 5.2 actually requires, why a black box over text is not redaction, and how to redact a filing for PACER without uploading privileged material.">
+    <meta property="og:image" content="https://redactlocal.org/blog/federal-court-efiling-redaction-frcp-52/cover.jpg">
+    <meta property="og:image:width" content="1600">
+    <meta property="og:image:height" content="957">
+    <meta property="og:image:alt" content="RedactLocal's in-browser PDF editor redacting identifiers from a court filing">
+    <meta property="og:site_name" content="RedactLocal">
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://redactlocal.org/blog/federal-court-efiling-redaction-frcp-52">
+    <meta name="twitter:title" content="FRCP 5.2 Redaction: E-Filing Court Documents Safely">
+    <meta name="twitter:description" content="What Rule 5.2 actually requires, why a black box over text is not redaction, and how to redact a filing for PACER without uploading privileged material.">
+    <meta name="twitter:image" content="https://redactlocal.org/blog/federal-court-efiling-redaction-frcp-52/cover.jpg">
+
+    <!-- JSON-LD Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "BlogPosting",
+          "@id": "https://redactlocal.org/blog/federal-court-efiling-redaction-frcp-52#article",
+          "isPartOf": { "@id": "https://redactlocal.org/blog/federal-court-efiling-redaction-frcp-52" },
+          "mainEntityOfPage": { "@id": "https://redactlocal.org/blog/federal-court-efiling-redaction-frcp-52" },
+          "headline": "FRCP 5.2 Redaction: E-Filing Court Documents Without Leaking Them",
+          "alternativeHeadline": "What Rule 5.2 requires, and how to redact a filing without uploading it",
+          "description": "What Rule 5.2 actually requires, why a black box over text is not redaction, and how to redact a filing for PACER without uploading privileged material.",
+          "inLanguage": "en",
+          "datePublished": "2026-08-19T09:00:00+00:00",
+          "dateModified": "2026-08-19T09:00:00+00:00",
+          "author": {
+            "@type": "Person",
+            "@id": "https://redactlocal.org/#founder",
+            "name": "Muhammad Daniyal",
+            "jobTitle": "Founder",
+            "url": "https://redactlocal.org/about"
+          },
+          "publisher": { "@id": "https://redactlocal.org/#organization" },
+          "image": {
+            "@type": "ImageObject",
+            "url": "https://redactlocal.org/blog/federal-court-efiling-redaction-frcp-52/cover.jpg",
+            "width": 1600,
+            "height": 957
+          },
+          "articleSection": "Litigation",
+          "keywords": [
+            "FRCP 5.2 redaction",
+            "redact court filing",
+            "PACER redaction",
+            "e-filing redaction",
+            "CM/ECF redaction",
+            "client-side PDF redaction"
+          ],
+          "about": [
+            { "@type": "Thing", "name": "Federal Rules of Civil Procedure" },
+            { "@type": "Thing", "name": "Electronic court filing" },
+            { "@type": "Thing", "name": "PDF redaction" }
+          ],
+          "mentions": { "@id": "https://redactlocal.org/#software" }
+        },
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://redactlocal.org/#software",
+          "name": "RedactLocal",
+          "url": "https://redactlocal.org",
+          "description": "A browser-native PDF redactor that runs entirely on your device. Documents are never uploaded. Pages are permanently rasterized so redacted text is destroyed rather than hidden, and every export is re-inspected to confirm zero selectable characters and zero embedded fonts.",
+          "applicationCategory": ["SecurityApplication", "BusinessApplication"],
+          "applicationSubCategory": "PDF Redaction",
+          "operatingSystem": "Any (runs in a modern web browser)",
+          "browserRequirements": "Requires JavaScript. Chrome, Firefox, Safari or Edge.",
+          "isAccessibleForFree": true,
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock"
+          },
+          "featureList": [
+            "Client-side PDF redaction with no file upload",
+            "Works offline after the page loads",
+            "Permanent rasterization destroys the underlying text layer",
+            "Automatic post-export verification of zero selectable text and zero fonts",
+            "Pattern scanning for SSNs, tax IDs, account numbers, cards and government IDs",
+            "Manual review of every match before redaction is applied",
+            "Batch processing of multiple documents",
+            "Custom redaction stamps",
+            "No account or installation required"
+          ],
+          "publisher": { "@id": "https://redactlocal.org/#organization" },
+          "author": { "@id": "https://redactlocal.org/#founder" }
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://redactlocal.org/#organization",
+          "name": "RedactLocal",
+          "url": "https://redactlocal.org",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://redactlocal.org/favicon.svg",
+            "width": 48,
+            "height": 48
+          }
+        }
+      ]
+    }
+    </script>
+
+    <style>
+        /* Base Flexbox Layout & Typography */
+        :root {
+            --text-main: #1a1a1a;
+            --text-muted: #4a5568;
+            --bg-color: #ffffff;
+            --accent: #2b6cb0;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text-main);
+            background-color: var(--bg-color);
+            line-height: 1.7;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        nav {
+            width: 100%;
+            max-width: 768px;
+            padding: 2rem 1.5rem;
+            box-sizing: border-box;
+        }
+
+        nav a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        article {
+            width: 100%;
+            max-width: 768px;
+            padding: 0 1.5rem 4rem 1.5rem;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            line-height: 1.2;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+            font-weight: 400;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            margin-top: 3rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 2rem;
+            margin-bottom: 0.75rem;
+        }
+
+        p, ul, ol {
+            margin-bottom: 1.5rem;
+            font-size: 1.125rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* In-text links. The base stylesheet only styled nav links and the CTA
+           button, which left contextual links rendering as default browser blue. */
+        article p a,
+        article li a,
+        article td a {
+            color: var(--accent);
+            font-weight: 500;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+            text-decoration-thickness: 1px;
+            transition: color 0.15s ease;
+        }
+
+        article p a:hover,
+        article li a:hover,
+        article td a:hover {
+            color: var(--text-main);
+        }
+
+        code {
+            background-color: #f1f5f9;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+
+        .callout {
+            border-left: 3px solid var(--accent);
+            background-color: #f8fafc;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .callout p:last-child {
+            margin-bottom: 0;
+        }
+
+        .disclaimer {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            padding-top: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .cta-box {
+            background-color: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-top: 3rem;
+            text-align: center;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background-color: var(--text-main);
+            color: #ffffff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 1rem;
+            transition: background-color 0.2s ease;
+        }
+
+        .cta-button:hover {
+            background-color: var(--accent);
+        }
+
+        /* A mid-article conversion point, styled to read as an action rather
+           than as another paragraph. */
+        .inline-cta {
+            text-align: center;
+            margin: 2.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8fafc;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            h2 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="/">&larr; Back to RedactLocal</a>
+    </nav>
+
+    <article>
+        <h1>FRCP 5.2 Redaction: E-Filing Court Documents Without Leaking Them</h1>
+        <p class="subtitle">What Rule 5.2 actually requires, and why the tool you use to comply matters as much as the rule itself.</p>
+
+        <img
+            src="/blog/federal-court-efiling-redaction-frcp-52/cover.jpg"
+            alt="RedactLocal's in-browser PDF editor redacting identifiers from a court filing"
+            width="1600"
+            height="957"
+            fetchpriority="high"
+            decoding="async"
+            onerror="this.style.display='none'"
+            style="display: block; box-sizing: border-box; width: 100%; max-width: 800px; height: auto; aspect-ratio: 1600 / 957; margin: 0 auto 3rem; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 24px rgba(15, 23, 42, 0.10), 0 1px 3px rgba(15, 23, 42, 0.06);">
+
+        <p>A filing goes out at 11:52pm. Exhibit C is a client's bank statement with the account number blacked out. It is accepted, docketed, and available on PACER within seconds.</p>
+
+        <p>Two weeks later opposing counsel mentions the account number in a deposition. Nobody hacked anything. They selected the text underneath your black rectangle, and pasted it.</p>
+
+        <p>What happens next is the part that hurts. The document is already public. PACER is scraped continuously by aggregators, researchers and commercial data brokers, so withdrawal does not undo distribution. You are now looking at a motion to seal that arrives too late, a call to a client explaining how their account number entered the public record, and a conversation about whether the disclosure was reasonable under your professional obligations.</p>
+
+        <p>This is one of the most common self-inflicted wounds in federal practice, and it has two causes: a misunderstanding of what Rule 5.2 requires, and a redaction tool that never actually removed anything.</p>
+
+        <h2>What Rule 5.2 Actually Requires</h2>
+
+        <p>Federal Rule of Civil Procedure 5.2(a) governs personal identifiers in filings. It is worth reading precisely, because most summaries of it &mdash; including the ones circulating in firm checklists &mdash; get two things wrong.</p>
+
+        <p><strong>First: there are five categories, not four.</strong> Taxpayer-identification numbers are routinely omitted from internal cheat sheets.</p>
+
+        <p><strong>Second: the rule calls for partial redaction, not removal.</strong> Rule 5.2(a) says a filing containing these items "may include only" the truncated form. It does not instruct you to obliterate them.</p>
+
+        <table>
+            <tr>
+                <th>Identifier</th>
+                <th>What the filing may include</th>
+            </tr>
+            <tr>
+                <td>Social-security number</td>
+                <td>The last four digits only</td>
+            </tr>
+            <tr>
+                <td>Taxpayer-identification number</td>
+                <td>The last four digits only</td>
+            </tr>
+            <tr>
+                <td>Birth date</td>
+                <td>The year of birth only</td>
+            </tr>
+            <tr>
+                <td>Name of an individual known to be a minor</td>
+                <td>The minor's initials only</td>
+            </tr>
+            <tr>
+                <td>Financial-account number</td>
+                <td>The last four digits only</td>
+            </tr>
+        </table>
+
+        <p>The practical consequence: blacking out an entire date of birth when the rule contemplates showing the year, or an entire account number when the last four are permitted, is over-redaction. It will not usually get you sanctioned, but it can get a filing questioned or make an exhibit useless for identification &mdash; and in some districts it will draw a clerk's notice. Redact to the line the rule draws, not past it.</p>
+
+        <h3>The exceptions worth knowing</h3>
+
+        <p>Rule 5.2(b) exempts certain filings, including the record of an administrative or agency proceeding, the official record of a state-court proceeding, and filings in an action to enforce or quash an administrative summons. Rule 5.2(c) limits remote electronic access in social security and immigration cases. Rule 5.2(d) permits filing under seal, and 5.2(f) allows a party to file an unredacted copy under seal alongside the redacted public version. Rule 5.2(g) permits a reference list filed under seal.</p>
+
+        <h3>Whose job this is</h3>
+
+        <p>Not the clerk's. The Judicial Conference privacy policy and the local CM/ECF procedures in essentially every district place responsibility for redaction on the filing party and its counsel. The clerk's office does not review your exhibits for identifiers, and the ECF system will accept a filing full of them without complaint.</p>
+
+        <div class="callout">
+            <p><strong>Rule 5.2(h) is the one people forget.</strong> A person waives the protection of Rule 5.2(a) as to their <em>own</em> information by filing it unredacted and not under seal. That waiver does nothing for the third parties in your exhibit &mdash; the client, the witness, the minor child, the account holder &mdash; who never had a say in your filing.</p>
+        </div>
+
+        <h2>Why a Black Box Is Not a Redaction</h2>
+
+        <p>Here is the failure that turns a compliance task into a disclosure event.</p>
+
+        <p>When you draw a black rectangle over text in a standard PDF editor, you are not deleting anything. You are appending one more drawing instruction to the page's content stream. It paints over the earlier instructions, but the text-showing operators, the character codes and the embedded fonts all remain in the file, at known coordinates, in reading order.</p>
+
+        <p>Anyone can retrieve them by selecting and copying, by running <code>pdftotext</code> against the document, or by pushing the file through almost any format converter. No expertise is required. This is the mechanism behind essentially every publicised redaction failure in court filings, government releases and merger documents &mdash; the box was drawn on top, the words were never removed.</p>
+
+        <p>We covered the mechanics in detail in <a href="/blog/black-box-flaw">The Black Box Flaw</a>. The short version: the only method that actually removes the content is <strong>rasterization</strong> &mdash; rendering each page to a flat image, burning the redaction into the pixel data, and rebuilding the PDF from those images alone. There is then no text layer to recover, because there is no text.</p>
+
+        <p>For a PACER filing this distinction is everything. A sealed document has controlled access. A public document with a recoverable text layer has no protection at all, and it is being archived by third parties from the moment it posts.</p>
+
+        <h2>The Upload Problem</h2>
+
+        <p>So you need real redaction. The obvious move is to search for a PDF redaction tool, and nearly every free result begins the same way: <em>upload your file</em>.</p>
+
+        <p>Stop there. The document you are about to upload is an unredacted client exhibit. It is the version with the account numbers, the medical history and the minor's name still in it.</p>
+
+        <p>Be precise about what that does and does not mean. Sending a document to a third-party vendor does not automatically waive attorney-client privilege &mdash; courts and ethics authorities have generally accepted that using outside service providers with reasonable confidentiality protections is compatible with the duty of confidentiality. The problem is narrower and more practical.</p>
+
+        <ul>
+            <li><strong>You must be able to justify the choice.</strong> ABA Model Rule 1.6(c) requires a lawyer to make reasonable efforts to prevent inadvertent or unauthorized disclosure of information relating to the representation. A free web tool you found via search, with terms you did not read and a jurisdiction you cannot name, is difficult to defend as a reasonable effort.</li>
+            <li><strong>Competence now includes the technology.</strong> Comment 8 to Model Rule 1.1 requires lawyers to keep abreast of the benefits and risks of relevant technology. "I did not know it stored the file" is not a defence a disciplinary body finds persuasive.</li>
+            <li><strong>Protective orders rarely permit it.</strong> Many orders restrict disclosure of designated material to named categories of people. A cloud PDF processor is generally not one of them.</li>
+            <li><strong>You inherit their breach.</strong> If that vendor is compromised next year, your client's unredacted exhibit is in scope, and ABA Formal Opinion 483 addresses a lawyer's obligations following a data breach involving client information.</li>
+        </ul>
+
+        <p>The cleanest way to resolve every one of those questions is to make sure the upload never happens.</p>
+
+        <div class="inline-cta">
+            <a href="/" class="cta-button">Redact a filing in your browser &rarr;</a>
+        </div>
+
+        <h2>A Defensible E-Filing Redaction Workflow</h2>
+
+        <ol>
+            <li><strong>Keep the unredacted original.</strong> You may need it for a sealed filing under Rule 5.2(f) or a reference list under 5.2(g). Store it under your normal file controls; never transmit it.</li>
+            <li><strong>Redact on a machine you control.</strong> If a tool requires an upload, it has joined your chain of custody. <a href="/">RedactLocal</a> runs entirely inside your browser tab, so the exhibit never reaches a server.</li>
+            <li><strong>Scan for the numeric identifiers.</strong> Social-security numbers, taxpayer IDs and account numbers follow predictable formats and should be caught mechanically rather than by eye at midnight.</li>
+            <li><strong>Read for the two the machine cannot find.</strong> Birth dates and the names of minors require a human. So does context &mdash; "the plaintiff's daughter, then fourteen" identifies a minor as surely as a name.</li>
+            <li><strong>Redact to the rule, not past it.</strong> Leave the last four digits and the year of birth where Rule 5.2(a) permits them.</li>
+            <li><strong>Flatten the output.</strong> Export so the removed text is destroyed rather than covered.</li>
+            <li><strong>Verify before you file.</strong> Run <code>pdftotext</code> over the finished PDF, or open it and search for a number you know you removed. If it appears, do not file it.</li>
+            <li><strong>Check the exhibits, not just the brief.</strong> The brief is usually clean. The leak is almost always in an attached statement, medical record or contract.</li>
+        </ol>
+
+        <h2>How RedactLocal Fits</h2>
+
+        <p><a href="/">RedactLocal</a> is a PDF redactor that runs entirely in the browser. There is no upload endpoint, because there is no backend that accepts files.</p>
+
+        <h3>Nothing leaves the tab</h3>
+        <p>Your exhibit is read into memory by the browser's own file API, parsed and rendered locally, and exported by your browser's download mechanism. You can confirm this in about ten seconds: open the tool, <strong>disconnect from the internet, and redact a document</strong>. It keeps working, because there is nowhere for the file to go. No cloud tool survives that test, and it is the whole difference.</p>
+
+        <h3>Auto-Redact finds the numeric identifiers</h3>
+        <p>The scanner sweeps the document for social-security numbers, taxpayer identification numbers, financial account and card numbers, government ID numbers, emails and phone numbers. Every hit is listed with the line of text around it, and <strong>nothing is blacked out until you confirm it</strong>. That review step is deliberate: an automatic sweep either over-redacts an exhibit into uselessness or quietly misses something, and only the person who knows the matter can tell the difference.</p>
+
+        <p>Mapped against Rule 5.2(a), the scanner mechanically covers three of the five categories &mdash; social-security numbers, taxpayer-identification numbers and financial-account numbers. <strong>It does not detect birth dates, and it does not detect names</strong>, including minors' names. Those two categories are manual work, and the draw-a-box tools are there for exactly that. Any vendor telling you their tool handles all five automatically is selling you a name-recognition model that will miss "the plaintiff's stepson" on page 40.</p>
+
+        <h3>Redactions are destroyed, then verified</h3>
+        <p>On export, every page is rasterized and the redaction boxes are burned into the pixels. The new PDF is assembled from images alone. The file is then re-opened and inspected before the download appears, reporting the flattened page count alongside the number of selectable characters, text operators, font objects and annotations found. On a correct export those counts are zero &mdash; and that report is the closest thing to a receipt you can hand a supervising partner.</p>
+
+        <h3>Whole exhibit sets at once</h3>
+        <p>Filings are rarely one document. You can queue the whole exhibit set, scan every file in one pass, work through them individually, and export as a single archive. Each redaction can carry a stamp &mdash; <code>CONFIDENTIAL</code>, <code>PII REDACTED</code>, or a custom code such as a protective-order designation &mdash; burned into the black box so the reader knows the basis for the withholding.</p>
+
+        <h2>What This Does Not Do</h2>
+
+        <p>Two limits to know before you rely on any of the above.</p>
+
+        <p><strong>Scanned exhibits are not pattern-scanned.</strong> The identifier search reads a PDF's text layer. A photographed bank statement or a faxed medical record is an image with no text to match against. RedactLocal reports those pages by number and tells you to review them by eye rather than reporting them clean. Manual redaction and flattened export work normally on them &mdash; and note that a scanned exhibit which has been OCR'd by your document system <em>does</em> have a text layer, which is exactly the kind of file people assume is safe because "it's just a picture."</p>
+
+        <p><strong>The site loads page analytics.</strong> Loading redactlocal.org records a page view, as most websites do. It has no access to your documents, which never leave your tab's memory. We state that plainly, because a tool asking you to trust its handling of data you cannot see should be candid about the data you can.</p>
+
+        <div class="disclaimer">
+            <p><strong>This guide is for informational purposes and does not constitute legal advice.</strong> It summarises Federal Rule of Civil Procedure 5.2 and general professional-responsibility principles as of publication. Rules are amended, local rules and standing orders vary by district and judge, and the application of any rule depends on the facts of your matter. Always check the current text of the rule, your district's local rules and CM/ECF procedures, and any protective order in your case. Where a filing decision is contentious or finely balanced, consult supervising counsel.</p>
+        </div>
+
+        <div class="cta-box">
+            <h2>Redact the Filing Without Sending It Anywhere</h2>
+            <p>No account, no installation, and no server that receives your exhibit. Open the tool, turn off your Wi-Fi if you want proof, and redact your filing with the document never leaving your machine.</p>
+            <a href="/" class="cta-button">Start Redacting Locally (Zero Upload)</a>
+        </div>
+    </article>
+
+</body>
+</html>
