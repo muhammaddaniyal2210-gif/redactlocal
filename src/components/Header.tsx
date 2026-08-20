@@ -44,6 +44,18 @@ export function Header({ onTestOffline }: HeaderProps) {
               workspace holding an unsaved document in memory — navigating away
               in the same tab silently discards every redaction the user has
               made, with nothing to recover it from. */}
+          {/* Same new-tab rationale as the Blog link below: /about is a static
+              file in public/ with no SPA route, and this header sits above a
+              workspace holding an unsaved document. Styled identically to Blog. */}
+          <a
+            href="/about"
+            target="_blank"
+            rel="noopener"
+            className="inline-flex min-h-11 items-center rounded-xl px-3 text-sm font-medium text-slate-300 transition-all duration-200 hover:bg-slate-800/70 hover:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/60 lg:min-h-9"
+          >
+            About
+          </a>
+
           <a
             href="/blog"
             target="_blank"
