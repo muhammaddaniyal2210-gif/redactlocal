@@ -96,6 +96,17 @@ export const JURISDICTION_PRESETS: readonly JurisdictionPreset[] = [
     categories: ['pan'],
     banner: { flag: '💳', region: 'Global', rule: 'PCI-DSS card PANs' },
   },
+  {
+    id: 'privacy-first',
+    label: '🛡️ Privacy-First: Scan for All Identifiers',
+    hint: 'Turns on every detection pattern at once for a broad sweep.',
+    caveat:
+      'A broad sweep flags more, including false positives, so review each match. It finds structured identifiers, not free-text secrets — names, proprietary terms and context still need your eyes.',
+    // Every category the scanner knows. Filtered against the live category
+    // list at read time, so this stays correct as categories are added.
+    categories: ['emails', 'phones', 'ssns', 'ein', 'govIds', 'aadhaar', 'npi', 'mrn', 'pan', 'cards', 'iban', 'accounts'],
+    banner: { flag: '🛡️', region: 'Privacy-First', rule: 'all identifiers' },
+  },
 ]
 
 /**
@@ -113,6 +124,7 @@ const SLUG_TO_ID: Readonly<Record<string, string>> = {
   'global-pii': 'eu-gdpr',
   'us-hipaa': 'us-hipaa',
   'pci-dss': 'pci-dss',
+  'privacy-first': 'privacy-first',
 }
 
 const ID_TO_SLUG = new Map(Object.entries(SLUG_TO_ID).map(([slug, id]) => [id, slug]))
