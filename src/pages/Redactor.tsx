@@ -10,8 +10,8 @@ export function Redactor() {
 
   return (
     <RedactorWorkspace
-      heading="Redact a PDF without it ever leaving your device"
-      subheading="The file is read into this tab's memory with the browser's own FileReader and rendered here. There is no server to send it to."
+      heading="Securely Redact PDFs and Sensitive Documents — 100% Local & Private"
+      subheading="From legal contracts and medical records to personal identification, RedactLocal processes every file directly in your browser. No server. No cloud. No leaks."
     />
   )
 }
