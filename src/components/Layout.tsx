@@ -35,6 +35,21 @@ export function Layout() {
           route. A disclosure that disappears the moment someone opens a file
           is not a disclosure. */}
       <footer className="mt-auto border-t border-slate-800/80 px-4 py-4 text-center text-xs text-slate-500 sm:px-6">
+        {/* A real footer nav did not exist before — the footer was a lone
+            privacy disclosure. A single centred row keeps it minimal while
+            leaving room for more links later. Slate, not gray, so it matches
+            the rest of the app (the disclosure below is slate-500 and the
+            header's nav links use the same hover). The address is not shown;
+            it rides on the mailto so it is not scraped off the page as text. */}
+        <nav aria-label="Footer" className="mb-3 flex flex-wrap items-center justify-center gap-x-6">
+          <a
+            href="mailto:redactlocal@gmail.com"
+            className="inline-flex min-h-9 items-center rounded px-1 font-medium text-slate-400 transition-colors hover:text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+          >
+            Contact Support
+          </a>
+        </nav>
+
         <p>Files are held in memory and discarded when you close the tab.</p>
         <p className="mt-1.5 text-slate-600">
           Note: Vercel Analytics logs page visits only. Your files remain 100% local and
