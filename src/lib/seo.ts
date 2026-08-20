@@ -16,7 +16,7 @@ export const SITE_URL = (
 export const SITE_NAME = 'RedactLocal'
 
 export const HOME_DESCRIPTION =
-  'Black out sensitive parts of a PDF in your browser. Nothing is uploaded — the file is read into the tab, flattened to images on export, and the text underneath is destroyed.'
+  'Securely redact sensitive documents and PDFs directly in your browser. 100% private, zero uploads, and HIPAA/PCI-DSS/GDPR compliant.'
 
 export interface HeadTags {
   title: string
@@ -102,23 +102,25 @@ export function buildHeadTags(config: LandingConfig): HeadTags {
 /** Head tags for the tool's own home page. Shared with the prerender script. */
 export function buildHomeHeadTags(): HeadTags {
   const canonical = `${SITE_URL}/`
-  const ogTitle = `${SITE_NAME} — 100% local PDF redaction`
+  // One title across the tab, the search result and the social card, so the
+  // branding is identical wherever the page surfaces.
+  const title = 'Redact PDFs and Sensitive Documents Locally | RedactLocal'
 
   return {
-    title: `${SITE_NAME} — Redact PDFs in your browser, with zero uploads`,
+    title,
     description: HOME_DESCRIPTION,
     canonical,
     og: {
       'og:type': 'website',
       'og:site_name': SITE_NAME,
-      'og:title': ogTitle,
+      'og:title': title,
       'og:description': HOME_DESCRIPTION,
       'og:url': canonical,
       'og:locale': 'en_US',
     },
     twitter: {
       'twitter:card': 'summary',
-      'twitter:title': ogTitle,
+      'twitter:title': title,
       'twitter:description': HOME_DESCRIPTION,
     },
     jsonLd: {
