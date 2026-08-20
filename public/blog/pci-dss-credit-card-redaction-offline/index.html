@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Primary Meta Tags -->
+    <title>PCI-DSS Credit Card Redaction Without Cloud Uploads</title>
+    <meta name="description" content="Card numbers leak into logs, support tickets and shared PDFs. Why local, browser-native redaction keeps PANs off servers, and how the PCI-DSS preset works.">
+    <link rel="canonical" href="https://redactlocal.org/blog/pci-dss-credit-card-redaction-offline">
+
+    <!-- Open Graph / LinkedIn / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://redactlocal.org/blog/pci-dss-credit-card-redaction-offline">
+    <meta property="og:title" content="Securing Financial Data: The Offline Approach to PCI-DSS Card Redaction">
+    <meta property="og:description" content="Card numbers leak into logs, support tickets and shared PDFs. Why local, browser-native redaction keeps PANs off servers, and how the PCI-DSS preset works.">
+    <meta property="og:image" content="https://redactlocal.org/blog/pci-dss-credit-card-redaction-offline/cover.jpg">
+    <meta property="og:image:width" content="1600">
+    <meta property="og:image:height" content="957">
+    <meta property="og:image:alt" content="RedactLocal's in-browser editor with a 16-digit card number redacted on a settlement report">
+    <meta property="og:site_name" content="RedactLocal">
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://redactlocal.org/blog/pci-dss-credit-card-redaction-offline">
+    <meta name="twitter:title" content="Securing Financial Data: The Offline Approach to PCI-DSS Card Redaction">
+    <meta name="twitter:description" content="Card numbers leak into logs, support tickets and shared PDFs. Why local, browser-native redaction keeps PANs off servers, and how the PCI-DSS preset works.">
+    <meta name="twitter:image" content="https://redactlocal.org/blog/pci-dss-credit-card-redaction-offline/cover.jpg">
+
+    <!-- JSON-LD Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "BlogPosting",
+          "@id": "https://redactlocal.org/blog/pci-dss-credit-card-redaction-offline#article",
+          "isPartOf": { "@id": "https://redactlocal.org/blog/pci-dss-credit-card-redaction-offline" },
+          "mainEntityOfPage": { "@id": "https://redactlocal.org/blog/pci-dss-credit-card-redaction-offline" },
+          "headline": "Securing Financial Data: The Offline Approach to PCI-DSS Credit Card Redaction",
+          "alternativeHeadline": "Why card numbers leak into internal documents, and how to scrub them without an upload",
+          "description": "Card numbers leak into logs, support tickets and shared PDFs. Why local, browser-native redaction keeps PANs off servers, and how the PCI-DSS preset works.",
+          "inLanguage": "en",
+          "datePublished": "2026-08-20T09:00:00+00:00",
+          "dateModified": "2026-08-20T09:00:00+00:00",
+          "author": {
+            "@type": "Person",
+            "@id": "https://redactlocal.org/#founder",
+            "name": "Muhammad Daniyal",
+            "jobTitle": "Founder",
+            "url": "https://redactlocal.org/about"
+          },
+          "publisher": { "@id": "https://redactlocal.org/#organization" },
+          "image": {
+            "@type": "ImageObject",
+            "url": "https://redactlocal.org/blog/pci-dss-credit-card-redaction-offline/cover.jpg",
+            "width": 1600,
+            "height": 957
+          },
+          "articleSection": "Financial Compliance",
+          "keywords": [
+            "PCI-DSS redaction",
+            "redact credit card number",
+            "PAN redaction",
+            "primary account number",
+            "offline PDF redaction",
+            "client-side PDF redaction"
+          ],
+          "about": [
+            { "@type": "Thing", "name": "Payment Card Industry Data Security Standard" },
+            { "@type": "Thing", "name": "Primary Account Number" },
+            { "@type": "Thing", "name": "Cardholder data" }
+          ],
+          "mentions": { "@id": "https://redactlocal.org/#software" }
+        },
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://redactlocal.org/#software",
+          "name": "RedactLocal",
+          "url": "https://redactlocal.org",
+          "description": "A browser-native PDF redactor that runs entirely on your device. Documents are never uploaded. Pages are permanently rasterized so redacted text is destroyed rather than hidden, and every export is re-inspected to confirm zero selectable characters and zero embedded fonts.",
+          "applicationCategory": ["SecurityApplication", "BusinessApplication"],
+          "applicationSubCategory": "PDF Redaction",
+          "operatingSystem": "Any (runs in a modern web browser)",
+          "browserRequirements": "Requires JavaScript. Chrome, Firefox, Safari or Edge.",
+          "isAccessibleForFree": true,
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock"
+          },
+          "featureList": [
+            "Client-side PDF redaction with no file upload",
+            "Works offline after the page loads",
+            "Global Finance (PCI-DSS) preset for Luhn-validated 16-digit card numbers",
+            "Permanent rasterization destroys the underlying text layer",
+            "Automatic post-export verification of zero selectable text and zero fonts",
+            "Manual review of every match before redaction is applied",
+            "Batch processing of multiple documents",
+            "Custom redaction stamps",
+            "No account or installation required"
+          ],
+          "publisher": { "@id": "https://redactlocal.org/#organization" },
+          "author": { "@id": "https://redactlocal.org/#founder" }
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://redactlocal.org/#organization",
+          "name": "RedactLocal",
+          "url": "https://redactlocal.org",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://redactlocal.org/favicon.svg",
+            "width": 48,
+            "height": 48
+          }
+        }
+      ]
+    }
+    </script>
+
+    <style>
+        /* Base Flexbox Layout & Typography */
+        :root {
+            --text-main: #1a1a1a;
+            --text-muted: #4a5568;
+            --bg-color: #ffffff;
+            --accent: #2b6cb0;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text-main);
+            background-color: var(--bg-color);
+            line-height: 1.7;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        nav {
+            width: 100%;
+            max-width: 768px;
+            padding: 2rem 1.5rem;
+            box-sizing: border-box;
+        }
+
+        nav a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        article {
+            width: 100%;
+            max-width: 768px;
+            padding: 0 1.5rem 4rem 1.5rem;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            line-height: 1.2;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+            font-weight: 400;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            margin-top: 3rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 2rem;
+            margin-bottom: 0.75rem;
+        }
+
+        p, ul, ol {
+            margin-bottom: 1.5rem;
+            font-size: 1.125rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* In-text links. The base stylesheet only styled nav links and the CTA
+           button, which left contextual links rendering as default browser blue. */
+        article p a,
+        article li a,
+        article td a {
+            color: var(--accent);
+            font-weight: 500;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+            text-decoration-thickness: 1px;
+            transition: color 0.15s ease;
+        }
+
+        article p a:hover,
+        article li a:hover,
+        article td a:hover {
+            color: var(--text-main);
+        }
+
+        code {
+            background-color: #f1f5f9;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+
+        .callout {
+            border-left: 3px solid var(--accent);
+            background-color: #f8fafc;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .callout p:last-child {
+            margin-bottom: 0;
+        }
+
+        .disclaimer {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            padding-top: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .cta-box {
+            background-color: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-top: 3rem;
+            text-align: center;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background-color: var(--text-main);
+            color: #ffffff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 1rem;
+            transition: background-color 0.2s ease;
+        }
+
+        .cta-button:hover {
+            background-color: var(--accent);
+        }
+
+        /* A mid-article conversion point, styled to read as an action rather
+           than as another paragraph. */
+        .inline-cta {
+            text-align: center;
+            margin: 2.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8fafc;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            h2 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="/">&larr; Back to RedactLocal</a>
+    </nav>
+
+    <article>
+        <h1>Securing Financial Data: The Offline Approach to PCI-DSS Credit Card Redaction</h1>
+        <p class="subtitle">A Primary Account Number in an internal PDF is a scope problem. The tool you use to remove it should not be a second one.</p>
+
+        <img
+            src="/blog/pci-dss-credit-card-redaction-offline/cover.jpg"
+            alt="RedactLocal's in-browser editor with a 16-digit card number redacted on a settlement report"
+            width="1600"
+            height="957"
+            fetchpriority="high"
+            decoding="async"
+            onerror="this.style.display='none'"
+            style="display: block; box-sizing: border-box; width: 100%; max-width: 800px; height: auto; aspect-ratio: 1600 / 957; margin: 0 auto 3rem; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 24px rgba(15, 23, 42, 0.10), 0 1px 3px rgba(15, 23, 42, 0.06);">
+
+        <p>A support agent pastes a customer's full card number into a ticket to "help the finance team trace a chargeback." An operations manager exports a settlement report to PDF and drops it in a shared drive. A developer attaches a log file to a bug so QA can reproduce a failed payment.</p>
+
+        <p>None of these people work in your cardholder data environment. All three have just put a Primary Account Number somewhere it was never supposed to be — and every one of those locations is now, by definition, in scope for PCI-DSS.</p>
+
+        <p>This is the quiet way card data spreads. Not through the payment gateway, which is hardened and audited, but through the ordinary documents that flow around it. And the reflex fix — search for a redaction tool and upload the file — takes a scope problem and adds a data-transmission problem on top of it.</p>
+
+        <h2>Where Card Numbers End Up That They Shouldn't</h2>
+
+        <p>The PAN is the 16-digit (for most networks) number on the front of the card. Under PCI-DSS it is the defining element of cardholder data, and any system component that stores, processes or transmits it falls inside the Cardholder Data Environment (CDE) and inherits the full weight of the standard.</p>
+
+        <p>The trouble is that a PAN does not stay where your architecture put it. It leaks sideways into systems that were never scoped, designed or secured to hold it:</p>
+
+        <ul>
+            <li><strong>Support tickets and CRM notes</strong>, where an agent or a customer pastes a full card number in plain text.</li>
+            <li><strong>Exported reports</strong> &mdash; settlement files, reconciliation reports, dispute packets &mdash; saved as PDF or spreadsheet and shared internally.</li>
+            <li><strong>Email attachments</strong> forwarded to accounting, a processor, or an auditor.</li>
+            <li><strong>Application logs and debugging artifacts</strong>, where a request body containing a PAN is written to disk and attached to a ticket.</li>
+        </ul>
+
+        <p>Each of these drags an out-of-band system into your assessment scope, which is why "how does card data reach places it shouldn't, and how do we get it back out" is a question every QSA eventually asks. Removing a PAN from a document that should never have contained it is remediation, and it needs to happen without spreading the number further.</p>
+
+        <h2>What PCI-DSS Requires of a Stored PAN</h2>
+
+        <p>Requirement 3 of PCI-DSS governs the protection of stored account data, and two provisions matter directly here.</p>
+
+        <p><strong>A stored PAN must be rendered unreadable.</strong> Requirement 3.5.1 states that wherever a PAN is stored, it must be made unreadable &mdash; through one-way hashing of the entire PAN, truncation, tokenization, or strong cryptography. A PAN sitting in cleartext inside a shared PDF meets none of these.</p>
+
+        <p><strong>When displayed, a PAN must be masked.</strong> Requirement 3.4.1 limits what may be shown to, at most, the first six and last four digits, and only for personnel with a documented business need. The default everywhere else is to reveal no more than the last four.</p>
+
+        <table>
+            <tr>
+                <th>Data element</th>
+                <th>PCI-DSS treatment</th>
+            </tr>
+            <tr>
+                <td>Primary Account Number (PAN)</td>
+                <td>Rendered unreadable when stored; masked when displayed</td>
+            </tr>
+            <tr>
+                <td>Cardholder name, expiry, service code</td>
+                <td>Cardholder data; protected in line with the standard</td>
+            </tr>
+            <tr>
+                <td>Full track data, CVV/CVC2, PIN</td>
+                <td>Sensitive authentication data; must not be retained after authorization</td>
+            </tr>
+        </table>
+
+        <p>For a document that is being remediated rather than displayed in an application, the practical goal is stronger than masking: the PAN should be <em>destroyed</em> in the file, not merely hidden. Which is exactly where most redaction goes wrong.</p>
+
+        <h2>Why a Black Box Is Not a Redaction</h2>
+
+        <p>Drawing a black rectangle over a card number in a standard PDF editor does not remove it. It appends a drawing instruction that paints over the digits, while the underlying text operators, character codes and fonts remain in the file at known coordinates.</p>
+
+        <p>The PAN is still there, and it comes straight back out through select-and-copy, through <code>pdftotext</code>, or through any format converter. A truncation or masking control that leaves the full number recoverable underneath is not truncation at all. This is the mechanism behind essentially every publicized redaction failure, and we took it apart in <a href="/blog/black-box-flaw">The Black Box Flaw</a>.</p>
+
+        <p>The only method that genuinely removes the number is <strong>rasterization</strong>: flattening each page to an image and burning the redaction into the pixels, so the rebuilt PDF contains no text layer to recover.</p>
+
+        <h2>The Upload Problem: Your Redaction Tool Is Now In Scope</h2>
+
+        <p>So you need real redaction, and the obvious move is a free online tool that begins with <em>upload your file</em>. Stop there. The file you are about to upload is the one with the live PAN in it.</p>
+
+        <p>Transmitting cardholder data to a third-party web service makes that service a component that processes your CHD. Under PCI-DSS a third-party service provider handling cardholder data is expected to be PCI-DSS compliant in its own right and to be governed by written agreements and monitoring under Requirement 12.8. A redaction site you found through a search engine is none of those things, and using it does three concrete things at once:</p>
+
+        <ul>
+            <li><strong>It transmits a PAN outside your environment</strong> to a party with no agreement, no documented compliance and, often, no identifiable jurisdiction.</li>
+            <li><strong>It expands your scope</strong> rather than shrinking it, pulling an uncontrolled external service into the story you have to tell an assessor.</li>
+            <li><strong>It inherits their breach.</strong> If that service is compromised, the card numbers you sent it are in the blast radius.</li>
+        </ul>
+
+        <p>The clean resolution is to make sure the transmission never happens. If the file is redacted on the same machine that opened it, there is no third party, no new scope, and no PAN on the wire.</p>
+
+        <div class="inline-cta">
+            <a href="/?preset=pci-dss" class="cta-button">Redact a card number in your browser &rarr;</a>
+        </div>
+
+        <h2>Local-First: Keep the PAN Off the Wire</h2>
+
+        <p><a href="/?preset=pci-dss">RedactLocal</a> is a PDF redactor that runs entirely in the browser. The file is read into the tab's memory by the browser's own file API, rendered locally, and exported by the browser's download mechanism. There is no upload endpoint, because there is no backend that accepts files.</p>
+
+        <p>You can verify it in about ten seconds, and this is the test no cloud tool passes: <strong>open the tool, disconnect from the internet, and redact the document.</strong> It keeps working, because the card number has nowhere to go. That property is what keeps the redaction step from ever becoming a transmission of cardholder data.</p>
+
+        <h2>How the "Global Finance: PCI-DSS" Preset Works</h2>
+
+        <p>Selecting <strong>💳 Global Finance: PCI-DSS</strong> from the compliance preset selector configures the scanner to find Primary Account Numbers. Everything below runs against text already in the browser's memory, with nothing transmitted and full support for working offline.</p>
+
+        <h3>Structured matching, then checksum validation</h3>
+        <p>The scanner looks for the canonical PAN shape &mdash; four groups of four digits, with spaces or hyphens between the blocks optional &mdash; so <code>4111 1111 1111 1111</code>, <code>4111-1111-1111-1111</code> and <code>4111111111111111</code> are all recognized. A structural match is not enough on its own, so each candidate is then run through the <strong>Luhn checksum</strong> (the mod-10 algorithm every issuer uses as the PAN's final digit). Only numbers that pass are reported. That validation step is what separates a real card-number sweep from one that flags every sixteen-digit string in the document.</p>
+
+        <h3>Review, then permanent removal</h3>
+        <p>Every match is listed with the surrounding line of text, and nothing is covered until you confirm it. On export, each page is rasterized and the redaction boxes are burned into the pixels; the PDF is rebuilt from images alone. The file is then re-opened and inspected before the download appears, reporting the flattened page count alongside the number of selectable characters, text operators, font objects and annotations found. On a correct export those counts are zero &mdash; a verifiable artifact you can keep with the remediation record.</p>
+
+        <h2>A PCI-Minded Redaction Workflow</h2>
+
+        <ol>
+            <li><strong>Treat the source file as in-scope.</strong> Until the PAN is destroyed, the document is cardholder data. Handle and store it accordingly, and never transmit it to an outside tool to be cleaned.</li>
+            <li><strong>Redact on a machine you control.</strong> A tool that uploads the file has become a system component processing your CHD. A browser-native tool never receives it.</li>
+            <li><strong>Scan for the PAN.</strong> Let the preset find Luhn-valid card numbers, including those broken into spaced or hyphenated blocks.</li>
+            <li><strong>Flatten the output</strong> so the number is destroyed in the pixels rather than hidden behind a box.</li>
+            <li><strong>Verify before the file moves.</strong> Confirm the post-export report shows zero recoverable text, or run <code>pdftotext</code> and search for the last four digits. If they appear, do not release it.</li>
+            <li><strong>Fix the source, not just the copy.</strong> A PAN in a support ticket means a process is capturing card data where it should not. Redacting the export is remediation; closing the intake path is the fix.</li>
+        </ol>
+
+        <h2>What This Does Not Do</h2>
+
+        <p>Three limits to be precise about, because an audit-minded reader should know exactly where the tool's edges are.</p>
+
+        <p><strong>It targets 16-digit PANs.</strong> The four-by-four pattern matches the common 16-digit networks. American Express (15 digits) and Diners Club (14) do not fit that shape and are not caught by this preset &mdash; review those by eye or with a manual box.</p>
+
+        <p><strong>It scrubs the PAN, not the rest of the record.</strong> Cardholder name, expiry date and any authentication data are not pattern-detected. PCI-DSS covers those too, and they remain your review.</p>
+
+        <p><strong>Scanned and photographed documents have no text layer.</strong> The scanner reads a PDF's text; an imaged statement or a screenshot of a terminal has nothing to match against. Redact those by hand and flatten as normal. Note that a scan run through OCR <em>does</em> contain recoverable text, which is exactly the file people assume is safe because "it's only a picture."</p>
+
+        <p>And for completeness: loading redactlocal.org records a page view, as most sites do. It has no access to your documents, which never leave the tab's memory. We say so plainly, because a tool asking you to trust it with data you cannot see should be candid about the data you can.</p>
+
+        <div class="disclaimer">
+            <p><strong>This guide is for informational purposes and does not constitute compliance or legal advice.</strong> It summarizes provisions of the PCI Data Security Standard as of publication; the standard is maintained by the PCI Security Standards Council and is periodically revised. RedactLocal is a redaction tool, not a certification of PCI-DSS compliance, and using it does not by itself make an organization compliant. Scope, applicable requirements and validation depend on your merchant level, payment channels and environment. Always confirm the current text of the standard and consult your QSA or acquirer before setting policy.</p>
+        </div>
+
+        <div class="cta-box">
+            <h2>Scrub the Card Number Without Sending It Anywhere</h2>
+            <p>No account, no installation, and no server that receives your file. Open the tool with the PCI-DSS preset armed, turn off your Wi-Fi if you want proof, and redact the PAN with the document never leaving your machine.</p>
+            <a href="/?preset=pci-dss" class="cta-button">Redact Local (PCI-DSS Preset)</a>
+        </div>
+    </article>
+
+</body>
+</html>
