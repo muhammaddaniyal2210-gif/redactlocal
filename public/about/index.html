@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>About &amp; Contact | RedactLocal</title>
+    <meta name="description" content="Why RedactLocal redacts sensitive PII, PHI and financial documents entirely in your browser — no uploads, no servers — who it is built for, and how to reach us.">
+    <link rel="canonical" href="https://redactlocal.org/about">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://redactlocal.org/about">
+    <meta property="og:title" content="About & Contact | RedactLocal">
+    <meta property="og:description" content="Local-first PDF redaction: sensitive documents never leave your browser. Our mission, how the client-side architecture works, and how to contact us.">
+    <meta property="og:site_name" content="RedactLocal">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "AboutPage",
+          "@id": "https://redactlocal.org/about#page",
+          "url": "https://redactlocal.org/about",
+          "name": "About & Contact | RedactLocal",
+          "description": "Why RedactLocal processes sensitive documents entirely in the browser, who it is for, and how to contact the team.",
+          "isPartOf": { "@id": "https://redactlocal.org/#organization" },
+          "about": { "@id": "https://redactlocal.org/#organization" }
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://redactlocal.org/#organization",
+          "name": "RedactLocal",
+          "url": "https://redactlocal.org",
+          "email": "redactlocal@gmail.com",
+          "description": "A browser-native PDF redactor that runs entirely on your device. Documents are never uploaded; pages are permanently rasterized so redacted text is destroyed rather than hidden.",
+          "founder": { "@id": "https://redactlocal.org/#founder" },
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://redactlocal.org/favicon.svg",
+            "width": 48,
+            "height": 48
+          },
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "email": "redactlocal@gmail.com",
+            "contactType": "customer support"
+          }
+        },
+        {
+          "@type": "Person",
+          "@id": "https://redactlocal.org/#founder",
+          "name": "Muhammad Daniyal",
+          "jobTitle": "Founder",
+          "url": "https://redactlocal.org/about"
+        }
+      ]
+    }
+    </script>
+
+    <style>
+        /* ============================================================
+           About & Contact — drawn from the app's DESIGN.md tokens and the
+           blog hub, so this page is the same slate dark theme with the same
+           emerald accent. No build step; colours inline.
+           ============================================================ */
+        :root {
+            --sealed-slate: #020617;   /* page ground */
+            --chamber: #0f172a;        /* card body */
+            --partition: #1e293b;      /* raised / hover */
+            --slate-800: #1e293b;      /* card border at rest */
+            --seam: #334155;           /* hairline dividers */
+            --edge: #475569;
+            --green: #34d399;          /* accent */
+            --green-solid: #10b981;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --text-faint: #64748b;
+            --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --ease: cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        * { box-sizing: border-box; }
+        html { -webkit-text-size-adjust: 100%; }
+
+        body {
+            margin: 0;
+            background-color: var(--sealed-slate);
+            background-image: radial-gradient(circle at 1px 1px, rgba(51, 65, 85, 0.35) 1px, transparent 0);
+            background-size: 24px 24px;
+            color: var(--text-primary);
+            font-family: var(--font);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a { color: inherit; text-decoration: none; }
+
+        .container {
+            width: 100%;
+            max-width: 60rem;
+            margin-inline: auto;
+            padding-inline: clamp(1.25rem, 4vw, 2.5rem);
+        }
+
+        /* ---------- top bar ---------- */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.55);
+            background-color: rgba(2, 6, 23, 0.82);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .topbar-inner { display: flex; align-items: center; height: 64px; }
+        .brand { display: inline-flex; align-items: center; gap: 10px; }
+        .brand svg { height: 26px; width: auto; }
+        .brand-word { font-size: 1.15rem; font-weight: 650; letter-spacing: -0.02em; }
+        .brand-word em { font-style: normal; color: var(--green); }
+        .topbar-cta {
+            margin-left: auto;
+            display: inline-flex;
+            align-items: center;
+            min-height: 44px;
+            padding-inline: 1.1rem;
+            border-radius: 12px;
+            border: 1px solid var(--seam);
+            background-color: var(--chamber);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: border-color 0.2s var(--ease), color 0.2s var(--ease), background-color 0.2s var(--ease);
+        }
+        .topbar-cta:hover { border-color: var(--edge); background-color: var(--partition); color: var(--text-primary); }
+        .topbar-cta:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+
+        /* ---------- hero ---------- */
+        .hero { padding-top: clamp(3rem, 8vw, 5.5rem); padding-bottom: clamp(1.5rem, 4vw, 2.5rem); }
+        .eyebrow {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--green);
+            margin: 0 0 1rem;
+        }
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            line-height: 1.08;
+            letter-spacing: -0.03em;
+            font-weight: 700;
+            margin: 0 0 1rem;
+            max-width: 20ch;
+        }
+        .hero p {
+            font-size: clamp(1.05rem, 2.4vw, 1.25rem);
+            color: var(--text-muted);
+            margin: 0;
+            max-width: 60ch;
+        }
+
+        /* ---------- sections ---------- */
+        section { padding-block: clamp(1.75rem, 4vw, 2.75rem); }
+        h2 {
+            font-size: clamp(1.4rem, 3vw, 1.75rem);
+            letter-spacing: -0.02em;
+            font-weight: 650;
+            margin: 0 0 1.25rem;
+        }
+        .prose p {
+            font-size: 1.075rem;
+            color: var(--text-secondary);
+            max-width: 68ch;
+            margin: 0 0 1.15rem;
+        }
+        .prose p:last-child { margin-bottom: 0; }
+        .prose a { color: var(--green); text-decoration: underline; text-underline-offset: 2px; }
+        .prose a:hover { color: var(--green-solid); }
+        .prose strong { color: var(--text-primary); font-weight: 600; }
+
+        /* ---------- card grid ---------- */
+        .card {
+            border: 1px solid var(--slate-800);
+            background-color: rgba(15, 23, 42, 0.6);
+            border-radius: 16px;
+            padding: clamp(1.25rem, 3vw, 1.75rem);
+        }
+        .grid {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: 1fr;
+        }
+        @media (min-width: 640px) { .grid.two { grid-template-columns: 1fr 1fr; } }
+
+        .step-num {
+            display: inline-grid;
+            place-items: center;
+            width: 34px; height: 34px;
+            border-radius: 10px;
+            background: rgba(52, 211, 153, 0.12);
+            color: var(--green);
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 0.85rem;
+        }
+        .card h3 { margin: 0 0 0.4rem; font-size: 1.1rem; letter-spacing: -0.01em; }
+        .card p { margin: 0; color: var(--text-muted); font-size: 0.98rem; }
+        .card .tag { color: var(--green); font-weight: 600; font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; }
+
+        /* ---------- contact card ---------- */
+        .contact {
+            border: 1px solid var(--seam);
+            border-radius: 20px;
+            background:
+                radial-gradient(120% 140% at 100% 0%, rgba(52, 211, 153, 0.10), transparent 55%),
+                var(--chamber);
+            padding: clamp(1.75rem, 4vw, 2.75rem);
+            text-align: center;
+        }
+        .contact h2 { margin-bottom: 0.5rem; }
+        .contact p { color: var(--text-muted); margin: 0 auto 1.5rem; max-width: 46ch; }
+        .email-row {
+            display: inline-flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+        .email-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55rem;
+            min-height: 48px;
+            padding-inline: 1.1rem;
+            border-radius: 12px;
+            border: 1px solid var(--seam);
+            background-color: var(--sealed-slate);
+            color: var(--text-primary);
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-size: 1rem;
+            letter-spacing: 0.01em;
+        }
+        .email-pill svg { color: var(--text-faint); flex: none; }
+        .copy-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-height: 48px;
+            padding-inline: 1.25rem;
+            border-radius: 12px;
+            border: 1px solid transparent;
+            background-color: var(--green);
+            color: #04120c;
+            font-family: var(--font);
+            font-size: 0.95rem;
+            font-weight: 650;
+            cursor: pointer;
+            transition: background-color 0.2s var(--ease), transform 0.05s var(--ease);
+        }
+        .copy-btn:hover { background-color: var(--green-solid); }
+        .copy-btn:active { transform: scale(0.98); }
+        .copy-btn:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+        .copy-btn.copied { background-color: var(--partition); color: var(--green); border-color: var(--seam); }
+        .copy-btn svg { flex: none; }
+
+        /* ---------- footer ---------- */
+        footer {
+            border-top: 1px solid rgba(51, 65, 85, 0.55);
+            margin-top: clamp(2rem, 5vw, 3.5rem);
+            padding-block: 2rem;
+            color: var(--text-faint);
+            font-size: 0.85rem;
+            text-align: center;
+        }
+        footer a { color: var(--text-muted); text-decoration: underline; text-underline-offset: 2px; }
+        footer a:hover { color: var(--text-secondary); }
+
+        .sr-only {
+            position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+            overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="topbar">
+        <div class="container topbar-inner">
+            <a class="brand" href="/" aria-label="RedactLocal home">
+                <svg viewBox="7 11.5 34 26.6" aria-hidden="true" focusable="false">
+                    <rect x="7" y="11.5" width="26" height="4.6" rx="2.3" fill="#475569"/>
+                    <rect x="7" y="20.2" width="34" height="9.2" rx="2.6" fill="#34d399"/>
+                    <rect x="7" y="33.5" width="19" height="4.6" rx="2.3" fill="#475569"/>
+                </svg>
+                <span class="brand-word">Redact<em>Local</em></span>
+            </a>
+            <a class="topbar-cta" href="/">Open the app &rarr;</a>
+        </div>
+    </div>
+
+    <main>
+        <header class="hero">
+            <div class="container">
+                <span class="eyebrow">About &amp; Contact</span>
+                <h1>Redaction should never require an upload.</h1>
+                <p>RedactLocal removes sensitive information from PDFs entirely inside your browser. The file is never sent to a server, because there is no server that receives it.</p>
+            </div>
+        </header>
+
+        <section aria-labelledby="mission">
+            <div class="container prose">
+                <h2 id="mission">Our mission</h2>
+                <p>Every day, people are asked to strip a Social Security number, a patient identifier, or a card number out of a document before sharing it. The reflex is to search for a free online tool and upload the file. That single action is the problem.</p>
+                <p>The moment a document containing <strong>PII, PHI, or cardholder data</strong> is uploaded to a third-party service, it has left the environment that was supposed to protect it. For regulated teams that is not a convenience — it is an unnecessary disclosure, a widening of scope, and, if that service is ever breached, a liability you inherited for free. The redaction step, the one meant to reduce risk, becomes the moment risk is created.</p>
+                <p>We built RedactLocal on a simple premise: the safest place to handle a sensitive document is the machine it already lives on. If the file never travels, there is nothing to intercept, nothing to retain, and no third party to vet. Local-first is not a feature here — it is the whole point.</p>
+            </div>
+        </section>
+
+        <section aria-labelledby="how">
+            <div class="container">
+                <h2 id="how">How it works</h2>
+                <div class="grid two">
+                    <div class="card">
+                        <span class="step-num">1</span>
+                        <h3>The file is read locally</h3>
+                        <p>Your PDF is opened with the browser's own file API and rendered in-tab with a WebAssembly PDF engine running in a worker. It is held in memory only — never written to a server, because there is no upload endpoint.</p>
+                    </div>
+                    <div class="card">
+                        <span class="step-num">2</span>
+                        <h3>Detection runs in the sandbox</h3>
+                        <p>Pattern matching — SSNs, tax IDs, Aadhaar numbers, NPIs, card PANs and more — executes as JavaScript inside the browser sandbox, against text already in memory. Nothing is transmitted, and it all works with the network off.</p>
+                    </div>
+                    <div class="card">
+                        <span class="step-num">3</span>
+                        <h3>Redactions are burned in</h3>
+                        <p>On export, each page is rasterized and the redaction is flattened into the pixels. The rebuilt PDF is assembled from images alone, so there is no text layer left underneath to recover — unlike a black box drawn on top.</p>
+                    </div>
+                    <div class="card">
+                        <span class="step-num">4</span>
+                        <h3>Every export is verified</h3>
+                        <p>Before the download appears, the finished file is re-opened and inspected, reporting the count of selectable characters, text operators and embedded fonts. On a correct export those counts are zero — a receipt you can keep.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section aria-labelledby="who">
+            <div class="container">
+                <h2 id="who">Who it is for</h2>
+                <div class="grid two">
+                    <a class="card" href="/blog/federal-court-efiling-redaction-frcp-52">
+                        <p class="tag">Legal</p>
+                        <h3>Litigation &amp; e-filing teams</h3>
+                        <p>Redact exhibits for PACER and CM/ECF under FRCP 5.2 without an unredacted filing ever reaching a vendor.</p>
+                    </a>
+                    <a class="card" href="/blog/hipaa-patient-record-redaction-offline">
+                        <p class="tag">Healthcare</p>
+                        <h3>Compliance &amp; records staff</h3>
+                        <p>Scrub identifiers from patient records without the upload that would make a redaction tool a business associate.</p>
+                    </a>
+                    <a class="card" href="/blog/pci-dss-credit-card-redaction-offline">
+                        <p class="tag">Fintech</p>
+                        <h3>Developers &amp; operations</h3>
+                        <p>Remove 16-digit PANs from logs, tickets and exported reports without pulling a cloud tool into your PCI-DSS scope.</p>
+                    </a>
+                    <a class="card" href="/blog/subject-access-request-redaction">
+                        <p class="tag">Privacy</p>
+                        <h3>DPOs &amp; privacy-conscious professionals</h3>
+                        <p>Prepare GDPR subject access responses and remove third-party PII with the document never leaving your device.</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section aria-labelledby="contact">
+            <div class="container">
+                <div class="contact">
+                    <h2 id="contact">Contact &amp; support</h2>
+                    <p>Questions, feedback, or a compliance scenario you want to talk through? We read every message.</p>
+                    <div class="email-row">
+                        <span class="email-pill">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                            <span id="email">redactlocal@gmail.com</span>
+                        </span>
+                        <button type="button" class="copy-btn" id="copyBtn" data-email="redactlocal@gmail.com" aria-label="Copy email address to clipboard">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                            <span class="label">Copy email</span>
+                        </button>
+                    </div>
+                    <p class="sr-only" role="status" aria-live="polite" id="copyStatus"></p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>
+                <a href="/">RedactLocal</a> &mdash; redact PDFs in your browser, with nothing ever uploaded. &middot; <a href="/blog">Blog</a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+      /* Copy-to-clipboard, no mailto redirect. Falls back to a hidden textarea
+         where the async Clipboard API is unavailable (older Safari, non-HTTPS). */
+      (function () {
+        var btn = document.getElementById('copyBtn');
+        var label = btn.querySelector('.label');
+        var status = document.getElementById('copyStatus');
+        var resetTimer;
+
+        function flash() {
+          label.textContent = 'Copied!';
+          btn.classList.add('copied');
+          status.textContent = 'Email address copied to clipboard';
+          clearTimeout(resetTimer);
+          resetTimer = setTimeout(function () {
+            label.textContent = 'Copy email';
+            btn.classList.remove('copied');
+            status.textContent = '';
+          }, 2000);
+        }
+
+        function fallbackCopy(text) {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.setAttribute('readonly', '');
+          ta.style.position = 'absolute';
+          ta.style.left = '-9999px';
+          document.body.appendChild(ta);
+          ta.select();
+          try { document.execCommand('copy'); } catch (e) {}
+          document.body.removeChild(ta);
+        }
+
+        btn.addEventListener('click', function () {
+          var email = btn.getAttribute('data-email');
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(email).then(flash, function () { fallbackCopy(email); flash(); });
+          } else {
+            fallbackCopy(email);
+            flash();
+          }
+        });
+      })();
+    </script>
+</body>
+</html>

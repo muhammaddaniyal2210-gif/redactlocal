@@ -35,18 +35,19 @@ export function Layout() {
           route. A disclosure that disappears the moment someone opens a file
           is not a disclosure. */}
       <footer className="mt-auto border-t border-slate-800/80 px-4 py-4 text-center text-xs text-slate-500 sm:px-6">
-        {/* A real footer nav did not exist before — the footer was a lone
-            privacy disclosure. A single centred row keeps it minimal while
-            leaving room for more links later. Slate, not gray, so it matches
-            the rest of the app (the disclosure below is slate-500 and the
-            header's nav links use the same hover). The address is not shown;
-            it rides on the mailto so it is not scraped off the page as text. */}
+        {/* A plain anchor, not a router Link, and a new tab — for the same two
+            reasons the header's Blog link is: /about is a static file in
+            public/ with no route in the SPA (a Link would hit the catch-all and
+            bounce to "/"), and this footer sits under a workspace holding an
+            unsaved document, so a same-tab navigation would discard it. */}
         <nav aria-label="Footer" className="mb-3 flex flex-wrap items-center justify-center gap-x-6">
           <a
-            href="mailto:redactlocal@gmail.com"
+            href="/about"
+            target="_blank"
+            rel="noopener"
             className="inline-flex min-h-9 items-center rounded px-1 font-medium text-slate-400 transition-colors hover:text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
           >
-            Contact Support
+            About &amp; Contact
           </a>
         </nav>
 
