@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>RedactLocal — GDPR data sovereignty cover</title>
+<style>
+  /* ============================================================
+     RedactLocal — Product Hunt gallery slide (1270 x 760)
+
+     HOW TO USE
+     1. Drop your UI screenshot next to this file as `app-shot.png`
+        (anything wide works; it is cropped from the top edge).
+     2. Open this file in a browser.
+     3. Press E. A 2540x1520 PNG (1270x760 at 2x) downloads.
+
+     No screenshot tool, no cropping, no terminal. The export renders
+     the slide itself, so what downloads is exactly what you see.
+     ============================================================ */
+
+  :root {
+    /* Straight from DESIGN.md so the slide and the product match. */
+    --sealed-slate: #020617;
+    --chamber: #0f172a;
+    --seam: #334155;
+    --edge: #475569;
+    --containment-green: #34d399;
+    --text-primary: #f1f5f9;
+    --text-muted: #94a3b8;
+
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto,
+            Helvetica, Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #05070d;          /* Just the page around the slide. */
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+  }
+
+  /* ---------- the slide: a strict, non-negotiable 1270 x 760 ---------- */
+
+  .slide {
+    position: relative;
+    width: 1270px;
+    height: 760px;
+    flex: none;
+    overflow: hidden;
+    background: var(--sealed-slate);
+    font-family: var(--font);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+
+    /* Two rows: the message, then the product. The product row takes
+       everything left over, so the headline can grow without squashing it. */
+    display: grid;
+    grid-template-rows: auto 1fr;
+    row-gap: 30px;
+    padding: 50px 56px 52px;
+  }
+
+  /* Texture, not decoration: the same dot grid the app's canvas sits on.
+     Kept under 4% opacity so it reads as material, never as pattern. */
+  .slide::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle at 1px 1px,
+                      rgb(51 65 85 / 0.55) 1px, transparent 0);
+    background-size: 26px 26px;
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  /* A single soft light behind the product. This is what makes the app
+     "pop" — the surface is lit, rather than the background being styled. */
+  .slide::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 58%;
+    width: 1150px;
+    height: 620px;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(ellipse at center,
+                rgb(52 211 153 / 0.13) 0%,
+                rgb(52 211 153 / 0.05) 38%,
+                transparent 68%);
+    pointer-events: none;
+  }
+
+  .slide > * { position: relative; z-index: 1; }
+
+  /* ---------- header ---------- */
+
+  .header {
+    display: grid;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .lockup {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .lockup svg { height: 22px; width: auto; display: block; }
+
+  .lockup span {
+    font-size: 19px;
+    font-weight: 650;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+  }
+
+  .lockup span em {
+    font-style: normal;
+    color: var(--containment-green);
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 50px;
+    line-height: 1.06;
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    /* Two balanced lines, deliberately: a single 1400px line would have to
+       drop to ~48px to fit, and the hook is the one thing that must read
+       from across a Product Hunt grid. */
+    text-wrap: balance;
+    max-width: 19ch;
+  }
+
+  .sub {
+    margin: 14px 0 0;
+    font-size: 17px;
+    line-height: 1.5;
+    font-weight: 400;
+    color: var(--text-muted);
+    letter-spacing: -0.005em;
+    /* Wide enough to hold the line in one run. At 60ch it broke after
+       "still" and left "works." orphaned on a line of its own. */
+    max-width: 740px;
+  }
+
+  /* ---------- the product slot ---------- */
+
+  .stage {
+    display: grid;
+    place-items: center;
+    min-height: 0;             /* lets the frame shrink inside the 1fr row */
+  }
+
+  .frame {
+    width: 560px;
+    height: auto;
+    align-self: center;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    overflow: hidden;
+    border: 1px solid rgb(51 65 85 / 0.7);
+    border-radius: 14px;
+    background: var(--chamber);
+    /* Depth comes from one deep drop plus a hairline of light on the rim —
+       the same two-shadow budget the product itself keeps to. */
+    box-shadow:
+      0 2px 0 0 rgb(255 255 255 / 0.04) inset,
+      0 40px 80px -20px rgb(0 0 0 / 0.75),
+      0 0 0 1px rgb(52 211 153 / 0.08);
+  }
+
+  /* A restrained browser bar. It costs 34px and buys the viewer the
+     single most important fact: this is a website, not a desktop app. */
+  .chrome {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 34px;
+    padding: 0 13px;
+    border-bottom: 1px solid rgb(51 65 85 / 0.6);
+    background: rgb(2 6 23 / 0.6);
+  }
+
+  .dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--edge);
+    opacity: 0.55;
+    flex: none;
+  }
+
+  .url {
+    margin-left: 8px;
+    padding: 3px 12px;
+    border-radius: 999px;
+    background: rgb(15 23 42 / 0.9);
+    border: 1px solid rgb(51 65 85 / 0.5);
+    font-size: 11.5px;
+    letter-spacing: 0.01em;
+    color: var(--text-muted);
+  }
+
+  .shot {
+    position: relative;
+    overflow: hidden;
+    background: var(--chamber);
+  }
+
+  .shot img {
+    display: block;
+    width: 100%;
+    height: auto;
+    /* Cropped from the top: toolbars and the first fold are what matter,
+       and the bottom of a long screenshot is the expendable part. */
+    object-fit: contain;
+    object-position: center;
+  }
+
+  /* Shown only when app-shot.png is missing, so the layout can be
+     judged before the real screenshot exists. */
+  .placeholder {
+    display: none;
+    place-items: center;
+    height: 100%;
+    text-align: center;
+    color: var(--edge);
+    font-size: 14px;
+    letter-spacing: 0.04em;
+  }
+
+  .shot.is-empty img { display: none; }
+  .shot.is-empty .placeholder { display: grid; }
+
+  /* The 2x export is handled by the script at the end of this file, which
+     rasterises the slide at any scale. Nothing here needs to change. */
+</style>
+</head>
+<body>
+
+<div class="slide">
+
+  <header class="header">
+    <div class="lockup">
+      <!-- The shipped mark, cropped to its artwork exactly as in the app. -->
+      <svg viewBox="7 11.5 34 26.6" aria-hidden="true">
+        <rect x="7" y="11.5" width="26" height="4.6" rx="2.3" fill="#475569"/>
+        <rect x="7" y="20.2" width="34" height="9.2" rx="2.6" fill="#34d399"/>
+        <rect x="7" y="33.5" width="19" height="4.6" rx="2.3" fill="#475569"/>
+      </svg>
+      <span>Redact<em>Local</em></span>
+    </div>
+
+    <h1>EU data that never<br>crosses a border.</h1>
+
+    <!-- Delete this line if you want the hook to carry the slide alone. -->
+    <p class="sub">
+      Client-side redaction. No wire, no transfer, no cross-border DPA for the task.
+    </p>
+  </header>
+
+  <div class="stage">
+    <div class="frame">
+      <div class="chrome">
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="url">redactlocal.org</span>
+      </div>
+
+      <!-- ================= DROP YOUR SCREENSHOT HERE ================= -->
+      <div class="shot" id="shot">
+        <img src="app-shot-gdpr.png" alt="A synthetic EU customer record with personal data redacted in the browser"
+             onerror="document.getElementById('shot').classList.add('is-empty')">
+        <div class="placeholder">app-shot-gdpr.png</div>
+      </div>
+      <!-- ============================================================= -->
+    </div>
+  </div>
+
+</div>
+
+<script>
+/**
+ * Press E to export the slide as a PNG at 2x (2540 x 1520).
+ *
+ * The slide is serialised into an SVG <foreignObject>, rasterised through an
+ * Image, and drawn to a canvas at the target size — so the export is the real
+ * layout at native resolution rather than an upscale of a 1x capture.
+ *
+ * Two things that will silently break it if changed: the screenshot must be
+ * inlined as a data URI (an SVG rasterised through <img> cannot fetch anything),
+ * and the SVG must be handed over as a data: URL — a blob: URL taints the
+ * canvas and toBlob() then throws a SecurityError.
+ */
+async function exportSlide(scale = 2) {
+  const W = 1270, H = 760;
+  const slide = document.querySelector('.slide');
+
+  const img = slide.querySelector('.shot img');
+  let inlined = null;
+  if (img && img.getAttribute('src') && !img.getAttribute('src').startsWith('data:')) {
+    const blob = await (await fetch(img.getAttribute('src'))).blob();
+    inlined = await new Promise((res) => {
+      const fr = new FileReader();
+      fr.onload = () => res(fr.result);
+      fr.readAsDataURL(blob);
+    });
+  }
+
+  const clone = slide.cloneNode(true);
+  if (inlined) clone.querySelector('.shot img').setAttribute('src', inlined);
+  clone.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+
+  const css = document.querySelector('style').textContent;
+  const markup = new XMLSerializer().serializeToString(clone);
+  const svg =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="' + W * scale + '" height="' + H * scale +
+    '" viewBox="0 0 ' + W + ' ' + H + '">' +
+    '<foreignObject x="0" y="0" width="' + W + '" height="' + H + '">' +
+    '<style xmlns="http://www.w3.org/1999/xhtml">' + css + '</style>' + markup +
+    '</foreignObject></svg>';
+
+  const image = await new Promise((res, rej) => {
+    const i = new Image();
+    i.onload = () => res(i);
+    i.onerror = () => rej(new Error('render failed'));
+    i.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+  });
+
+  const canvas = document.createElement('canvas');
+  canvas.width = W * scale;
+  canvas.height = H * scale;
+  canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
+
+  canvas.toBlob((blob) => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'ph-gallery.png';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  }, 'image/png');
+}
+
+addEventListener('keydown', (e) => {
+  if (e.key === 'e' || e.key === 'E') exportSlide(2);
+});
+</script>
+</body>
+</html>
