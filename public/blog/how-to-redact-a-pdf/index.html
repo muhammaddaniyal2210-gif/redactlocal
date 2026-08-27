@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Primary Meta Tags -->
+    <title>How to Redact a PDF for Free (Without Uploading It)</title>
+    <meta name="description" content="Step-by-step: how to redact a PDF for free in your browser. Black out text so it can't be recovered — no upload, no software. Works on Mac, Windows and mobile.">
+    <link rel="canonical" href="https://redactlocal.org/blog/how-to-redact-a-pdf">
+
+    <!-- Open Graph / LinkedIn / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://redactlocal.org/blog/how-to-redact-a-pdf">
+    <meta property="og:title" content="How to Redact a PDF for Free (Without Uploading It)">
+    <meta property="og:description" content="Step-by-step: how to redact a PDF for free in your browser. Black out text so it can't be recovered — no upload, no software. Works on Mac, Windows and mobile.">
+    <meta property="og:image" content="https://redactlocal.org/blog/how-to-redact-a-pdf/cover.jpg">
+    <meta property="og:image:width" content="1600">
+    <meta property="og:image:height" content="957">
+    <meta property="og:image:alt" content="RedactLocal's in-browser editor redacting text from a PDF">
+    <meta property="og:site_name" content="RedactLocal">
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://redactlocal.org/blog/how-to-redact-a-pdf">
+    <meta name="twitter:title" content="How to Redact a PDF for Free (Without Uploading It)">
+    <meta name="twitter:description" content="Step-by-step: how to redact a PDF for free in your browser. Black out text so it can't be recovered — no upload, no software. Works on Mac, Windows and mobile.">
+    <meta name="twitter:image" content="https://redactlocal.org/blog/how-to-redact-a-pdf/cover.jpg">
+
+    <!-- JSON-LD Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "BlogPosting",
+          "@id": "https://redactlocal.org/blog/how-to-redact-a-pdf#article",
+          "isPartOf": { "@id": "https://redactlocal.org/blog/how-to-redact-a-pdf" },
+          "mainEntityOfPage": { "@id": "https://redactlocal.org/blog/how-to-redact-a-pdf" },
+          "headline": "How to Redact a PDF for Free — Without Uploading It to a Server",
+          "alternativeHeadline": "A step-by-step guide to blacking out text in a PDF so it cannot be recovered",
+          "description": "Step-by-step: how to redact a PDF for free in your browser. Black out text so it can't be recovered — no upload, no software. Works on Mac, Windows and mobile.",
+          "inLanguage": "en",
+          "datePublished": "2026-08-28T09:00:00+00:00",
+          "dateModified": "2026-08-28T09:00:00+00:00",
+          "author": {
+            "@type": "Person",
+            "@id": "https://redactlocal.org/#founder",
+            "name": "Muhammad Daniyal",
+            "jobTitle": "Founder",
+            "url": "https://redactlocal.org/about"
+          },
+          "publisher": { "@id": "https://redactlocal.org/#organization" },
+          "image": {
+            "@type": "ImageObject",
+            "url": "https://redactlocal.org/blog/how-to-redact-a-pdf/cover.jpg",
+            "width": 1600,
+            "height": 957
+          },
+          "articleSection": "Guides",
+          "keywords": [
+            "how to redact a PDF",
+            "redact PDF free",
+            "redact PDF without uploading",
+            "black out text in PDF",
+            "permanently remove text from PDF",
+            "redact PDF online"
+          ],
+          "about": [
+            { "@type": "Thing", "name": "PDF redaction" },
+            { "@type": "Thing", "name": "Document privacy" },
+            { "@type": "Thing", "name": "Client-side processing" }
+          ],
+          "mentions": { "@id": "https://redactlocal.org/#software" }
+        },
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://redactlocal.org/#software",
+          "name": "RedactLocal",
+          "url": "https://redactlocal.org",
+          "description": "A browser-native PDF redactor that runs entirely on your device. Documents are never uploaded. Pages are permanently rasterized so redacted text is destroyed rather than hidden, and every export is re-inspected to confirm zero selectable characters and zero embedded fonts.",
+          "applicationCategory": ["SecurityApplication", "BusinessApplication"],
+          "applicationSubCategory": "PDF Redaction",
+          "operatingSystem": "Any (runs in a modern web browser)",
+          "browserRequirements": "Requires JavaScript. Chrome, Firefox, Safari or Edge.",
+          "isAccessibleForFree": true,
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock"
+          },
+          "featureList": [
+            "Free PDF redaction with no file upload",
+            "Works offline after the page loads",
+            "Black out text so it is permanently destroyed, not just hidden",
+            "Permanent rasterization removes the underlying text layer",
+            "Automatic post-export verification of zero selectable text and zero fonts",
+            "Automatic detection of emails, phone numbers, SSNs, card numbers and more",
+            "Batch processing of multiple documents",
+            "No account or installation required"
+          ],
+          "publisher": { "@id": "https://redactlocal.org/#organization" },
+          "author": { "@id": "https://redactlocal.org/#founder" }
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://redactlocal.org/#organization",
+          "name": "RedactLocal",
+          "url": "https://redactlocal.org",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://redactlocal.org/favicon.svg",
+            "width": 48,
+            "height": 48
+          }
+        }
+      ]
+    }
+    </script>
+
+    <style>
+        /* Base Flexbox Layout & Typography */
+        :root {
+            --text-main: #1a1a1a;
+            --text-muted: #4a5568;
+            --bg-color: #ffffff;
+            --accent: #2b6cb0;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text-main);
+            background-color: var(--bg-color);
+            line-height: 1.7;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        nav {
+            width: 100%;
+            max-width: 768px;
+            padding: 2rem 1.5rem;
+            box-sizing: border-box;
+        }
+
+        nav a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        article {
+            width: 100%;
+            max-width: 768px;
+            padding: 0 1.5rem 4rem 1.5rem;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            line-height: 1.2;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+            font-weight: 400;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            margin-top: 3rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 2rem;
+            margin-bottom: 0.75rem;
+        }
+
+        p, ul, ol {
+            margin-bottom: 1.5rem;
+            font-size: 1.125rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* In-text links. The base stylesheet only styled nav links and the CTA
+           button, which left contextual links rendering as default browser blue. */
+        article p a,
+        article li a,
+        article td a {
+            color: var(--accent);
+            font-weight: 500;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+            text-decoration-thickness: 1px;
+            transition: color 0.15s ease;
+        }
+
+        article p a:hover,
+        article li a:hover,
+        article td a:hover {
+            color: var(--text-main);
+        }
+
+        code {
+            background-color: #f1f5f9;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+
+        .callout {
+            border-left: 3px solid var(--accent);
+            background-color: #f8fafc;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .callout p:last-child {
+            margin-bottom: 0;
+        }
+
+        .disclaimer {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            padding-top: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .cta-box {
+            background-color: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-top: 3rem;
+            text-align: center;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background-color: var(--text-main);
+            color: #ffffff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 1rem;
+            transition: background-color 0.2s ease;
+        }
+
+        .cta-button:hover {
+            background-color: var(--accent);
+        }
+
+        /* A mid-article conversion point, styled to read as an action rather
+           than as another paragraph. */
+        .inline-cta {
+            text-align: center;
+            margin: 2.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8fafc;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            h2 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="/">&larr; Back to RedactLocal</a>
+    </nav>
+
+    <article>
+        <h1>How to Redact a PDF for Free — Without Uploading It to a Server</h1>
+        <p class="subtitle">A step-by-step guide to blacking out text in a PDF so it is truly gone &mdash; not just hidden &mdash; using only your browser. No software, no account, and no upload.</p>
+
+        <img
+            src="/blog/how-to-redact-a-pdf/cover.jpg"
+            alt="RedactLocal's in-browser editor redacting text from a PDF"
+            width="1600"
+            height="957"
+            fetchpriority="high"
+            decoding="async"
+            onerror="this.style.display='none'"
+            style="display: block; box-sizing: border-box; width: 100%; max-width: 800px; height: auto; aspect-ratio: 1600 / 957; margin: 0 auto 3rem; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 24px rgba(15, 23, 42, 0.10), 0 1px 3px rgba(15, 23, 42, 0.06);">
+
+        <p>Redacting a PDF sounds simple: black out the sensitive parts and share the rest. But most people do it in a way that leaves the "hidden" text fully recoverable &mdash; and many free online tools solve that by uploading your document to a server you don't control. This guide shows you how to redact a PDF <strong>for free, in your browser, without uploading it anywhere</strong>, so the text is permanently destroyed and nothing leaves your device.</p>
+
+        <h2>What "Redacting" a PDF Actually Means</h2>
+
+        <p>To redact a document is to <em>remove</em> specific information from it before sharing &mdash; a name, an address, an account number, a salary figure. The key word is remove. A proper redaction does not merely cover the text; it destroys it, so that no one can retrieve what was underneath.</p>
+
+        <p>This distinction is where almost every redaction failure comes from. There are two ways to "black out" text, and only one of them is real.</p>
+
+        <h2>The Wrong Way: Why a Black Box Doesn't Work</h2>
+
+        <p>Open a PDF in a standard editor, draw a black rectangle over a name, save, and it looks redacted. It isn't. That black box is just another object drawn <em>on top</em> of the page. The original text is still in the file, at its original position, in the document's text layer.</p>
+
+        <p>Anyone who receives that file can recover the text in seconds &mdash; by selecting and copying the area, by running the file through <code>pdftotext</code>, or by opening it in another editor and deleting the box. This is the cause of nearly every famous redaction leak in court filings and government documents. We break down the mechanism in detail in <a href="/blog/black-box-flaw">The Black Box Flaw</a>.</p>
+
+        <p>The only reliable way to redact a PDF is to <strong>flatten the page to an image and burn the redaction into the pixels</strong>, so there is no text layer left to recover. That is called rasterization, and it is what separates a real redaction from a cosmetic one.</p>
+
+        <div class="callout">
+            <p><strong>The rule of thumb:</strong> if you can still select or search for the text after redacting, it was never removed. A genuine redaction leaves nothing behind to select.</p>
+        </div>
+
+        <h2>How to Redact a PDF in Your Browser (Step by Step)</h2>
+
+        <p>Here is the fastest way to redact a PDF for free, using <a href="/?preset=privacy-first">RedactLocal</a>, a browser-based redaction tool that runs entirely on your device. Nothing is uploaded &mdash; the file is opened, edited, and saved without ever leaving your computer.</p>
+
+        <ol>
+            <li><strong>Open the tool.</strong> Go to <a href="/">redactlocal.org</a> in any modern browser (Chrome, Firefox, Safari or Edge). There is nothing to install and no account to create.</li>
+            <li><strong>Add your PDF.</strong> Drag the file onto the page, or click to browse and select it. The document opens instantly in the editor because it is read directly into your browser's memory &mdash; not sent anywhere.</li>
+            <li><strong>Find what to remove.</strong> Draw a box over anything sensitive by hand, or run <strong>Auto-Detect</strong> to find common identifiers automatically &mdash; emails, phone numbers, Social Security numbers, card numbers and more. Review each match and confirm the ones you want gone.</li>
+            <li><strong>Apply the redactions.</strong> Every confirmed area is marked for removal. You can add a stamp such as <code>CONFIDENTIAL</code> if you want the black box labelled.</li>
+            <li><strong>Export the redacted PDF.</strong> Click Export. Each page is rasterized, the redaction is burned into the image, and a new PDF is built with no recoverable text layer. Your browser downloads it directly.</li>
+            <li><strong>Verify before you send</strong> (see the next section).</li>
+        </ol>
+
+        <p>The whole process takes under a minute, and because it runs client-side, you can do it with your Wi-Fi switched off &mdash; proof that the file never left your machine.</p>
+
+        <div class="inline-cta">
+            <a href="/?preset=privacy-first" class="cta-button">Redact your PDF now &mdash; free &rarr;</a>
+        </div>
+
+        <h2>How to Verify Your Redaction Actually Worked</h2>
+
+        <p>Never trust a redaction you haven't checked. Two quick tests confirm the text is really gone:</p>
+
+        <ul>
+            <li><strong>Try to select it.</strong> Open the finished PDF and drag your cursor across a redacted area, then paste into a text field. If nothing comes out, the text was removed. If the hidden words appear, the redaction failed.</li>
+            <li><strong>Run <code>pdftotext</code>.</strong> On any computer with the tool installed, run <code>pdftotext redacted.pdf -</code> and search the output for something you removed. It should not be there.</li>
+        </ul>
+
+        <p>RedactLocal does this check for you automatically: after export, it re-opens the finished file and reports the number of selectable characters, text operators and embedded fonts it can find. On a correct redaction, those counts are zero.</p>
+
+        <h2>How to Redact a PDF on Mac, Windows, and Mobile</h2>
+
+        <p>Because a browser-based tool runs anywhere a browser does, the steps above are identical across devices:</p>
+
+        <ul>
+            <li><strong>On Windows or Mac:</strong> open the tool in Chrome, Edge, Firefox or Safari and follow the steps above. No download, no Acrobat licence, no admin rights needed.</li>
+            <li><strong>On iPhone or iPad:</strong> open the site in Safari, tap to choose a PDF from Files, redact, and the finished file saves back to your device.</li>
+            <li><strong>On Android:</strong> open the site in Chrome, pick your PDF, redact, and download the result.</li>
+        </ul>
+
+        <p>The advantage of a client-side tool is that the security guarantee doesn't change with the device: on every platform, the file is processed locally and never uploaded.</p>
+
+        <h2>Don't Forget Metadata and Hidden Layers</h2>
+
+        <p>Visible text is not the only place information hides in a PDF. Before you share a document, be aware of three less obvious sources:</p>
+
+        <ul>
+            <li><strong>The text layer under scans.</strong> A scanned document that has been run through OCR contains a searchable text layer even though it looks like an image. Redact it as carefully as a native PDF.</li>
+            <li><strong>Metadata.</strong> Author name, software, and creation timestamps are stored in the file's properties. Rasterizing each page on export, as RedactLocal does, rebuilds the document from images and drops the original page-level text and structure in the process.</li>
+            <li><strong>Earlier revisions.</strong> Some PDFs retain previous versions of edited content. A redaction that destroys the current text but leaves an old revision intact has not done its job &mdash; another reason a flattened, rebuilt output is safer than an edited original.</li>
+        </ul>
+
+        <h2>Frequently Asked Questions</h2>
+
+        <h3>Is it safe to redact a PDF online?</h3>
+        <p>It depends entirely on <em>how</em> the tool works. Most "online" redaction tools upload your file to a server to process it, which means your unredacted document leaves your control. A client-side tool like RedactLocal is different: it runs in your browser and never uploads the file, so "online" here means "in your browser," not "on someone's server." You can confirm it by disconnecting from the internet &mdash; it keeps working.</p>
+
+        <h3>Can redacted text be recovered?</h3>
+        <p>If the redaction was done with a black box drawn over the text in a normal editor, yes &mdash; trivially, by copy-paste or a converter. If the page was rasterized so the text layer was destroyed, no: there is nothing left in the file to recover.</p>
+
+        <h3>How do I permanently remove text from a PDF?</h3>
+        <p>Cover the text, then flatten the page to an image on export so the underlying characters are destroyed rather than hidden. Then verify by trying to select or search for the removed text. RedactLocal does the flattening and the verification automatically.</p>
+
+        <h3>Is RedactLocal free?</h3>
+        <p>Yes. There is no account, no installation, and no upload. Open the tool, redact your PDF, and download the result.</p>
+
+        <h3>Does it work offline?</h3>
+        <p>Yes. Once the page has loaded, you can turn off your Wi-Fi and redact a document &mdash; the clearest proof that your file is processed locally and never sent anywhere.</p>
+
+        <p>For industry-specific rules, we also have detailed guides on redacting <a href="/blog/hipaa-patient-record-redaction-offline">HIPAA patient records</a>, <a href="/blog/pci-dss-credit-card-redaction-offline">PCI-DSS card data</a>, <a href="/blog/federal-court-efiling-redaction-frcp-52">FRCP 5.2 court filings</a> and <a href="/blog/gdpr-data-sovereignty-offline-redaction">GDPR personal data</a>.</p>
+
+        <div class="cta-box">
+            <h2>Redact Your PDF for Free, Right Now</h2>
+            <p>No account, no installation, and no server that receives your file. Open the tool, disconnect from the internet if you want proof, and redact your PDF with the document never leaving your machine.</p>
+            <a href="/?preset=privacy-first" class="cta-button">Redact Local (Privacy Preset)</a>
+        </div>
+    </article>
+
+</body>
+</html>
