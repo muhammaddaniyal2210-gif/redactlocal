@@ -1,109 +1,109 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://redactlocal.org/</loc>
+    <loc>https://www.redactlocal.org/</loc>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://redactlocal.org/redact-bank-statement</loc>
+    <loc>https://www.redactlocal.org/redact-bank-statement</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://redactlocal.org/redact-tax-forms</loc>
+    <loc>https://www.redactlocal.org/redact-tax-forms</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://redactlocal.org/redact-passport-id</loc>
+    <loc>https://www.redactlocal.org/redact-passport-id</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://redactlocal.org/redact-w9-form</loc>
+    <loc>https://www.redactlocal.org/redact-w9-form</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://redactlocal.org/blackout-invoice-pdf</loc>
+    <loc>https://www.redactlocal.org/blackout-invoice-pdf</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://redactlocal.org/check</loc>
+    <loc>https://www.redactlocal.org/check</loc>
     <lastmod>2026-10-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://redactlocal.org/about</loc>
+    <loc>https://www.redactlocal.org/about</loc>
     <lastmod>2026-08-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://redactlocal.org/blog</loc>
+    <loc>https://www.redactlocal.org/blog</loc>
     <lastmod>2026-08-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://redactlocal.org/blog/how-to-redact-a-pdf</loc>
+    <loc>https://www.redactlocal.org/blog/how-to-redact-a-pdf</loc>
     <lastmod>2026-08-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://redactlocal.org/blog/cloud-pdf-redaction-dangers</loc>
+    <loc>https://www.redactlocal.org/blog/cloud-pdf-redaction-dangers</loc>
     <lastmod>2026-08-20</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://redactlocal.org/blog/gdpr-data-sovereignty-offline-redaction</loc>
+    <loc>https://www.redactlocal.org/blog/gdpr-data-sovereignty-offline-redaction</loc>
     <lastmod>2026-08-20</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://redactlocal.org/blog/ai-training-offline-redaction</loc>
+    <loc>https://www.redactlocal.org/blog/ai-training-offline-redaction</loc>
     <lastmod>2026-08-20</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://redactlocal.org/blog/pci-dss-credit-card-redaction-offline</loc>
+    <loc>https://www.redactlocal.org/blog/pci-dss-credit-card-redaction-offline</loc>
     <lastmod>2026-08-20</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://redactlocal.org/blog/hipaa-patient-record-redaction-offline</loc>
+    <loc>https://www.redactlocal.org/blog/hipaa-patient-record-redaction-offline</loc>
     <lastmod>2026-08-20</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://redactlocal.org/blog/aadhaar-card-masking-offline</loc>
+    <loc>https://www.redactlocal.org/blog/aadhaar-card-masking-offline</loc>
     <lastmod>2026-08-19</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://redactlocal.org/blog/federal-court-efiling-redaction-frcp-52</loc>
+    <loc>https://www.redactlocal.org/blog/federal-court-efiling-redaction-frcp-52</loc>
     <lastmod>2026-08-19</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://redactlocal.org/blog/black-box-flaw</loc>
+    <loc>https://www.redactlocal.org/blog/black-box-flaw</loc>
     <lastmod>2026-08-18</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://redactlocal.org/blog/subject-access-request-redaction</loc>
+    <loc>https://www.redactlocal.org/blog/subject-access-request-redaction</loc>
     <lastmod>2026-08-18</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.7</priority>

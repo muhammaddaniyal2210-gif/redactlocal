@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://redactlocal.org/sitemap.xml
+Sitemap: https://www.redactlocal.org/sitemap.xml
