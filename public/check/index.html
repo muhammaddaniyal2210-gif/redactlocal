@@ -165,7 +165,7 @@
         <section class="explainer">
             <h2>How this works</h2>
             <p style="margin:0 0 0.8rem">A PDF stores text separately from anything drawn on top of it. Covering a name with a black rectangle adds a drawing instruction — it doesn’t delete the characters underneath, which stay in the file at known positions. This reads that text layer back the same way a copy-paste, a converter, or <code>pdftotext</code> would.</p>
-            <p style="margin:0">The only way to truly remove it is to flatten the page to an image and burn the redaction into the pixels — which is what <a href="/">the redactor</a> does, with the file never leaving your browser. More in <a href="/blog/black-box-flaw">The Black Box Flaw</a>.</p>
+            <p style="margin:0">Permanent redaction removes the underlying content. Some PDF tools remove selected text and graphics while preserving the rest of the document. <a href="/">RedactLocal</a> uses a flattened export: marked areas are burned into page images, and the original text layer is not included — all in your browser, with the file never leaving your device. More in <a href="/blog/black-box-flaw">The Black Box Flaw</a>.</p>
         </section>
     </main>
 

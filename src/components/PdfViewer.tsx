@@ -6,6 +6,7 @@ import {
   ChevronRight,
   Eraser,
   FileText,
+  Info,
   Loader2,
   Maximize2,
   MousePointer2,
@@ -375,6 +376,17 @@ export function PdfViewer({ doc, onClose, queue }: PdfViewerProps) {
         >
           <X className="size-4" />
         </button>
+      </div>
+
+      {/* Export tradeoff — sits with the Export control and shows before any
+          download. It informs; it does not gate (no dialog, no checkbox). */}
+      <div className="flex items-start gap-2 border-b border-slate-700/50 bg-slate-950/40 px-4 py-2.5 text-xs leading-relaxed text-slate-400">
+        <Info className="mt-0.5 size-3.5 shrink-0 text-slate-500" />
+        <p className="min-w-0">
+          <span className="font-medium text-slate-300">Export format: flattened PDF.</span> Text in the
+          downloaded file will no longer be selectable or searchable, and image-only pages can limit
+          screen-reader access. Keep your original if you need an editable or accessible copy.
+        </p>
       </div>
 
       {/* Redaction toolbar: what you add, then what you take back. */}
