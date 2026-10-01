@@ -34,7 +34,15 @@ export function Layout() {
       {/* The footer is the only place present in every app state and on every
           route. A disclosure that disappears the moment someone opens a file
           is not a disclosure. */}
-      <footer className="mt-auto border-t border-slate-800/80 px-4 py-4 text-center text-xs text-slate-500 sm:px-6">
+      <footer className="mt-auto border-t border-slate-800/80 px-4 py-5 text-center text-xs text-slate-500 sm:px-6">
+        {/* The free tools, cross-linked site-wide. Plain anchors and a full
+            navigation: each is a standalone static page in public/, so a router
+            Link would miss it, and a fresh load is exactly what we want. */}
+        <nav aria-label="Free tools" className="mb-3 flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-slate-400">
+          <a href="/check" className="transition-colors hover:text-slate-200">Leak Checker</a>
+          <a href="/remove-metadata" className="transition-colors hover:text-slate-200">Metadata Remover</a>
+          <a href="/redact-image" className="transition-colors hover:text-slate-200">Image Redactor</a>
+        </nav>
         <p>Files are held in memory and discarded when you close the tab.</p>
         <p className="mt-1.5 text-slate-600">
           Note: Vercel Analytics logs page visits only. Your files remain 100% local and

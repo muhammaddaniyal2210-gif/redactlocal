@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Remove Image Metadata &amp; EXIF Online — Free, No Upload</title>
+    <meta name="description" content="Strip EXIF, GPS location and other metadata from your photos — free and 100% in your browser. See exactly what a photo reveals, then remove it. Nothing is uploaded.">
+    <link rel="canonical" href="https://www.redactlocal.org/remove-metadata">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.redactlocal.org/remove-metadata">
+    <meta property="og:title" content="Remove Image Metadata & EXIF Online — Free, No Upload">
+    <meta property="og:description" content="Your photos carry your GPS location, camera and timestamp. See what yours reveal and strip it — entirely in your browser. Nothing is uploaded.">
+    <meta property="og:image" content="https://www.redactlocal.org/remove-metadata/cover.jpg">
+    <meta property="og:image:width" content="1600">
+    <meta property="og:image:height" content="957">
+    <meta property="og:image:alt" content="An image's hidden GPS location and camera metadata, exposed then removed">
+    <meta property="og:site_name" content="RedactLocal">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Remove Image Metadata & EXIF Online — Free, No Upload">
+    <meta name="twitter:description" content="Your photos carry your GPS location, camera and timestamp. See what yours reveal and strip it — entirely in your browser.">
+    <meta name="twitter:image" content="https://www.redactlocal.org/remove-metadata/cover.jpg">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "RedactLocal Metadata & EXIF Remover",
+      "url": "https://www.redactlocal.org/remove-metadata",
+      "applicationCategory": "SecurityApplication",
+      "operatingSystem": "Any — runs in a web browser",
+      "isAccessibleForFree": true,
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "permissions": "None. Images are read in the browser and are never uploaded.",
+      "description": "See and remove EXIF, GPS and other metadata from images, entirely in the browser."
+    }
+    </script>
+
+    <style>
+        :root {
+            --sealed-slate:#020617;--chamber:#0f172a;--partition:#1e293b;--slate-800:#1e293b;
+            --seam:#334155;--edge:#475569;--green:#34d399;--green-solid:#10b981;--red:#f87171;--amber:#fbbf24;
+            --text-primary:#f1f5f9;--text-secondary:#cbd5e1;--text-muted:#94a3b8;--text-faint:#64748b;
+            --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+            --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;--ease:cubic-bezier(0.22,1,0.36,1);
+        }
+        *{box-sizing:border-box;} html{-webkit-text-size-adjust:100%;}
+        body{margin:0;background-color:var(--sealed-slate);background-image:radial-gradient(circle at 1px 1px,rgba(51,65,85,0.35) 1px,transparent 0);background-size:24px 24px;color:var(--text-primary);font-family:var(--font);line-height:1.6;-webkit-font-smoothing:antialiased;}
+        a{color:inherit;text-decoration:none;}
+        .container{width:100%;max-width:48rem;margin-inline:auto;padding-inline:clamp(1.25rem,4vw,2rem);}
+        .topbar{border-bottom:1px solid rgba(51,65,85,0.55);background-color:rgba(2,6,23,0.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}
+        .topbar-inner{display:flex;align-items:center;height:64px;max-width:48rem;margin-inline:auto;padding-inline:clamp(1.25rem,4vw,2rem);}
+        .brand{display:inline-flex;align-items:center;gap:10px;}
+        .brand svg{height:26px;width:auto;}
+        .brand-word{font-size:1.15rem;font-weight:650;letter-spacing:-0.02em;}
+        .brand-word em{font-style:normal;color:var(--green);}
+        .topbar-cta{margin-left:auto;display:inline-flex;align-items:center;min-height:40px;padding-inline:1rem;border-radius:10px;border:1px solid var(--seam);background-color:var(--chamber);color:var(--text-secondary);font-size:0.875rem;font-weight:500;transition:all .2s var(--ease);}
+        .topbar-cta:hover{border-color:var(--edge);background-color:var(--partition);color:var(--text-primary);}
+        .hero{text-align:center;padding-top:clamp(2.5rem,6vw,4rem);}
+        .eyebrow{display:inline-flex;align-items:center;gap:.4rem;font-size:.75rem;font-weight:600;letter-spacing:.04em;color:var(--green);border:1px solid rgba(52,211,153,.3);background:rgba(52,211,153,.1);padding:.3rem .8rem;border-radius:999px;}
+        h1{font-size:clamp(1.9rem,5vw,2.75rem);line-height:1.1;letter-spacing:-.03em;font-weight:700;margin:1rem 0 .75rem;}
+        .sub{color:var(--text-muted);font-size:1.05rem;max-width:38rem;margin:0 auto;}
+        .zone{margin-top:2rem;border:2px dashed var(--seam);border-radius:18px;background:rgba(15,23,42,.4);padding:clamp(2.5rem,7vw,4rem) 1.5rem;text-align:center;cursor:pointer;transition:border-color .2s var(--ease),background-color .2s var(--ease);}
+        .zone:hover,.zone.drag{border-color:var(--green);background:rgba(52,211,153,.06);}
+        .zone:focus-visible{outline:2px solid var(--green);outline-offset:3px;}
+        .zone-icon{width:56px;height:56px;margin:0 auto 1rem;display:grid;place-items:center;border-radius:16px;background:var(--partition);color:var(--text-muted);}
+        .zone-title{font-size:1.1rem;font-weight:600;}
+        .zone-hint{margin-top:.4rem;font-size:.9rem;color:var(--text-muted);}
+        .results{margin-top:1.5rem;display:grid;gap:1rem;}
+        .card{border:1px solid var(--slate-800);border-radius:16px;background:rgba(15,23,42,.5);overflow:hidden;}
+        .card-top{display:flex;gap:1rem;padding:1rem 1.1rem;align-items:center;}
+        .thumb{width:64px;height:64px;border-radius:10px;object-fit:cover;background:var(--partition);flex:none;border:1px solid var(--seam);}
+        .card-name{font-weight:600;font-size:.95rem;word-break:break-all;}
+        .card-meta{font-size:.8rem;color:var(--text-muted);margin-top:.15rem;}
+        .findings{border-top:1px solid var(--slate-800);padding:.9rem 1.1rem;display:grid;gap:.5rem;}
+        .finding{display:flex;gap:.6rem;align-items:flex-start;font-size:.88rem;}
+        .finding .k{color:var(--text-faint);min-width:7.5rem;flex:none;}
+        .finding .v{color:var(--text-secondary);word-break:break-word;}
+        .finding.gps .v{color:#fca5a5;font-weight:600;}
+        .finding.gps a{color:#fca5a5;text-decoration:underline;text-underline-offset:2px;}
+        .clean-note{border-top:1px solid var(--slate-800);padding:.75rem 1.1rem;font-size:.85rem;color:var(--green);display:flex;gap:.5rem;align-items:center;}
+        .card-foot{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;justify-content:space-between;border-top:1px solid var(--slate-800);padding:.8rem 1.1rem;background:rgba(2,6,23,.3);}
+        .foot-stat{font-size:.8rem;color:var(--text-muted);}
+        .btn-dl{display:inline-flex;align-items:center;gap:.45rem;min-height:40px;padding-inline:1rem;border-radius:10px;background:var(--green);color:#04120c;font-weight:650;font-size:.9rem;border:none;cursor:pointer;text-decoration:none;transition:background-color .2s var(--ease);}
+        .btn-dl:hover{background:var(--green-solid);}
+        .actions{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1.25rem;justify-content:center;}
+        .btn-ghost{display:inline-flex;align-items:center;min-height:46px;padding-inline:1.2rem;border-radius:12px;border:1px solid var(--seam);background:rgba(30,41,59,.4);color:var(--text-secondary);font-weight:500;font-size:.92rem;cursor:pointer;transition:all .2s var(--ease);}
+        .btn-ghost:hover{border-color:var(--edge);background:var(--partition);color:var(--text-primary);}
+        .err{display:none;margin-top:1rem;border:1px solid rgba(248,113,113,.3);background:rgba(248,113,113,.1);color:#fca5a5;border-radius:12px;padding:.8rem 1rem;font-size:.9rem;}
+        .explainer{margin-top:3rem;border:1px solid var(--slate-800);border-radius:16px;background:rgba(15,23,42,.3);padding:1.5rem;font-size:.95rem;color:var(--text-muted);}
+        .explainer h2{margin:0 0 .6rem;font-size:1rem;color:var(--text-secondary);}
+        .explainer a{color:var(--green);text-decoration:underline;text-underline-offset:2px;}
+        .more-tools{margin-top:1.5rem;display:grid;gap:.6rem;grid-template-columns:1fr;}
+        @media(min-width:640px){.more-tools{grid-template-columns:1fr 1fr;}}
+        .tool-link{display:flex;align-items:center;gap:.6rem;border:1px solid var(--slate-800);background:rgba(15,23,42,.4);border-radius:12px;padding:.85rem 1rem;font-size:.9rem;color:var(--text-secondary);transition:all .2s var(--ease);}
+        .tool-link:hover{border-color:var(--edge);background:var(--partition);color:var(--text-primary);}
+        .tool-link .dot{color:var(--green);}
+        footer{border-top:1px solid rgba(51,65,85,.55);margin-top:3rem;padding:2rem 0;text-align:center;color:var(--text-faint);font-size:.85rem;}
+        footer a{color:var(--text-muted);text-decoration:underline;text-underline-offset:2px;}
+        .noscript{max-width:48rem;margin:2rem auto;padding:1rem 1.5rem;border:1px solid var(--seam);border-radius:12px;color:var(--text-muted);}
+    </style>
+</head>
+<body>
+    <div class="topbar"><div class="topbar-inner">
+        <a class="brand" href="/" aria-label="RedactLocal home">
+            <svg viewBox="7 11.5 34 26.6" aria-hidden="true"><rect x="7" y="11.5" width="26" height="4.6" rx="2.3" fill="#475569"/><rect x="7" y="20.2" width="34" height="9.2" rx="2.6" fill="#34d399"/><rect x="7" y="33.5" width="19" height="4.6" rx="2.3" fill="#475569"/></svg>
+            <span class="brand-word">Redact<em>Local</em></span>
+        </a>
+        <a class="topbar-cta" href="/">Open the redactor &rarr;</a>
+    </div></div>
+
+    <main class="container">
+        <section class="hero">
+            <span class="eyebrow">Free · runs 100% in your browser</span>
+            <h1>Remove image metadata &amp; EXIF</h1>
+            <p class="sub">Every photo you take embeds your GPS location, camera, and the exact time — invisibly. Drop an image to see what yours reveals, then download a clean copy with it all stripped. Nothing is uploaded.</p>
+        </section>
+
+        <div id="zone" class="zone" role="button" tabindex="0" aria-label="Choose images or drag them here">
+            <div class="zone-icon" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></svg></div>
+            <div class="zone-title">Drop images here</div>
+            <div class="zone-hint">or click to choose · JPEG, PNG, WebP · they never leave your device</div>
+            <input id="file" type="file" accept="image/*" multiple hidden>
+        </div>
+        <div id="err" class="err"></div>
+        <div id="results" class="results"></div>
+        <div id="actions" class="actions" style="display:none"><button class="btn-ghost" id="again" type="button">Clear &amp; choose more</button></div>
+
+        <section class="explainer">
+            <h2>Why this matters</h2>
+            <p style="margin:0 0 .8rem">Photos store <strong>EXIF metadata</strong>: the GPS coordinates where the picture was taken, the device that took it, and the timestamp. Post or send that photo and you may be handing over your home address without realizing it. This tool reads that metadata in your browser so you can see it, then rebuilds the image without it — losslessly for JPEG and PNG, so the picture itself is untouched.</p>
+            <p style="margin:0">Everything runs on your device. The image is never uploaded, and you can prove it — turn off your Wi-Fi and it still works.</p>
+        </section>
+
+        <div class="more-tools">
+            <a class="tool-link" href="/check"><span class="dot">●</span> Leak Checker — is your PDF really redacted?</a>
+            <a class="tool-link" href="/redact-image"><span class="dot">●</span> Image Redactor — black out parts of a photo</a>
+        </div>
+    </main>
+
+    <noscript><div class="noscript">This tool runs in your browser and needs JavaScript. No data is ever uploaded.</div></noscript>
+
+    <footer><div class="container"><a href="/">RedactLocal</a> &mdash; private, in-browser tools. Nothing is ever uploaded. · <a href="/check">Leak Checker</a> · <a href="/redact-image">Image Redactor</a> · <a href="/blog">Blog</a></div></footer>
+
+    <script>
+      (function () {
+        var zone = document.getElementById('zone');
+        var fileInput = document.getElementById('file');
+        var errBox = document.getElementById('err');
+        var results = document.getElementById('results');
+        var actions = document.getElementById('actions');
+
+        function show(el, on) { el.style.display = on ? '' : 'none'; }
+        function fmtBytes(n){ if(n<1024)return n+' B'; if(n<1048576)return (n/1024).toFixed(0)+' KB'; return (n/1048576).toFixed(1)+' MB'; }
+        function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+
+        // ---- EXIF reader (JPEG). Extracts the tags that actually matter. ----
+        function readExif(buf) {
+          try {
+            var v = new DataView(buf);
+            if (v.getUint16(0) !== 0xFFD8) return null;
+            var off = 2, len = v.byteLength;
+            while (off + 4 <= len) {
+              var marker = v.getUint16(off);
+              if (marker === 0xFFDA || marker === 0xFFD9) break;        // SOS / EOI
+              if ((marker & 0xFF00) !== 0xFF00) break;
+              var size = v.getUint16(off + 2);
+              if (marker === 0xFFE1 && v.getUint32(off + 4) === 0x45786966) { // "Exif"
+                return parseTiff(v, off + 10, off + 2 + size);
+              }
+              off += 2 + size;
+            }
+          } catch (e) {}
+          return null;
+        }
+        function parseTiff(v, base, end) {
+          var little = v.getUint16(base) === 0x4949;
+          var g16 = function (o) { return v.getUint16(o, little); };
+          var g32 = function (o) { return v.getUint32(o, little); };
+          var out = {};
+          var ifd0 = base + g32(base + 4);
+          var wants0 = { 0x010F: 'Make', 0x0110: 'Model', 0x0132: 'DateTime', 0x0131: 'Software' };
+          var exifPtr = 0, gpsPtr = 0;
+          readIfd(ifd0, function (tag, o, count, type) {
+            if (wants0[tag]) out[wants0[tag]] = ascii(o, count);
+            else if (tag === 0x8769) exifPtr = base + g32(o);
+            else if (tag === 0x8825) gpsPtr = base + g32(o);
+          });
+          if (exifPtr) readIfd(exifPtr, function (tag, o, count) {
+            if (tag === 0x9003) out.DateTimeOriginal = ascii(o, count);
+          });
+          if (gpsPtr) {
+            var gps = {};
+            readIfd(gpsPtr, function (tag, o, count, type) {
+              if (tag === 0x0001) gps.latRef = ascii(o, count);
+              else if (tag === 0x0002) gps.lat = rationals(o, 3);
+              else if (tag === 0x0003) gps.lonRef = ascii(o, count);
+              else if (tag === 0x0004) gps.lon = rationals(o, 3);
+            });
+            if (gps.lat && gps.lon) {
+              var la = dms(gps.lat, gps.latRef), lo = dms(gps.lon, gps.lonRef);
+              if (la != null && lo != null) out.GPS = la.toFixed(6) + ', ' + lo.toFixed(6);
+            }
+          }
+          return Object.keys(out).length ? out : null;
+
+          function readIfd(ptr, cb) {
+            if (ptr + 2 > end) return;
+            var n = g16(ptr);
+            for (var i = 0; i < n; i++) {
+              var e = ptr + 2 + i * 12;
+              if (e + 12 > end) break;
+              var tag = g16(e), type = g16(e + 2), count = g32(e + 4);
+              var size = ({ 1: 1, 2: 1, 3: 2, 4: 4, 5: 8, 7: 1, 9: 4, 10: 8 }[type] || 1) * count;
+              var valOff = size <= 4 ? e + 8 : base + g32(e + 8);
+              cb(tag, valOff, count, type);
+            }
+          }
+          function ascii(o, count) { var s = ''; for (var i = 0; i < count; i++) { var c = v.getUint8(o + i); if (c === 0) break; s += String.fromCharCode(c); } return s.trim(); }
+          function rationals(o, n) { var r = []; for (var i = 0; i < n; i++) { var num = g32(o + i * 8), den = g32(o + i * 8 + 4); r.push(den ? num / den : 0); } return r; }
+          function dms(r, ref) { if (!r) return null; var d = r[0] + r[1] / 60 + r[2] / 3600; if (ref === 'S' || ref === 'W') d = -d; return d; }
+        }
+
+        // ---- Lossless metadata strip ----
+        function stripJpeg(buf) {
+          var v = new DataView(buf), len = v.byteLength;
+          if (v.getUint16(0) !== 0xFFD8) return null;
+          var keep = [0xFFD8];                  // SOI
+          var off = 2;
+          while (off + 2 <= len) {
+            var marker = v.getUint16(off);
+            if ((marker & 0xFF00) !== 0xFF00) break;
+            if (marker === 0xFFDA) { keep.push([off, len]); break; }  // SOS -> rest is image
+            var size = v.getUint16(off + 2);
+            var isApp = marker >= 0xFFE0 && marker <= 0xFFEF;         // APPn (EXIF/XMP/IPTC/etc.)
+            var isCom = marker === 0xFFFE;                            // comment
+            // Keep JFIF (APP0) so the file stays a well-formed baseline JPEG.
+            if ((isApp && marker !== 0xFFE0) || isCom) { off += 2 + size; continue; }
+            keep.push([off, off + 2 + size]);
+            off += 2 + size;
+          }
+          var total = 2; for (var i = 1; i < keep.length; i++) total += keep[i][1] - keep[i][0];
+          var out = new Uint8Array(total), p = 0, src = new Uint8Array(buf);
+          out[0] = 0xFF; out[1] = 0xD8; p = 2;
+          for (var j = 1; j < keep.length; j++) { out.set(src.subarray(keep[j][0], keep[j][1]), p); p += keep[j][1] - keep[j][0]; }
+          return new Blob([out], { type: 'image/jpeg' });
+        }
+        function stripPng(buf) {
+          var src = new Uint8Array(buf);
+          var sig = [137, 80, 78, 71, 13, 10, 26, 10];
+          for (var s = 0; s < 8; s++) if (src[s] !== sig[s]) return null;
+          var v = new DataView(buf), out = [src.subarray(0, 8)], off = 8, len = src.byteLength;
+          var drop = { tEXt: 1, zTXt: 1, iTXt: 1, eXIf: 1, tIME: 1 };
+          while (off + 8 <= len) {
+            var clen = v.getUint32(off);
+            var type = String.fromCharCode(src[off+4], src[off+5], src[off+6], src[off+7]);
+            var next = off + 12 + clen;
+            if (!drop[type]) out.push(src.subarray(off, next));
+            if (type === 'IEND') break;
+            off = next;
+          }
+          return new Blob(out, { type: 'image/png' });
+        }
+        function stripViaCanvas(file) {
+          return new Promise(function (resolve, reject) {
+            var url = URL.createObjectURL(file);
+            var img = new Image();
+            img.onload = function () {
+              var c = document.createElement('canvas'); c.width = img.naturalWidth; c.height = img.naturalHeight;
+              c.getContext('2d').drawImage(img, 0, 0);
+              var type = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+              c.toBlob(function (b) { URL.revokeObjectURL(url); b ? resolve(b) : reject(new Error('encode failed')); }, type, 0.95);
+            };
+            img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('decode failed')); };
+            img.src = url;
+          });
+        }
+
+        function cleanName(name) { var m = name.match(/(\.[^.]+)$/); var ext = m ? m[1] : '.jpg'; var base = m ? name.slice(0, -ext.length) : name; return base + '-clean' + ext; }
+
+        function row(file, exif, cleanBlob, savedBytes) {
+          var thumbUrl = URL.createObjectURL(cleanBlob);
+          var card = document.createElement('div'); card.className = 'card';
+          var findings = '';
+          if (exif) {
+            if (exif.GPS) findings += '<div class="finding gps"><span class="k">📍 GPS location</span><span class="v"><a href="https://www.google.com/maps?q=' + encodeURIComponent(exif.GPS) + '" target="_blank" rel="noopener">' + esc(exif.GPS) + '</a> — this is where the photo was taken</span></div>';
+            if (exif.Make || exif.Model) findings += '<div class="finding"><span class="k">Camera</span><span class="v">' + esc([exif.Make, exif.Model].filter(Boolean).join(' ')) + '</span></div>';
+            var when = exif.DateTimeOriginal || exif.DateTime;
+            if (when) findings += '<div class="finding"><span class="k">Date taken</span><span class="v">' + esc(when) + '</span></div>';
+            if (exif.Software) findings += '<div class="finding"><span class="k">Software</span><span class="v">' + esc(exif.Software) + '</span></div>';
+          }
+          var body = findings
+            ? '<div class="findings">' + findings + '</div>'
+            : '<div class="clean-note"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> No readable EXIF metadata found — the clean copy below is stripped regardless.</div>';
+          card.innerHTML =
+            '<div class="card-top"><img class="thumb" src="' + thumbUrl + '" alt=""><div><div class="card-name">' + esc(file.name) + '</div><div class="card-meta">' + fmtBytes(file.size) + (savedBytes > 0 ? ' → ' + fmtBytes(cleanBlob.size) : '') + '</div></div></div>' +
+            body +
+            '<div class="card-foot"><span class="foot-stat">' + (savedBytes > 0 ? ('Removed ' + fmtBytes(savedBytes) + ' of metadata') : 'Metadata stripped') + '</span><a class="btn-dl" download="' + esc(cleanName(file.name)) + '" href="' + thumbUrl + '"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download clean</a></div>';
+          results.appendChild(card);
+        }
+
+        async function handleFiles(list) {
+          var files = Array.prototype.slice.call(list || []).filter(function (f) { return /^image\//.test(f.type); });
+          if (!files.length) { errBox.textContent = 'Please choose image files (JPEG, PNG or WebP).'; show(errBox, true); return; }
+          show(errBox, false);
+          for (var i = 0; i < files.length; i++) {
+            var file = files[i];
+            try {
+              var buf = await file.arrayBuffer();
+              var exif = file.type === 'image/jpeg' ? readExif(buf) : null;
+              var blob = null;
+              if (file.type === 'image/jpeg') blob = stripJpeg(buf);
+              else if (file.type === 'image/png') blob = stripPng(buf);
+              if (!blob) blob = await stripViaCanvas(file);          // webp / fallback
+              row(file, exif, blob, file.size - blob.size);
+            } catch (e) {
+              console.error(e);
+              errBox.textContent = 'One file could not be processed: ' + file.name; show(errBox, true);
+            }
+          }
+          show(actions, true); zone.style.display = 'none';
+        }
+
+        function reset() { results.innerHTML = ''; show(actions, false); show(errBox, false); zone.style.display = ''; }
+
+        zone.addEventListener('click', function () { fileInput.click(); });
+        zone.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); } });
+        fileInput.addEventListener('change', function () { handleFiles(fileInput.files); fileInput.value = ''; });
+        document.getElementById('again').addEventListener('click', reset);
+        var depth = 0;
+        zone.addEventListener('dragenter', function (e) { e.preventDefault(); depth++; zone.classList.add('drag'); });
+        zone.addEventListener('dragover', function (e) { e.preventDefault(); });
+        zone.addEventListener('dragleave', function (e) { e.preventDefault(); if (--depth <= 0) zone.classList.remove('drag'); });
+        zone.addEventListener('drop', function (e) { e.preventDefault(); depth = 0; zone.classList.remove('drag'); handleFiles(e.dataTransfer && e.dataTransfer.files); });
+      })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="957" viewBox="0 0 1600 957" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b1326"/><stop offset=".55" stop-color="#060c1c"/><stop offset="1" stop-color="#020617"/></linearGradient>
+    <radialGradient id="g1" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#1d4ed8" stop-opacity=".5"/><stop offset="1" stop-color="#1e3a8a" stop-opacity="0"/></radialGradient>
+    <radialGradient id="g2" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#10b981" stop-opacity=".45"/><stop offset="1" stop-color="#059669" stop-opacity="0"/></radialGradient>
+    <linearGradient id="photo" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1e3a5f"/><stop offset=".5" stop-color="#2b5a7a"/><stop offset="1" stop-color="#3f7d6e"/></linearGradient>
+    <linearGradient id="emerald" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#34d399"/><stop offset="1" stop-color="#10b981"/></linearGradient>
+    <pattern id="dots" width="30" height="30" patternUnits="userSpaceOnUse"><circle cx="1.2" cy="1.2" r="1.2" fill="#334155" fill-opacity=".16"/></pattern>
+    <filter id="soft" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="30"/></filter>
+    <filter id="sh" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="26" stdDeviation="34" flood-color="#000" flood-opacity=".5"/></filter>
+  </defs>
+
+  <rect width="1600" height="957" fill="url(#bg)"/>
+  <rect width="1600" height="957" fill="url(#dots)"/>
+  <ellipse cx="420" cy="230" rx="600" ry="440" fill="url(#g1)" filter="url(#soft)"/>
+  <ellipse cx="1240" cy="770" rx="560" ry="420" fill="url(#g2)" filter="url(#soft)"/>
+
+  <!-- lockup -->
+  <g transform="translate(646,70)">
+    <rect x="0" y="9" width="26" height="4.6" rx="2.3" fill="#475569"/>
+    <rect x="0" y="0" width="34" height="9.2" rx="2.6" fill="#34d399"/>
+    <rect x="0" y="18" width="19" height="4.6" rx="2.3" fill="#475569"/>
+    <text x="46" y="20" fill="#f1f5f9" font-size="25" font-weight="650" letter-spacing="-.4">Redact<tspan fill="#34d399">Local</tspan></text>
+  </g>
+
+  <!-- headline -->
+  <text x="800" y="210" text-anchor="middle" fill="#f1f5f9" font-size="62" font-weight="700" letter-spacing="-1.4">Your photos know</text>
+  <text x="800" y="282" text-anchor="middle" fill="#f1f5f9" font-size="62" font-weight="700" letter-spacing="-1.4">where you were.</text>
+  <text x="800" y="340" text-anchor="middle" fill="#94a3b8" font-size="25">See the hidden GPS, camera and date — then strip it. Free, in your browser.</text>
+
+  <!-- photo card with EXIF overlay -->
+  <g filter="url(#sh)" transform="translate(500,410)">
+    <rect x="0" y="0" width="600" height="400" rx="20" fill="url(#photo)"/>
+    <!-- simple landscape: sun + horizon -->
+    <circle cx="470" cy="110" r="46" fill="#ffffff" fill-opacity=".18"/>
+    <path d="M0 300 Q150 250 300 285 T600 270 V400 H0 Z" fill="#0f2a24" fill-opacity=".55"/>
+    <!-- map pin -->
+    <g transform="translate(276,150)"><path d="M24 0C10.7 0 0 10.7 0 24c0 17 24 40 24 40s24-23 24-40C48 10.7 37.3 0 24 0z" fill="#ef4444"/><circle cx="24" cy="24" r="10" fill="#fff"/></g>
+    <!-- EXIF chip -->
+    <rect x="28" y="316" width="544" height="60" rx="12" fill="#020617" fill-opacity=".82"/>
+    <text x="48" y="353" font-family="ui-monospace, Menlo, monospace" font-size="21">
+      <tspan fill="#f87171" font-weight="700">📍 37.7749, -122.4194</tspan><tspan fill="#64748b">  ·  iPhone 14  ·  14 Jul 2023</tspan>
+    </text>
+  </g>
+
+  <!-- stripped badge -->
+  <g transform="translate(1030,470)">
+    <rect x="0" y="0" width="230" height="56" rx="28" fill="rgba(52,211,153,0.12)" stroke="#10b981" stroke-width="1.5"/>
+    <path d="M26 28 l10 10 l18 -20" fill="none" stroke="#34d399" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="68" y="36" fill="#34d399" font-size="22" font-weight="700">Stripped clean</text>
+  </g>
+</svg>
