@@ -166,11 +166,16 @@ export function buildCheckHeadTags(): HeadTags {
       'og:description': description,
       'og:url': canonical,
       'og:locale': 'en_US',
+      'og:image': `${SITE_URL}/check-og.jpg`,
+      'og:image:width': '1600',
+      'og:image:height': '957',
+      'og:image:alt': 'A document whose “redacted” account number is still readable through the black box',
     },
     twitter: {
-      'twitter:card': 'summary',
+      'twitter:card': 'summary_large_image',
       'twitter:title': 'Is Your PDF Really Redacted? Free In-Browser Checker',
       'twitter:description': description,
+      'twitter:image': `${SITE_URL}/check-og.jpg`,
     },
     jsonLd: {
       '@context': 'https://schema.org',
