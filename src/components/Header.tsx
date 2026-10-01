@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { WifiOff } from 'lucide-react'
 import { BrandMark } from './BrandMark'
 
@@ -42,18 +43,17 @@ export function Header({ onTestOffline }: HeaderProps) {
         </span>
 
         <nav className="ml-auto flex items-center gap-1 sm:gap-2">
-          {/* The free Leak Checker. New tab, like the siblings below: /check is
-              a real SPA route, but navigating to it in the same tab would still
-              unmount the redactor and discard any in-progress document. A new
-              tab keeps the workspace intact. Styled identically to About/Blog. */}
-          <a
-            href="/check"
-            target="_blank"
-            rel="noopener"
+          {/* The free Leak Checker. A same-tab router Link, unlike the static
+              About/Blog anchors below: /check is a real in-app route, and a new
+              tab made the click look like it did nothing (the current tab stays
+              put). Client-side navigation takes you straight there. Styled to
+              match the sibling links. */}
+          <Link
+            to="/check"
             className="inline-flex min-h-11 items-center rounded-xl px-3 text-sm font-medium text-slate-300 transition-all duration-200 hover:bg-slate-800/70 hover:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/60 lg:min-h-9"
           >
             Check
-          </a>
+          </Link>
 
           {/* A plain anchor, not a router Link: the blog is a static file in
               public/, so the router has no route for it and would render the
