@@ -144,6 +144,55 @@ export function buildHomeHeadTags(): HeadTags {
   }
 }
 
+/**
+ * The Leak Checker (/check). Targets the high-intent, lower-competition query a
+ * new site can actually rank for — "is my PDF really redacted", "recover text
+ * under a black box" — rather than the Adobe-owned head term "redact a PDF".
+ */
+export function buildCheckHeadTags(): HeadTags {
+  const canonical = `${SITE_URL}/check`
+  const title = 'Redaction Checker: Is Your PDF Really Redacted?'
+  const description =
+    'Free, 100% in-browser tool. Drop a PDF and instantly see if “redacted” text is still recoverable under the black boxes — nothing is uploaded, nothing leaves your device.'
+
+  return {
+    title,
+    description,
+    canonical,
+    og: {
+      'og:type': 'website',
+      'og:site_name': SITE_NAME,
+      'og:title': 'Is Your PDF Really Redacted? Free In-Browser Checker',
+      'og:description': description,
+      'og:url': canonical,
+      'og:locale': 'en_US',
+    },
+    twitter: {
+      'twitter:card': 'summary',
+      'twitter:title': 'Is Your PDF Really Redacted? Free In-Browser Checker',
+      'twitter:description': description,
+    },
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'WebApplication',
+      name: 'RedactLocal Redaction Leak Checker',
+      url: canonical,
+      applicationCategory: 'SecurityApplication',
+      operatingSystem: 'Any — runs in a web browser',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'USD',
+        availability: 'https://schema.org/InStock',
+      },
+      permissions: 'None. The PDF is read in the browser and is never uploaded.',
+      description,
+    },
+  }
+}
+
 function titleCase(value: string) {
   return value.charAt(0).toUpperCase() + value.slice(1)
 }

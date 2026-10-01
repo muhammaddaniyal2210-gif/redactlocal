@@ -16,7 +16,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { LANDINGS } from '../src/content/landings.ts'
-import { buildHeadTags, buildHomeHeadTags, SITE_URL } from '../src/lib/seo.ts'
+import { buildCheckHeadTags, buildHeadTags, buildHomeHeadTags, SITE_URL } from '../src/lib/seo.ts'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const DIST = path.join(ROOT, 'dist')
@@ -53,6 +53,7 @@ const template = await readFile(path.join(DIST, 'index.html'), 'utf8')
 
 const routes = [
   { dir: '.', tags: buildHomeHeadTags() },
+  { dir: 'check', tags: buildCheckHeadTags() },
   ...LANDINGS.map((config) => ({ dir: config.slug, tags: buildHeadTags(config) })),
 ]
 
