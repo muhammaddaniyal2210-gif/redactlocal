@@ -1,4 +1,4 @@
-import { type PDFPageProxy } from 'pdfjs-dist'
+import type { PDFPageProxy } from 'pdfjs-dist'
 import { readPageText } from './pdfjs'
 import { asArray, type RedactionBox } from './redactions'
 

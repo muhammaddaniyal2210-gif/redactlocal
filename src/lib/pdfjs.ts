@@ -1,4 +1,3 @@
-import * as pdfjs from 'pdfjs-dist'
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist'
 
 // The worker, the font data and the CMaps are all served from our own origin.
@@ -7,15 +6,35 @@ import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist'
 //
 // This points at our wrapper rather than at pdf.js's worker directly, so the
 // worker thread gets the polyfills too. `?worker&url` makes Vite bundle the
-// wrapper as a worker entry and hand back its URL.
+// wrapper as a worker entry and hand back its URL — just a URL string in the
+// main bundle, not the worker's code.
 import workerUrl from './pdfWorker?worker&url'
-
-pdfjs.GlobalWorkerOptions.workerSrc = workerUrl
 
 /** Copied from node_modules/pdfjs-dist at setup time — see `npm run sync:pdfjs`. */
 const ASSET_BASE = `${import.meta.env.BASE_URL}pdfjs/`
 
 export type { PDFDocumentProxy, PDFPageProxy }
+
+/**
+ * Load pdf.js on demand.
+ *
+ * pdf.js is roughly a megabyte, and the landing pages — the home route and the
+ * SEO routes a first-time visitor and a crawler actually hit — never open a PDF
+ * until the user picks one. A static `import` would put that megabyte in the
+ * initial bundle and hurt the load time (and Core Web Vitals) of every page.
+ * Importing it dynamically keeps it out of the first payload; it is fetched the
+ * moment a document is loaded, and cached for the rest of the session.
+ */
+let pdfjsPromise: Promise<typeof import('pdfjs-dist')> | null = null
+export function getPdfjsLib(): Promise<typeof import('pdfjs-dist')> {
+  if (!pdfjsPromise) {
+    pdfjsPromise = import('pdfjs-dist').then((pdfjs) => {
+      pdfjs.GlobalWorkerOptions.workerSrc = workerUrl
+      return pdfjs
+    })
+  }
+  return pdfjsPromise
+}
 
 /**
  * Parse PDF bytes entirely in browser memory.
@@ -24,7 +43,8 @@ export type { PDFDocumentProxy, PDFPageProxy }
  * always pass a copy and let the caller keep the pristine original for later
  * phases — re-rendering, and eventually burning redactions into an export.
  */
-export function loadPdfDocument(bytes: Uint8Array): Promise<PDFDocumentProxy> {
+export async function loadPdfDocument(bytes: Uint8Array): Promise<PDFDocumentProxy> {
+  const pdfjs = await getPdfjsLib()
   const task = pdfjs.getDocument({
     data: bytes.slice(),
     cMapUrl: `${ASSET_BASE}cmaps/`,

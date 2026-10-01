@@ -1,6 +1,6 @@
 import { jsPDF } from 'jspdf'
-import { OPS, type PDFDocumentProxy } from 'pdfjs-dist'
-import { loadPdfDocument, readPageText } from './pdfjs'
+import type { PDFDocumentProxy } from 'pdfjs-dist'
+import { getPdfjsLib, loadPdfDocument, readPageText } from './pdfjs'
 import { canvasPixelBudget, MAX_CANVAS_SIDE } from './canvasBudget'
 import { asArray, paintBoxes, type RedactionMap } from './redactions'
 
@@ -288,6 +288,11 @@ export async function verifyExport(blob: Blob): Promise<VerificationReport> {
   let textCharacters = 0
   let textOperators = 0
   let annotations = 0
+
+  // pdf.js is already loaded at this point (the document was parsed through it),
+  // so this resolves instantly; it just hands us the OPS enum from the lazily
+  // imported module.
+  const { OPS } = await getPdfjsLib()
 
   try {
     for (let pageNumber = 1; pageNumber <= check.numPages; pageNumber++) {
