@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import { WifiOff } from 'lucide-react'
 import { BrandMark } from './BrandMark'
 
@@ -43,17 +42,17 @@ export function Header({ onTestOffline }: HeaderProps) {
         </span>
 
         <nav className="ml-auto flex items-center gap-1 sm:gap-2">
-          {/* The free Leak Checker. A same-tab router Link, unlike the static
-              About/Blog anchors below: /check is a real in-app route, and a new
-              tab made the click look like it did nothing (the current tab stays
-              put). Client-side navigation takes you straight there. Styled to
-              match the sibling links. */}
-          <Link
-            to="/check"
+          {/* The free Leak Checker. A plain anchor doing a full same-tab
+              navigation: /check is now a standalone static page in public/
+              (not an SPA route), so it loads its own HTML and can never be
+              intercepted by a stale app bundle — which is what made it seem
+              broken. Styled to match About/Blog. */}
+          <a
+            href="/check"
             className="inline-flex min-h-11 items-center rounded-xl px-3 text-sm font-medium text-slate-300 transition-all duration-200 hover:bg-slate-800/70 hover:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/60 lg:min-h-9"
           >
             Check
-          </Link>
+          </a>
 
           {/* A plain anchor, not a router Link: the blog is a static file in
               public/, so the router has no route for it and would render the

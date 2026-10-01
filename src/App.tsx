@@ -4,7 +4,6 @@ import { ErrorBoundary } from './components/ErrorBoundary'
 import { Layout } from './components/Layout'
 import { DocumentRedactorLanding } from './components/DocumentRedactorLanding'
 import { Redactor } from './pages/Redactor'
-import { LeakChecker } from './pages/LeakChecker'
 import { LANDINGS } from './content/landings'
 
 export default function App() {
@@ -15,9 +14,9 @@ export default function App() {
           <Route element={<Layout />}>
             <Route path="/" element={<Redactor />} />
 
-            {/* The free Leak Checker — a link-worthy diagnostic that funnels
-                into the redactor. Static route, so it is prerendered too. */}
-            <Route path="/check" element={<LeakChecker />} />
+            {/* /check is a standalone static page in public/check/, not an SPA
+                route — it loads its own HTML + pdf.js so it can never be caught
+                by a stale app bundle. Vercel serves the static file directly. */}
 
             {/* One route per high-intent query, generated from the content table. */}
             {LANDINGS.map((config) => (
