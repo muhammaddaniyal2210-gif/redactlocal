@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>How to Check if a PDF Is Really Redacted</title>
+    <meta name="description" content="A black box can look done while the text is still there. Three ways to verify your PDF redaction actually removed the text — free in-browser checker.">
+    <link rel="canonical" href="https://www.redactlocal.org/blog/how-to-check-pdf-redaction">
+
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://www.redactlocal.org/blog/how-to-check-pdf-redaction">
+    <meta property="og:title" content="How to Check if a PDF Is Really Redacted">
+    <meta property="og:description" content="A black box can look done while the text is still in the file. Three ways to verify a PDF's redaction actually worked — including a free in-browser checker.">
+    <meta property="og:image" content="https://www.redactlocal.org/blog/how-to-check-pdf-redaction/cover.jpg">
+    <meta property="og:image:width" content="1600">
+    <meta property="og:image:height" content="957">
+    <meta property="og:image:alt" content="A document whose redacted text is still readable through the black box">
+    <meta property="og:site_name" content="RedactLocal">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://www.redactlocal.org/blog/how-to-check-pdf-redaction">
+    <meta name="twitter:title" content="How to Check if a PDF Is Really Redacted">
+    <meta name="twitter:description" content="Three ways to verify a PDF's redaction actually worked — including a free in-browser checker, no upload.">
+    <meta name="twitter:image" content="https://www.redactlocal.org/blog/how-to-check-pdf-redaction/cover.jpg">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "BlogPosting",
+          "@id": "https://www.redactlocal.org/blog/how-to-check-pdf-redaction#article",
+          "isPartOf": { "@id": "https://www.redactlocal.org/blog/how-to-check-pdf-redaction" },
+          "mainEntityOfPage": { "@id": "https://www.redactlocal.org/blog/how-to-check-pdf-redaction" },
+          "headline": "How to Check if a PDF Is Really Redacted (Before You Send It)",
+          "alternativeHeadline": "Three ways to verify your redaction actually removed the text",
+          "description": "A black box can look done while the text is still there. Three ways to verify your PDF redaction actually removed the text — free in-browser checker.",
+          "inLanguage": "en",
+          "datePublished": "2026-10-01T09:00:00+00:00",
+          "dateModified": "2026-10-01T09:00:00+00:00",
+          "author": { "@type": "Person", "@id": "https://www.redactlocal.org/#founder", "name": "Muhammad Daniyal", "jobTitle": "Founder", "url": "https://www.redactlocal.org/about" },
+          "publisher": { "@id": "https://www.redactlocal.org/#organization" },
+          "image": { "@type": "ImageObject", "url": "https://www.redactlocal.org/blog/how-to-check-pdf-redaction/cover.jpg", "width": 1600, "height": 957 },
+          "articleSection": "Data Security",
+          "keywords": ["check PDF redaction", "is my PDF redacted", "verify redaction", "recover redacted text", "pdftotext", "redaction checker"],
+          "about": [ { "@type": "Thing", "name": "PDF" }, { "@type": "Thing", "name": "Redaction" }, { "@type": "Thing", "name": "Data loss prevention" } ],
+          "mentions": { "@id": "https://www.redactlocal.org/#software" }
+        },
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://www.redactlocal.org/#software",
+          "name": "RedactLocal",
+          "url": "https://www.redactlocal.org",
+          "description": "Private, in-browser tools to redact documents and images, check redactions, and strip metadata. Files are never uploaded.",
+          "applicationCategory": ["SecurityApplication", "BusinessApplication"],
+          "operatingSystem": "Any (runs in a modern web browser)",
+          "isAccessibleForFree": true,
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+          "featureList": ["In-browser Leak Checker for recoverable PDF text", "Client-side PDF redaction by rasterization", "Post-export verification of zero selectable text", "Works offline after the page loads"],
+          "publisher": { "@id": "https://www.redactlocal.org/#organization" },
+          "author": { "@id": "https://www.redactlocal.org/#founder" }
+        },
+        { "@type": "Organization", "@id": "https://www.redactlocal.org/#organization", "name": "RedactLocal", "url": "https://www.redactlocal.org", "logo": { "@type": "ImageObject", "url": "https://www.redactlocal.org/favicon.svg", "width": 48, "height": 48 } }
+      ]
+    }
+    </script>
+
+    <style>
+        :root{--text-main:#1a1a1a;--text-muted:#4a5568;--bg-color:#ffffff;--accent:#2b6cb0;--border:#e2e8f0;}
+        body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--text-main);background-color:var(--bg-color);line-height:1.7;margin:0;padding:0;display:flex;flex-direction:column;align-items:center;}
+        nav{width:100%;max-width:768px;padding:2rem 1.5rem;box-sizing:border-box;}
+        nav a{color:var(--accent);text-decoration:none;font-weight:600;}
+        article{width:100%;max-width:768px;padding:0 1.5rem 4rem 1.5rem;box-sizing:border-box;}
+        h1{font-size:2.5rem;line-height:1.2;margin-bottom:0.5rem;letter-spacing:-0.02em;}
+        .subtitle{font-size:1.25rem;color:var(--text-muted);margin-bottom:2.5rem;font-weight:400;}
+        h2{font-size:1.75rem;margin-top:3rem;margin-bottom:1rem;border-bottom:1px solid var(--border);padding-bottom:0.5rem;}
+        h3{font-size:1.25rem;margin-top:2rem;margin-bottom:0.75rem;}
+        p,ul,ol{margin-bottom:1.5rem;font-size:1.125rem;}
+        li{margin-bottom:0.5rem;}
+        article p a,article li a,article td a{color:var(--accent);font-weight:500;text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px;transition:color 0.15s ease;}
+        article p a:hover,article li a:hover,article td a:hover{color:var(--text-main);}
+        code{background-color:#f1f5f9;padding:0.2rem 0.4rem;border-radius:4px;font-family:monospace;font-size:0.9em;}
+        .callout{border-left:3px solid var(--accent);background-color:#f8fafc;padding:1rem 1.25rem;margin-bottom:1.5rem;border-radius:0 6px 6px 0;}
+        .callout p:last-child{margin-bottom:0;}
+        .disclaimer{font-size:0.95rem;color:var(--text-muted);border-top:1px solid var(--border);padding-top:1.5rem;margin-top:3rem;}
+        .cta-box{background-color:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:2rem;margin-top:3rem;text-align:center;}
+        .cta-button{display:inline-block;background-color:var(--text-main);color:#ffffff;padding:0.75rem 1.5rem;border-radius:6px;text-decoration:none;font-weight:600;margin-top:1rem;transition:background-color 0.2s ease;}
+        .cta-button:hover{background-color:var(--accent);}
+        .inline-cta{text-align:center;margin:2.5rem 0;}
+        table{width:100%;border-collapse:collapse;margin-bottom:1.5rem;}
+        th,td{border:1px solid var(--border);padding:0.75rem;text-align:left;}
+        th{background-color:#f8fafc;}
+        @media(max-width:600px){h1{font-size:2rem;}h2{font-size:1.5rem;}}
+    </style>
+</head>
+<body>
+    <nav><a href="/">&larr; Back to RedactLocal</a></nav>
+    <article>
+        <h1>How to Check if a PDF Is Really Redacted (Before You Send It)</h1>
+        <p class="subtitle">The black boxes are in place and the document looks finished. But "looks redacted" and "is redacted" are different things — and the gap between them is where leaks happen. Here's how to be sure.</p>
+
+        <img src="/blog/how-to-check-pdf-redaction/cover.jpg" alt="A document whose redacted text is still readable through the black box" width="1600" height="957" fetchpriority="high" decoding="async" onerror="this.style.display='none'" style="display:block;box-sizing:border-box;width:100%;max-width:800px;height:auto;aspect-ratio:1600/957;margin:0 auto 3rem;border-radius:12px;border:1px solid #e2e8f0;box-shadow:0 4px 24px rgba(15,23,42,0.10),0 1px 3px rgba(15,23,42,0.06);">
+
+        <p>A redaction failure almost never looks like a failure. The page looks perfect — clean black bars over every sensitive line. The document goes out. And then someone selects the text under a bar, copies it, and reads the thing you thought you had removed.</p>
+
+        <p>This is one of the most repeated mistakes in law, government and business, and it keeps happening because the broken version and the correct version are visually identical. The only way to tell them apart is to check. It takes about thirty seconds, and you should do it on every document before it leaves your hands.</p>
+
+        <h2>Why the Black Box Often Isn't Enough</h2>
+
+        <p>When you draw a black rectangle over text in most PDF editors, you are not deleting the text — you are drawing a shape on top of it. The characters remain in the file underneath, at their original positions, fully intact. We take the mechanism apart in <a href="/blog/black-box-flaw">The Black Box Flaw</a>; the short version is that a cover is not a deletion, and anything still present in the file can be recovered.</p>
+
+        <p>So the question for any "redacted" PDF is simple: <strong>is there still recoverable text where the black boxes are?</strong> Here are three ways to answer it, from quickest to most thorough.</p>
+
+        <h2>Method 1: Select and Copy</h2>
+
+        <p>The fastest sanity check needs nothing but the PDF viewer you already have.</p>
+
+        <ol>
+            <li>Open the PDF.</li>
+            <li>Press <code>Ctrl+A</code> (or <code>Cmd+A</code>) to select all text on the page, or drag to select directly over a black box.</li>
+            <li>Copy, and paste into a plain text editor.</li>
+        </ol>
+
+        <p>If the "redacted" words appear in your text editor, the redaction failed — the text is still in the file. This catches the most common failures instantly. It is not exhaustive, though: some viewers select text oddly, and it only tells you about the page you tested.</p>
+
+        <h2>Method 2: Extract the Text With pdftotext</h2>
+
+        <p>For a definitive, whole-document check, extract the text layer directly. The <code>pdftotext</code> utility (part of Poppler, available on most systems) does exactly what an attacker would:</p>
+
+        <p><code>pdftotext redacted.pdf -</code></p>
+
+        <p>This prints every character the file still contains. Search the output for a value you redacted — a name, a number. If it appears, the text is recoverable and the document is not safe to release. A correctly redacted (flattened) document returns nothing but whitespace.</p>
+
+        <div class="callout">
+            <p><strong>This is the professional standard.</strong> If you handle filings, records or reports, running <code>pdftotext</code> over the finished file before release is the single best habit you can build. It is the same test the other side will run.</p>
+        </div>
+
+        <h2>Method 3: The Leak Checker (No Terminal, No Upload)</h2>
+
+        <p>If you don't want to touch a command line — or you want to actually <em>see</em> what is exposed — use a tool built for the job. <a href="/check">RedactLocal's Leak Checker</a> does the same extraction as <code>pdftotext</code>, but in your browser: drop the PDF in and it reads the recoverable text layer and shows you precisely what is still in the file, from the names to the numbers you thought were gone.</p>
+
+        <p>Because it runs entirely on your device, you can safely check the sensitive, unreleased document itself — the file never leaves the tab, and it works with your Wi-Fi off. A clean document reports no recoverable text; a leaky one shows you the words, so there is no ambiguity about whether you are safe to send.</p>
+
+        <div class="inline-cta">
+            <a href="/check" class="cta-button">Check your PDF now &rarr;</a>
+        </div>
+
+        <h2>What a Clean Result Looks Like</h2>
+
+        <p>A properly redacted PDF has <strong>no recoverable text where the redactions are</strong> — ideally none at all, if the whole page was flattened. In practice, a safe document shows: nothing when you select-and-copy over the boxes, nothing from <code>pdftotext</code> for the redacted content, and "no recoverable text found" in the Leak Checker. If all three agree, you are clear.</p>
+
+        <h3>Two things even a clean check won't catch</h3>
+        <ul>
+            <li><strong>Hidden metadata.</strong> The visible text can be gone while the document's properties, comments or earlier revisions still hold sensitive data. Flattening the document removes these along with the text layer.</li>
+            <li><strong>Scanned pages.</strong> An image-only scan has no text layer to extract, so a text check comes back empty — but if your document system has run OCR over it, there <em>is</em> recoverable text. Check whether a text layer exists before trusting an empty result.</li>
+        </ul>
+
+        <h2>How to Fix a PDF That Fails the Check</h2>
+
+        <p>If the text is still there, don't just add more black boxes — that repeats the mistake. The reliable fix is to <strong>rasterize</strong>: flatten each page to an image and rebuild the PDF from the images, so there is no text layer left to recover. <a href="/">RedactLocal's redactor</a> does this on export and then re-inspects the result, reporting zero selectable characters on a correct run — and, like the checker, it never uploads your file.</p>
+
+        <div class="disclaimer">
+            <p>This guide is for general information. No single check is a guarantee for every document or workflow; where a disclosure would be serious, combine the methods above, flatten the file, and confirm the result before release.</p>
+        </div>
+
+        <div class="cta-box">
+            <h2>Don't Guess — Check</h2>
+            <p>See whether your "redacted" PDF still has recoverable text, free and entirely in your browser. Nothing is uploaded.</p>
+            <a href="/check" class="cta-button">Open the Leak Checker</a>
+        </div>
+    </article>
+</body>
+</html>

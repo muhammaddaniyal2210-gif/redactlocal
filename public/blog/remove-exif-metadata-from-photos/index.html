@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Remove EXIF &amp; GPS Metadata From Photos (Free Guide)</title>
+    <meta name="description" content="Your photos embed your GPS location, camera and timestamp. What EXIF reveals, why it's a privacy risk, and how to remove it free without uploading.">
+    <link rel="canonical" href="https://www.redactlocal.org/blog/remove-exif-metadata-from-photos">
+
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://www.redactlocal.org/blog/remove-exif-metadata-from-photos">
+    <meta property="og:title" content="Remove EXIF & GPS Metadata From Photos (Free Guide)">
+    <meta property="og:description" content="Your photos embed your GPS location, camera and timestamp. What EXIF metadata reveals, why it's a privacy risk, and how to remove it without uploading anything.">
+    <meta property="og:image" content="https://www.redactlocal.org/blog/remove-exif-metadata-from-photos/cover.jpg">
+    <meta property="og:image:width" content="1600">
+    <meta property="og:image:height" content="957">
+    <meta property="og:image:alt" content="A photo's hidden GPS location and camera metadata, exposed then stripped">
+    <meta property="og:site_name" content="RedactLocal">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://www.redactlocal.org/blog/remove-exif-metadata-from-photos">
+    <meta name="twitter:title" content="Remove EXIF & GPS Metadata From Photos (Free Guide)">
+    <meta name="twitter:description" content="What EXIF metadata reveals about you, why it's a privacy risk, and how to remove it without uploading anything.">
+    <meta name="twitter:image" content="https://www.redactlocal.org/blog/remove-exif-metadata-from-photos/cover.jpg">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "BlogPosting",
+          "@id": "https://www.redactlocal.org/blog/remove-exif-metadata-from-photos#article",
+          "isPartOf": { "@id": "https://www.redactlocal.org/blog/remove-exif-metadata-from-photos" },
+          "mainEntityOfPage": { "@id": "https://www.redactlocal.org/blog/remove-exif-metadata-from-photos" },
+          "headline": "How to Remove EXIF & GPS Metadata From Photos (and Why You Should)",
+          "alternativeHeadline": "What your photos reveal about you, and how to strip it without uploading anything",
+          "description": "Your photos embed your GPS location, camera and timestamp. What EXIF metadata reveals, why it's a privacy risk, and how to remove it without uploading anything.",
+          "inLanguage": "en",
+          "datePublished": "2026-10-01T09:00:00+00:00",
+          "dateModified": "2026-10-01T09:00:00+00:00",
+          "author": { "@type": "Person", "@id": "https://www.redactlocal.org/#founder", "name": "Muhammad Daniyal", "jobTitle": "Founder", "url": "https://www.redactlocal.org/about" },
+          "publisher": { "@id": "https://www.redactlocal.org/#organization" },
+          "image": { "@type": "ImageObject", "url": "https://www.redactlocal.org/blog/remove-exif-metadata-from-photos/cover.jpg", "width": 1600, "height": 957 },
+          "articleSection": "Privacy",
+          "keywords": ["remove EXIF data", "remove GPS from photo", "strip image metadata", "EXIF privacy", "metadata remover", "photo location data"],
+          "about": [ { "@type": "Thing", "name": "Exif" }, { "@type": "Thing", "name": "Metadata" }, { "@type": "Thing", "name": "Geotagging" } ],
+          "mentions": { "@id": "https://www.redactlocal.org/#software" }
+        },
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://www.redactlocal.org/#software",
+          "name": "RedactLocal",
+          "url": "https://www.redactlocal.org",
+          "description": "Private, in-browser tools to redact documents and images and strip metadata. Files are never uploaded.",
+          "applicationCategory": ["SecurityApplication", "BusinessApplication"],
+          "operatingSystem": "Any (runs in a modern web browser)",
+          "isAccessibleForFree": true,
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+          "featureList": ["In-browser EXIF and metadata removal with no upload", "Lossless stripping for JPEG and PNG", "Client-side PDF and image redaction", "Works offline after the page loads"],
+          "publisher": { "@id": "https://www.redactlocal.org/#organization" },
+          "author": { "@id": "https://www.redactlocal.org/#founder" }
+        },
+        { "@type": "Organization", "@id": "https://www.redactlocal.org/#organization", "name": "RedactLocal", "url": "https://www.redactlocal.org", "logo": { "@type": "ImageObject", "url": "https://www.redactlocal.org/favicon.svg", "width": 48, "height": 48 } }
+      ]
+    }
+    </script>
+
+    <style>
+        :root{--text-main:#1a1a1a;--text-muted:#4a5568;--bg-color:#ffffff;--accent:#2b6cb0;--border:#e2e8f0;}
+        body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--text-main);background-color:var(--bg-color);line-height:1.7;margin:0;padding:0;display:flex;flex-direction:column;align-items:center;}
+        nav{width:100%;max-width:768px;padding:2rem 1.5rem;box-sizing:border-box;}
+        nav a{color:var(--accent);text-decoration:none;font-weight:600;}
+        article{width:100%;max-width:768px;padding:0 1.5rem 4rem 1.5rem;box-sizing:border-box;}
+        h1{font-size:2.5rem;line-height:1.2;margin-bottom:0.5rem;letter-spacing:-0.02em;}
+        .subtitle{font-size:1.25rem;color:var(--text-muted);margin-bottom:2.5rem;font-weight:400;}
+        h2{font-size:1.75rem;margin-top:3rem;margin-bottom:1rem;border-bottom:1px solid var(--border);padding-bottom:0.5rem;}
+        h3{font-size:1.25rem;margin-top:2rem;margin-bottom:0.75rem;}
+        p,ul,ol{margin-bottom:1.5rem;font-size:1.125rem;}
+        li{margin-bottom:0.5rem;}
+        article p a,article li a,article td a{color:var(--accent);font-weight:500;text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px;transition:color 0.15s ease;}
+        article p a:hover,article li a:hover,article td a:hover{color:var(--text-main);}
+        code{background-color:#f1f5f9;padding:0.2rem 0.4rem;border-radius:4px;font-family:monospace;font-size:0.9em;}
+        .callout{border-left:3px solid var(--accent);background-color:#f8fafc;padding:1rem 1.25rem;margin-bottom:1.5rem;border-radius:0 6px 6px 0;}
+        .callout p:last-child{margin-bottom:0;}
+        .disclaimer{font-size:0.95rem;color:var(--text-muted);border-top:1px solid var(--border);padding-top:1.5rem;margin-top:3rem;}
+        .cta-box{background-color:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:2rem;margin-top:3rem;text-align:center;}
+        .cta-button{display:inline-block;background-color:var(--text-main);color:#ffffff;padding:0.75rem 1.5rem;border-radius:6px;text-decoration:none;font-weight:600;margin-top:1rem;transition:background-color 0.2s ease;}
+        .cta-button:hover{background-color:var(--accent);}
+        .inline-cta{text-align:center;margin:2.5rem 0;}
+        table{width:100%;border-collapse:collapse;margin-bottom:1.5rem;}
+        th,td{border:1px solid var(--border);padding:0.75rem;text-align:left;}
+        th{background-color:#f8fafc;}
+        @media(max-width:600px){h1{font-size:2rem;}h2{font-size:1.5rem;}}
+    </style>
+</head>
+<body>
+    <nav><a href="/">&larr; Back to RedactLocal</a></nav>
+    <article>
+        <h1>How to Remove EXIF &amp; GPS Metadata From Photos (and Why You Should)</h1>
+        <p class="subtitle">The picture you just shared may quietly include the exact spot it was taken — often your home. Here's what's hidden in your photos, and how to strip it without handing the photo to anyone.</p>
+
+        <img src="/blog/remove-exif-metadata-from-photos/cover.jpg" alt="A photo's hidden GPS location and camera metadata, exposed then stripped" width="1600" height="957" fetchpriority="high" decoding="async" onerror="this.style.display='none'" style="display:block;box-sizing:border-box;width:100%;max-width:800px;height:auto;aspect-ratio:1600/957;margin:0 auto 3rem;border-radius:12px;border:1px solid #e2e8f0;box-shadow:0 4px 24px rgba(15,23,42,0.10),0 1px 3px rgba(15,23,42,0.06);">
+
+        <p>Take a photo with almost any phone or camera and it writes more than an image to the file. Tucked into the same file is a block of <strong>metadata</strong> called EXIF — and for a geotagged photo, that includes the precise latitude and longitude where you were standing when you pressed the shutter.</p>
+
+        <p>Share that photo the wrong way and you are sharing your location. It has outed the hiding places of people who thought they were anonymous, handed stalkers a home address, and turned a casual "for sale" post into a map to someone's front door. The fix takes seconds — once you know the data is there.</p>
+
+        <h2>What EXIF Metadata Actually Contains</h2>
+
+        <p>EXIF (Exchangeable Image File Format) is a standard block of tags embedded in JPEG and many other image files. Depending on the device and settings, it can include:</p>
+
+        <table>
+            <tr><th>Field</th><th>What it reveals</th></tr>
+            <tr><td>GPS coordinates</td><td>The exact latitude and longitude the photo was taken — often accurate to a few metres</td></tr>
+            <tr><td>Date &amp; time</td><td>When the photo was taken, to the second</td></tr>
+            <tr><td>Camera make &amp; model</td><td>The device used — and sometimes its serial number</td></tr>
+            <tr><td>Software</td><td>The app or OS that created or edited the file</td></tr>
+            <tr><td>Settings</td><td>Exposure, lens, orientation, and a thumbnail copy of the image</td></tr>
+        </table>
+
+        <p>The location field is the dangerous one. A set of coordinates is not vague — paste it into any map and it drops a pin on the driveway.</p>
+
+        <div class="callout">
+            <p><strong>This is not hypothetical.</strong> It is the same mechanism that located a fugitive tech millionaire in 2012 when a magazine published a photo of him with the GPS tags intact, and it is how countless "anonymous" accounts have been de-anonymised from a single posted picture. The photo looked harmless. The metadata was not.</p>
+        </div>
+
+        <h2>"Doesn't Instagram Strip This Already?"</h2>
+
+        <p>Partly — and that is exactly why people get caught out. Most large social platforms (Instagram, Facebook, X) <em>do</em> strip EXIF from images displayed publicly. But that protection is narrower than it sounds:</p>
+
+        <ul>
+            <li><strong>Direct shares keep it.</strong> A photo sent by email, as a messaging-app "document" or file attachment, over AirDrop, or shared from a cloud-storage link usually carries its full EXIF — including GPS.</li>
+            <li><strong>The platform still received it.</strong> Stripping it from the public view does not mean the platform never had your coordinates; it did.</li>
+            <li><strong>Marketplaces and forums vary.</strong> Plenty of smaller sites, classifieds and upload forms pass the original file through untouched.</li>
+        </ul>
+
+        <p>If a photo is going anywhere you care about — a listing, a forum, a stranger, a public dataset — assume the metadata is still attached until you have removed it yourself.</p>
+
+        <h2>How to Remove EXIF Metadata — The Right Way</h2>
+
+        <p>There are built-in options. On Windows you can right-click a file, open <em>Properties → Details → Remove Properties and Personal Information</em>. On a Mac you can strip some fields through Preview or the Photos export settings. These work, but they are fiddly, inconsistent across formats, and easy to forget.</p>
+
+        <p>The cleaner answer is a dedicated tool — with one condition that matters more than any other.</p>
+
+        <h3>Never upload the photo to remove its metadata</h3>
+        <p>Most "online EXIF remover" sites ask you to upload the image. Think about what that means: to strip the location from a sensitive photo, you first send that exact photo — location and all — to a server you know nothing about. The tool that was supposed to protect your privacy just became the thing that collected the data. For a file sensitive enough to clean, that is the wrong trade.</p>
+
+        <p><a href="/remove-metadata">RedactLocal's Metadata Remover</a> runs entirely in your browser. The photo is read into the tab, its EXIF is parsed so you can <strong>see</strong> what it exposes — the GPS pin, the camera, the timestamp — and a clean copy is rebuilt with all of it removed. For JPEG and PNG the strip is lossless, so the picture itself is untouched. Nothing is uploaded; turn off your Wi-Fi and it still works.</p>
+
+        <div class="inline-cta">
+            <a href="/remove-metadata" class="cta-button">Remove metadata from a photo &rarr;</a>
+        </div>
+
+        <h2>What Removing Metadata Does Not Do</h2>
+
+        <p>Two honest limits, because they trip people up.</p>
+
+        <p><strong>It does not hide what's visible in the picture.</strong> Stripping EXIF removes the <em>hidden</em> data. If a face, a house number, a licence plate or a document is visible in the frame, that is still there — and anyone can read it. To hide something in the image itself, black it out with the <a href="/redact-image">Image Redactor</a>.</p>
+
+        <p><strong>Screenshots usually have no EXIF to begin with.</strong> A screenshot is generated by your device, not a camera, so it carries no GPS tags — though it may still carry a creation timestamp and the visible content of whatever was on screen.</p>
+
+        <div class="disclaimer">
+            <p>This guide is for general privacy information. Metadata behaviour varies by device, app, platform and file format, and changes over time. When a photo's privacy genuinely matters, confirm the result — re-open the cleaned copy and check that the fields you cared about are gone.</p>
+        </div>
+
+        <div class="cta-box">
+            <h2>Strip the Hidden Data Before You Share</h2>
+            <p>See exactly what your photo reveals, then download a clean copy — free, with the image never leaving your device.</p>
+            <a href="/remove-metadata" class="cta-button">Open the Metadata Remover</a>
+        </div>
+    </article>
+</body>
+</html>
