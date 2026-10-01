@@ -43,15 +43,16 @@ export function Header({ onTestOffline }: HeaderProps) {
 
         <nav className="ml-auto flex items-center gap-1 sm:gap-2">
           {/* The free Leak Checker. A plain anchor doing a full same-tab
-              navigation: /check is now a standalone static page in public/
-              (not an SPA route), so it loads its own HTML and can never be
-              intercepted by a stale app bundle — which is what made it seem
-              broken. Styled to match About/Blog. */}
+              navigation: the tools live as standalone static pages in public/
+              (not SPA routes), so a plain anchor loads their own HTML and can
+              never be intercepted by a stale app bundle. "Tools" points at the
+              hub that lists all of them — the Leak Checker included — so one
+              nav item surfaces the whole suite. Styled to match About/Blog. */}
           <a
-            href="/check"
+            href="/tools"
             className="inline-flex min-h-11 items-center rounded-xl px-3 text-sm font-medium text-slate-300 transition-all duration-200 hover:bg-slate-800/70 hover:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/60 lg:min-h-9"
           >
-            Check
+            Tools
           </a>
 
           {/* A plain anchor, not a router Link: the blog is a static file in
