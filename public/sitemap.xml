@@ -67,6 +67,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://www.redactlocal.org/blog/how-to-redact-a-screenshot</loc>
+    <lastmod>2026-10-02</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://www.redactlocal.org/blog/remove-exif-metadata-from-photos</loc>
     <lastmod>2026-10-01</lastmod>
     <changefreq>yearly</changefreq>
