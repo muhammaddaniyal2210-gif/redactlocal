@@ -121,9 +121,8 @@
         <div id="err" class="err" style="display:none"></div>
 
         <section class="explainer">
-            <h2>Real redaction, not a sticker</h2>
-            <p style="margin:0 0 .8rem">Covering something with a shape in most editors leaves the original pixels underneath — they can resurface when the file is converted or inspected. This tool <strong>rewrites the pixels</strong>: a black box replaces them with solid black, and pixelate destroys the detail by averaging it into blocks. The exported image is re-encoded from scratch, so the original data — and the file's EXIF/GPS metadata — is gone.</p>
-            <p style="margin:0">All of it happens on your device. The image is never uploaded; turn off your Wi-Fi and it still works.</p>
+            <h2>How the redaction is applied</h2>
+            <p style="margin:0">A black box overwrites the pixels with solid black; pixelate averages them into coarse blocks. Both are burned into the image, so nothing survives underneath. The export is re-encoded at full resolution, which also strips the original EXIF and GPS data. Nothing is uploaded.</p>
         </section>
 
         <div class="more-tools">

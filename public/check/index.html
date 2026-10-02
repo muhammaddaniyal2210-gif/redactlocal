@@ -163,9 +163,8 @@
         <div id="result" class="result"></div>
 
         <section class="explainer">
-            <h2>How this works</h2>
-            <p style="margin:0 0 0.8rem">A PDF stores text separately from anything drawn on top of it. Covering a name with a black rectangle adds a drawing instruction — it doesn’t delete the characters underneath, which stay in the file at known positions. This reads that text layer back the same way a copy-paste, a converter, or <code>pdftotext</code> would.</p>
-            <p style="margin:0">Permanent redaction removes the underlying content. Some PDF tools remove selected text and graphics while preserving the rest of the document. <a href="/">RedactLocal</a> uses a flattened export: marked areas are burned into page images, and the original text layer is not included — all in your browser, with the file never leaving your device. More in <a href="/blog/black-box-flaw">The Black Box Flaw</a>.</p>
+            <h2>What this check reports</h2>
+            <p style="margin:0">A black box hides a PDF’s text on screen, but the words stay in the file. This reads that text layer in your browser, the same way a copy or <code>pdftotext</code> would. If any is recoverable, you see the count, the pages, and a sample of it; treat that as exposed. A clean result means no text layer was found, though a scanned image reads the same, so confirm the file.</p>
         </section>
     </main>
 
