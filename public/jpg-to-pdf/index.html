@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>JPG to PDF Converter – Private, No Uploads | RedactLocal</title>
+    <meta name="description" content="Combine JPG, PNG, or WebP images into a single PDF in your browser. Reorder pages, set size and margins. No uploads — your images stay on your device.">
+    <link rel="canonical" href="https://www.redactlocal.org/jpg-to-pdf">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.redactlocal.org/jpg-to-pdf">
+    <meta property="og:title" content="JPG to PDF Converter – Private, No Uploads">
+    <meta property="og:description" content="Turn JPG, PNG and WebP images into one PDF, in your browser. Nothing is uploaded.">
+    <meta property="og:image" content="https://www.redactlocal.org/check-og.jpg">
+    <meta property="og:site_name" content="RedactLocal">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="JPG to PDF Converter – Private, No Uploads">
+    <meta name="twitter:description" content="Combine images into one PDF in your browser. Nothing is uploaded.">
+    <meta name="twitter:image" content="https://www.redactlocal.org/check-og.jpg">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        { "@type": "WebApplication", "name": "JPG to PDF Converter", "url": "https://www.redactlocal.org/jpg-to-pdf", "applicationCategory": "UtilitiesApplication", "operatingSystem": "Any (runs in a web browser)", "isAccessibleForFree": true, "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }, "description": "Combine JPG, PNG and WebP images into a single PDF, entirely in the browser." },
+        { "@type": "FAQPage", "mainEntity": [
+          { "@type": "Question", "name": "Are my images uploaded?", "acceptedAnswer": { "@type": "Answer", "text": "No. The PDF is built locally in your browser from the images you choose. Nothing is sent to RedactLocal." } },
+          { "@type": "Question", "name": "Which image formats are supported?", "acceptedAnswer": { "@type": "Answer", "text": "JPG, JPEG, PNG, and WebP. You can mix formats in one PDF and reorder them before exporting." } },
+          { "@type": "Question", "name": "Will my images be stretched?", "acceptedAnswer": { "@type": "Answer", "text": "No. Each image keeps its aspect ratio and is centered on the page. You can choose the page size, orientation, and margins." } }
+        ] }
+      ]
+    }
+    </script>
+
+    <link rel="stylesheet" href="/tools-assets/tools.css">
+</head>
+<body>
+    <div class="topbar"><div class="topbar-inner">
+        <a class="brand" href="/" aria-label="RedactLocal home">
+            <svg viewBox="7 11.5 34 26.6" aria-hidden="true"><rect x="7" y="11.5" width="26" height="4.6" rx="2.3" fill="#475569"/><rect x="7" y="20.2" width="34" height="9.2" rx="2.6" fill="#34d399"/><rect x="7" y="33.5" width="19" height="4.6" rx="2.3" fill="#475569"/></svg>
+            <span class="brand-word">Redact<em>Local</em></span>
+        </a>
+        <a class="topbar-cta" href="/tools">All tools &rarr;</a>
+    </div></div>
+
+    <main class="container">
+        <header class="tool-hero">
+            <span class="eyebrow">Images · Convert</span>
+            <h1>JPG to PDF</h1>
+            <p class="lead">Combine JPG, PNG, and WebP images into a single PDF — reorder them, set the page size, and export, all in your browser.</p>
+            <div class="privacy">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <p><b>Private by design — your files stay on your device.</b><span>Processing happens locally in your browser. Your files are not uploaded to RedactLocal.</span></p>
+            </div>
+        </header>
+
+        <section class="panel" aria-label="JPG to PDF workspace">
+            <div id="drop" class="dropzone" role="button" tabindex="0" aria-label="Choose images or drop them here">
+                <div class="dz-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+                <div class="dz-title">Drop images here</div>
+                <div class="dz-sub">or click to choose files</div>
+                <div class="dz-types">JPG · PNG · WebP · processed on your device</div>
+                <input id="file" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" multiple class="sr-only" aria-hidden="true" tabindex="-1">
+            </div>
+            <div id="err" class="msg" hidden></div>
+            <div id="work" hidden></div>
+        </section>
+
+        <section class="content">
+            <h2>How it works</h2>
+            <ol class="steps">
+                <li><b>Add images</b><span>Drop in JPG, PNG, or WebP files — add as many as you like, in any mix.</span></li>
+                <li><b>Order &amp; adjust</b><span>Drag to reorder, remove any you don’t want, and set page size, orientation, and margins.</span></li>
+                <li><b>Create the PDF</b><span>Export one PDF with your images on their own pages, aspect ratio intact.</span></li>
+            </ol>
+
+            <h2>Why use RedactLocal?</h2>
+            <p>Photos and scans often hold more than you intend to share — and uploading them to a conversion site hands that data to a third party. RedactLocal assembles the PDF on your own device, so the images never leave it. It’s quick, works offline, and keeps your originals untouched.</p>
+
+            <h2>Frequently asked questions</h2>
+            <div class="faq">
+                <details><summary>Are my images uploaded?</summary><p>No. The PDF is built locally in your browser from the images you add. Nothing is sent to RedactLocal.</p></details>
+                <details><summary>Which formats can I use?</summary><p>JPG, JPEG, PNG, and WebP. You can combine different formats in one PDF and drag them into any order first.</p></details>
+                <details><summary>What happens to transparent PNGs?</summary><p>A PDF page has no transparency, so transparent areas appear over the white page — effectively a clean white background. The rest of the image is unchanged.</p></details>
+                <details><summary>Will the PDF be huge?</summary><p>No. JPGs are embedded as-is, and very large images are scaled to a sensible resolution, so the PDF stays a reasonable size without visible quality loss at normal viewing.</p></details>
+            </div>
+        </section>
+
+        <nav class="related" aria-label="Related tools">
+            <h2>Related tools</h2>
+            <div class="related-grid">
+                <a class="related-card" href="/pdf-to-jpg"><span class="related-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span><span><b>PDF to JPG</b><span>Turn PDF pages into images</span></span></a>
+                <a class="related-card" href="/merge-pdf"><span class="related-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg></span><span><b>Merge PDF</b><span>Combine PDFs into one</span></span></a>
+                <a class="related-card" href="/compress-pdf"><span class="related-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg></span><span><b>Compress PDF</b><span>Make a PDF smaller</span></span></a>
+                <a class="related-card" href="/organize-pdf"><span class="related-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="m17 14 4 4-4 4"/></svg></span><span><b>Organize PDF</b><span>Reorder &amp; rotate pages</span></span></a>
+            </div>
+        </nav>
+    </main>
+
+    <noscript><div class="noscript">This converter runs in your browser and needs JavaScript. No data is ever uploaded.</div></noscript>
+    <footer><div class="container"><a href="/">RedactLocal</a> &mdash; private, in-browser file tools. Nothing is uploaded. · <a href="/tools">Tools</a> · <a href="/about">About</a> · <a href="/blog">Blog</a></div></footer>
+
+    <script src="/tools-assets/common.js"></script>
+    <script src="/jpg-to-pdf/app.js"></script>
+</body>
+</html>

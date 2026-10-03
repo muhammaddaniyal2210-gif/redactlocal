@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Free Private Tools — Redact, Check &amp; Clean, No Upload | RedactLocal</title>
-    <meta name="description" content="Free, 100% in-browser privacy tools: redact PDFs, check if a PDF is really redacted, remove image EXIF/GPS metadata, and black out parts of a photo. Nothing is ever uploaded.">
+    <title>Private PDF &amp; Image Tools — No Uploads | RedactLocal</title>
+    <meta name="description" content="Free, in-browser tools to redact, convert, merge, split, compress and organize PDFs, plus remove image metadata and black out photos. Nothing is ever uploaded.">
     <link rel="canonical" href="https://www.redactlocal.org/tools">
 
     <meta property="og:type" content="website">
@@ -30,7 +30,13 @@
         { "@type": "WebApplication", "name": "PDF Redactor", "url": "https://www.redactlocal.org/", "applicationCategory": "SecurityApplication", "isAccessibleForFree": true, "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" } },
         { "@type": "WebApplication", "name": "Redaction Leak Checker", "url": "https://www.redactlocal.org/check", "applicationCategory": "SecurityApplication", "isAccessibleForFree": true, "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" } },
         { "@type": "WebApplication", "name": "Metadata & EXIF Remover", "url": "https://www.redactlocal.org/remove-metadata", "applicationCategory": "SecurityApplication", "isAccessibleForFree": true, "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" } },
-        { "@type": "WebApplication", "name": "Image Redactor", "url": "https://www.redactlocal.org/redact-image", "applicationCategory": "SecurityApplication", "isAccessibleForFree": true, "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" } }
+        { "@type": "WebApplication", "name": "Image Redactor", "url": "https://www.redactlocal.org/redact-image", "applicationCategory": "SecurityApplication", "isAccessibleForFree": true, "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" } },
+        { "@type": "WebApplication", "name": "PDF to JPG", "url": "https://www.redactlocal.org/pdf-to-jpg", "applicationCategory": "UtilitiesApplication", "isAccessibleForFree": true, "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" } },
+        { "@type": "WebApplication", "name": "JPG to PDF", "url": "https://www.redactlocal.org/jpg-to-pdf", "applicationCategory": "UtilitiesApplication", "isAccessibleForFree": true, "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" } },
+        { "@type": "WebApplication", "name": "Merge PDF", "url": "https://www.redactlocal.org/merge-pdf", "applicationCategory": "UtilitiesApplication", "isAccessibleForFree": true, "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" } },
+        { "@type": "WebApplication", "name": "Split PDF", "url": "https://www.redactlocal.org/split-pdf", "applicationCategory": "UtilitiesApplication", "isAccessibleForFree": true, "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" } },
+        { "@type": "WebApplication", "name": "Compress PDF", "url": "https://www.redactlocal.org/compress-pdf", "applicationCategory": "UtilitiesApplication", "isAccessibleForFree": true, "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" } },
+        { "@type": "WebApplication", "name": "Organize PDF", "url": "https://www.redactlocal.org/organize-pdf", "applicationCategory": "UtilitiesApplication", "isAccessibleForFree": true, "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" } }
       ]
     }
     </script>
@@ -51,12 +57,15 @@
         .eyebrow{display:inline-flex;align-items:center;gap:.4rem;font-size:.75rem;font-weight:600;letter-spacing:.04em;color:var(--green);border:1px solid rgba(52,211,153,.3);background:rgba(52,211,153,.1);padding:.3rem .8rem;border-radius:999px;}
         h1{font-size:clamp(2rem,5vw,3rem);line-height:1.08;letter-spacing:-.03em;font-weight:700;margin:1rem 0 .75rem;}
         .sub{color:var(--text-muted);font-size:1.1rem;max-width:40rem;margin:0 auto;}
-        .grid{margin-top:2.5rem;display:grid;gap:1rem;grid-template-columns:1fr;}
+        .cat{margin-top:2.5rem;}
+        .cat-head{font-size:1.1rem;font-weight:650;letter-spacing:-.01em;margin:0 0 .25rem;}
+        .cat-sub{color:var(--text-faint);font-size:.9rem;margin:0;}
+        .grid{margin-top:1rem;display:grid;gap:1rem;grid-template-columns:1fr;}
         @media(min-width:640px){.grid{grid-template-columns:1fr 1fr;}}
         .tool{display:flex;flex-direction:column;border:1px solid var(--slate-800);background:rgba(15,23,42,.45);border-radius:18px;padding:1.5rem;transition:border-color .2s var(--ease),background-color .2s var(--ease),transform .2s var(--ease);}
         .tool:hover{border-color:var(--edge);background:rgba(30,41,59,.5);transform:translateY(-2px);}
         .tool-ico{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;background:rgba(52,211,153,.12);color:var(--green);margin-bottom:1rem;}
-        .tool h2{margin:0 0 .35rem;font-size:1.2rem;letter-spacing:-.01em;}
+        .tool h3{margin:0 0 .35rem;font-size:1.2rem;letter-spacing:-.01em;}
         .tool p{margin:0;color:var(--text-muted);font-size:.95rem;flex:1;}
         .tool-go{margin-top:1.1rem;display:inline-flex;align-items:center;gap:.4rem;color:var(--green);font-weight:600;font-size:.9rem;}
         .tool:hover .tool-go{color:var(--green-solid);}
@@ -79,39 +88,106 @@
         <section class="hero">
             <span class="eyebrow">Free · everything runs in your browser</span>
             <h1>Private tools that never upload your files</h1>
-            <p class="sub">Redact, verify and clean documents and images without a single byte leaving your device. No account, no server, no catch. Turn off your Wi-Fi and they still work.</p>
+            <p class="sub">Redact, convert, clean and organize documents and images without a single byte leaving your device. No account, no server, no catch. Turn off your Wi-Fi and they still work.</p>
         </section>
 
-        <div class="grid">
-            <a class="tool" href="/">
-                <div class="tool-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><rect x="7" y="13" width="7" height="3" fill="currentColor" stroke="none"/></svg></div>
-                <span class="tag">PDF</span>
-                <h2>PDF Redactor</h2>
-                <p>Black out text in a PDF and destroy it for good — pages are flattened to images so nothing is recoverable. Auto-detect SSNs, card numbers, Aadhaar, NPIs and more, or draw boxes by hand.</p>
-                <span class="tool-go">Open the redactor &rarr;</span>
-            </a>
-            <a class="tool" href="/check">
-                <div class="tool-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></div>
-                <span class="tag">PDF</span>
-                <h2>Leak Checker</h2>
-                <p>Is your PDF really redacted? Drop it in and see whether text is still hiding under the black boxes — the words a copy-paste or pdftotext would pull right back out.</p>
-                <span class="tool-go">Check a PDF &rarr;</span>
-            </a>
-            <a class="tool" href="/remove-metadata">
-                <div class="tool-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 11l2 2 4-4"/></svg></div>
-                <span class="tag">Images</span>
-                <h2>Metadata &amp; EXIF Remover</h2>
-                <p>Your photos carry your GPS location, camera and the exact time. See what yours reveal, then download a clean copy with it all stripped — losslessly.</p>
-                <span class="tool-go">Clean a photo &rarr;</span>
-            </a>
-            <a class="tool" href="/redact-image">
-                <div class="tool-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><rect x="8" y="9" width="8" height="5" rx="1" fill="currentColor" stroke="none"/></svg></div>
-                <span class="tag">Images</span>
-                <h2>Image Redactor</h2>
-                <p>Black out or pixelate a face, a name, a plate — anything in a photo. The redaction is burned into the pixels, and the metadata is stripped on the way out.</p>
-                <span class="tool-go">Redact an image &rarr;</span>
-            </a>
-        </div>
+        <section class="cat">
+            <h2 class="cat-head">PDF Privacy</h2>
+            <p class="cat-sub">Remove sensitive content, and confirm it’s really gone.</p>
+            <div class="grid">
+                <a class="tool" href="/">
+                    <div class="tool-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><rect x="7" y="13" width="7" height="3" fill="currentColor" stroke="none"/></svg></div>
+                    <span class="tag">PDF</span>
+                    <h3>PDF Redactor</h3>
+                    <p>Black out text in a PDF and destroy it for good — pages are flattened to images so nothing is recoverable. Auto-detect SSNs, card numbers and more, or draw boxes by hand.</p>
+                    <span class="tool-go">Open the redactor &rarr;</span>
+                </a>
+                <a class="tool" href="/check">
+                    <div class="tool-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></div>
+                    <span class="tag">PDF</span>
+                    <h3>Leak Checker</h3>
+                    <p>Is your PDF really redacted? Drop it in and see whether text is still hiding under the black boxes — the words a copy-paste or pdftotext would pull right back out.</p>
+                    <span class="tool-go">Check a PDF &rarr;</span>
+                </a>
+            </div>
+        </section>
+
+        <section class="cat">
+            <h2 class="cat-head">Image Privacy</h2>
+            <p class="cat-sub">Strip hidden data and hide what shouldn’t be shared.</p>
+            <div class="grid">
+                <a class="tool" href="/remove-metadata">
+                    <div class="tool-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+                    <span class="tag">Images</span>
+                    <h3>Metadata &amp; EXIF Remover</h3>
+                    <p>Your photos carry your GPS location, camera and the exact time. See what yours reveal, then download a clean copy with it all stripped — losslessly.</p>
+                    <span class="tool-go">Clean a photo &rarr;</span>
+                </a>
+                <a class="tool" href="/redact-image">
+                    <div class="tool-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><rect x="8" y="9" width="8" height="5" rx="1" fill="currentColor" stroke="none"/></svg></div>
+                    <span class="tag">Images</span>
+                    <h3>Image Redactor</h3>
+                    <p>Black out or pixelate a face, a name, a plate — anything in a photo. The redaction is burned into the pixels, and the metadata is stripped on the way out.</p>
+                    <span class="tool-go">Redact an image &rarr;</span>
+                </a>
+            </div>
+        </section>
+
+        <section class="cat">
+            <h2 class="cat-head">PDF Conversion</h2>
+            <p class="cat-sub">Move between PDFs and images, locally.</p>
+            <div class="grid">
+                <a class="tool" href="/pdf-to-jpg">
+                    <div class="tool-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><circle cx="9.5" cy="13.5" r="1"/><path d="m7 18 2.5-2.5L12 18"/></svg></div>
+                    <span class="tag">PDF → Image</span>
+                    <h3>PDF to JPG</h3>
+                    <p>Turn each page of a PDF into a sharp JPG — choose pages and resolution. One page downloads as a JPG; several come back as a ZIP.</p>
+                    <span class="tool-go">Convert to JPG &rarr;</span>
+                </a>
+                <a class="tool" href="/jpg-to-pdf">
+                    <div class="tool-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+                    <span class="tag">Image → PDF</span>
+                    <h3>JPG to PDF</h3>
+                    <p>Combine JPG, PNG and WebP images into one PDF. Reorder them, set page size and margins, and keep every image’s aspect ratio.</p>
+                    <span class="tool-go">Create a PDF &rarr;</span>
+                </a>
+            </div>
+        </section>
+
+        <section class="cat">
+            <h2 class="cat-head">PDF Management</h2>
+            <p class="cat-sub">Combine, divide, shrink and rearrange PDFs.</p>
+            <div class="grid">
+                <a class="tool" href="/merge-pdf">
+                    <div class="tool-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg></div>
+                    <span class="tag">PDF</span>
+                    <h3>Merge PDF</h3>
+                    <p>Combine several PDFs into one, in the exact order you choose. Text and pages are preserved — nothing is rasterized.</p>
+                    <span class="tool-go">Merge PDFs &rarr;</span>
+                </a>
+                <a class="tool" href="/split-pdf">
+                    <div class="tool-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M10 20H4v-6"/><path d="M20 4 4 20"/></svg></div>
+                    <span class="tag">PDF</span>
+                    <h3>Split PDF</h3>
+                    <p>Extract the pages you need, split by ranges, or break a PDF into single pages. Multiple outputs arrive together in a ZIP.</p>
+                    <span class="tool-go">Split a PDF &rarr;</span>
+                </a>
+                <a class="tool" href="/compress-pdf">
+                    <div class="tool-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg></div>
+                    <span class="tag">PDF</span>
+                    <h3>Compress PDF</h3>
+                    <p>Make a PDF smaller — keep text selectable with lossless optimization, or trade quality for bigger savings. Honest before-and-after sizes, every time.</p>
+                    <span class="tool-go">Compress a PDF &rarr;</span>
+                </a>
+                <a class="tool" href="/organize-pdf">
+                    <div class="tool-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="m17 14 4 4-4 4"/></svg></div>
+                    <span class="tag">PDF</span>
+                    <h3>Organize PDF</h3>
+                    <p>Reorder, rotate and delete pages in a thumbnail grid, then export — with text and quality untouched. Works on desktop and touch.</p>
+                    <span class="tool-go">Organize a PDF &rarr;</span>
+                </a>
+            </div>
+        </section>
 
         <p class="assurance">🔒 Every tool runs 100% on your device. Nothing is uploaded, nothing is stored.</p>
     </main>

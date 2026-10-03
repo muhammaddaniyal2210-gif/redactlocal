@@ -3,6 +3,7 @@ import { DropZone } from './DropZone'
 import { ArmedPresetNotice } from './ArmedPresetNotice'
 import { PdfViewer } from './PdfViewer'
 import { SecurityGuarantee } from './SecurityGuarantee'
+import { MoreTools } from './MoreTools'
 import { useDocumentQueue } from '../hooks/useDocumentQueue'
 
 interface RedactorWorkspaceProps {
@@ -13,6 +14,8 @@ interface RedactorWorkspaceProps {
    *  so the SEO content below them is reachable by scrolling. */
   editorHeightClass?: string
   headingLevel?: 'h1' | 'h2'
+  /** Home route only: show the compact grid of the other file tools. */
+  showMoreTools?: boolean
 }
 
 /**
@@ -27,6 +30,7 @@ export function RedactorWorkspace({
   subheading,
   editorHeightClass = 'flex-1',
   headingLevel = 'h1',
+  showMoreTools = false,
 }: RedactorWorkspaceProps) {
   const queue = useDocumentQueue()
   const { status, error, doc, addFiles, closeAll } = queue
@@ -80,6 +84,8 @@ export function RedactorWorkspace({
               <div className="mx-auto w-full max-w-2xl">
                 <SecurityGuarantee />
               </div>
+
+              {showMoreTools && <MoreTools />}
             </div>
           )}
         </div>
